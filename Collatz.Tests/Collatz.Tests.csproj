@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Collatz2024\Collatz2024.csproj" />
+    <ProjectReference Include="..\Collatz\Collatz.csproj" />
   </ItemGroup>
 
 </Project>

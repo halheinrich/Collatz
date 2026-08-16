@@ -1,4 +1,4 @@
-﻿using HalHeinrich.Numerics;
+using HalHeinrich.Numerics;
 using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
@@ -8,9 +8,9 @@ using System.Text;
 using System.Xml.Linq;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace Collatz2024Namespace
+namespace HalHeinrich.Numerics.Collatz
 {
-    public class Collatz2024
+    public class Collatz
     {
         #region Public Methods
         public static List<int[]> GenerateExponentPermutations(int length, int order)
@@ -93,14 +93,14 @@ namespace Collatz2024Namespace
         {
             BigInteger retval = CollapseInOne_ModOneOut(_N1);
             retval *= BigInteger.Pow(2, 2 * _N2);
-            Debug.Assert(--retval % 3 == 0, "Collatz2024.CollapseInTwo_ModOne");
+            Debug.Assert(--retval % 3 == 0, "Collatz.CollapseInTwo_ModOne");
             return retval / 3;
         }
         public static BigInteger CollapseInTwo_ModTwo(Int32 _N1, Int32 _N2)
         {
             BigInteger retval = CollapseInOne_ModTwoOut(_N1);
             retval *= BigInteger.Pow(2, 2 * _N2 - 1);
-            Debug.Assert(--retval % 3 == 0, "Collatz2024.CollapseInTwo_ModTwo");
+            Debug.Assert(--retval % 3 == 0, "Collatz.CollapseInTwo_ModTwo");
             return retval / 3;
         }
         public static string toBinaryBigEndianString(BigInteger _BigInt)
@@ -193,7 +193,7 @@ namespace Collatz2024Namespace
         }
         public static UInt64 OddStepCountToOne(BigInteger _N)
         {
-            Debug.Assert(_N > 0, "Collatz2024.OddStepCountToOne");
+            Debug.Assert(_N > 0, "Collatz.OddStepCountToOne");
             BigInteger n = _N;
             while (n.IsEven)
                 n >>= 1;
@@ -209,7 +209,7 @@ namespace Collatz2024Namespace
         }
         public static UInt64 OddStepCountToSmaller(BigInteger _N)
         {
-            Debug.Assert(_N > 0, "Collatz2024.OddStepCountToSmaller");
+            Debug.Assert(_N > 0, "Collatz.OddStepCountToSmaller");
             BigInteger n = _N;
             while (n.IsEven)
                 n >>= 1;
@@ -395,8 +395,8 @@ namespace Collatz2024Namespace
             AdditiveConstant = addConst;
             StepsToOne = _PredecessorFormula.StepsToOne + 1;
             foreach (BigInteger c in DecayAnchorList)
-                if (Collatz2024.OddStepCountToOne(c) != StepsToOne)
-                    Debug.Assert(Collatz2024.OddStepCountToOne(c) == StepsToOne, "CollatzDecayFormulaRecursive.new()");
+                if (Collatz.OddStepCountToOne(c) != StepsToOne)
+                    Debug.Assert(Collatz.OddStepCountToOne(c) == StepsToOne, "CollatzDecayFormulaRecursive.new()");
         }
         #endregion Constructors
         #region Public Methods
@@ -560,7 +560,7 @@ namespace Collatz2024Namespace
                 if (c.IsEven)
                     c = (c << 2) + 1;
             }
-            string bitString = Collatz2024.toBinaryBigEndianString(c);
+            string bitString = Collatz.toBinaryBigEndianString(c);
             switch (StepsToOne)
             {
                 case 1:
@@ -638,7 +638,7 @@ namespace Collatz2024Namespace
                 default:
                     throw new NotImplementedException();
             }
-            retval = Collatz2024.toBigIntegerFromBinaryBigEndianString(sb.ToString());
+            retval = Collatz.toBigIntegerFromBinaryBigEndianString(sb.ToString());
             return retval;
         }
         private bool IsPatternMatch(string _BinaryBE, int _MinBits, string _Prefix, string _Repeat, string _Suffix)

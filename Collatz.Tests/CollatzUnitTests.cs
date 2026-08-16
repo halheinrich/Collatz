@@ -7,9 +7,9 @@ using System.Security.Cryptography;
 using System.Text;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace Collatz2024Namespace
+namespace HalHeinrich.Numerics.Collatz
 {
-    public class Collatz2024UnitTests
+    public class CollatzUnitTests
     {
         #region Fact Methods
         [Fact]
@@ -19,51 +19,51 @@ namespace Collatz2024Namespace
             BigRational n;
 
             // Loop length 1
-            isCollatzLoop = Collatz2024.SolveForLoop(new[] { 1 }, out n);
+            isCollatzLoop = Collatz.SolveForLoop(new[] { 1 }, out n);
             Assert.True(!isCollatzLoop && n == new BigRational(1, -1));
-            isCollatzLoop = Collatz2024.SolveForLoop(new[] { 2 }, out n);
+            isCollatzLoop = Collatz.SolveForLoop(new[] { 2 }, out n);
             Assert.True(isCollatzLoop && n == new BigRational(1, 1));
-            isCollatzLoop = Collatz2024.SolveForLoop(new[] { 3 }, out n);
+            isCollatzLoop = Collatz.SolveForLoop(new[] { 3 }, out n);
             Assert.True(!isCollatzLoop && n == new BigRational(1, 5));
-            isCollatzLoop = Collatz2024.SolveForLoop(new[] { 4 }, out n);
+            isCollatzLoop = Collatz.SolveForLoop(new[] { 4 }, out n);
             Assert.True(!isCollatzLoop && n == new BigRational(1, 13));
 
             // Loop length 2
-            isCollatzLoop = Collatz2024.SolveForLoop(new[] { 1, 1 }, out n);
+            isCollatzLoop = Collatz.SolveForLoop(new[] { 1, 1 }, out n);
             Assert.True(!isCollatzLoop && n == new BigRational(5, -5));
-            isCollatzLoop = Collatz2024.SolveForLoop(new[] { 1, 2 }, out n);
+            isCollatzLoop = Collatz.SolveForLoop(new[] { 1, 2 }, out n);
             Assert.True(!isCollatzLoop && n == new BigRational(5, -1));
-            isCollatzLoop = Collatz2024.SolveForLoop(new[] { 2, 1 }, out n);
+            isCollatzLoop = Collatz.SolveForLoop(new[] { 2, 1 }, out n);
             Assert.True(!isCollatzLoop && n == new BigRational(7, -1));
-            isCollatzLoop = Collatz2024.SolveForLoop(new[] { 2, 2 }, out n);
+            isCollatzLoop = Collatz.SolveForLoop(new[] { 2, 2 }, out n);
             Assert.True(isCollatzLoop && n == new BigRational(7, 7));
-            isCollatzLoop = Collatz2024.SolveForLoop(new[] { 1, 3 }, out n);
+            isCollatzLoop = Collatz.SolveForLoop(new[] { 1, 3 }, out n);
             Assert.True(!isCollatzLoop && n == new BigRational(5, 7));
-            isCollatzLoop = Collatz2024.SolveForLoop(new[] { 3, 1 }, out n);
+            isCollatzLoop = Collatz.SolveForLoop(new[] { 3, 1 }, out n);
             Assert.True(!isCollatzLoop && n == new BigRational(11, 7));
-            isCollatzLoop = Collatz2024.SolveForLoop(new[] { 2, 3 }, out n);
+            isCollatzLoop = Collatz.SolveForLoop(new[] { 2, 3 }, out n);
             Assert.True(!isCollatzLoop && n == new BigRational(7, 23));
-            isCollatzLoop = Collatz2024.SolveForLoop(new[] { 3, 2 }, out n);
+            isCollatzLoop = Collatz.SolveForLoop(new[] { 3, 2 }, out n);
             Assert.True(!isCollatzLoop && n == new BigRational(11, 23));
-            isCollatzLoop = Collatz2024.SolveForLoop(new[] { 3, 3 }, out n);
+            isCollatzLoop = Collatz.SolveForLoop(new[] { 3, 3 }, out n);
             Assert.True(!isCollatzLoop && n == new BigRational(11, 55));
 
             // Loop length 3
-            isCollatzLoop = Collatz2024.SolveForLoop(new[] { 1, 1, 1 }, out n);
+            isCollatzLoop = Collatz.SolveForLoop(new[] { 1, 1, 1 }, out n);
             Assert.True(!isCollatzLoop && n == new BigRational(19, -19));
-            isCollatzLoop = Collatz2024.SolveForLoop(new[] { 1, 1, 2 }, out n);
+            isCollatzLoop = Collatz.SolveForLoop(new[] { 1, 1, 2 }, out n);
             Assert.True(!isCollatzLoop && n == new BigRational(19, -11));
-            isCollatzLoop = Collatz2024.SolveForLoop(new[] { 1, 2, 1 }, out n);
+            isCollatzLoop = Collatz.SolveForLoop(new[] { 1, 2, 1 }, out n);
             Assert.True(!isCollatzLoop && n == new BigRational(23, -11));
-            isCollatzLoop = Collatz2024.SolveForLoop(new[] { 2, 1, 1 }, out n);
+            isCollatzLoop = Collatz.SolveForLoop(new[] { 2, 1, 1 }, out n);
             Assert.True(!isCollatzLoop && n == new BigRational(29, -11));
-            isCollatzLoop = Collatz2024.SolveForLoop(new[] { 1, 2, 2 }, out n);
+            isCollatzLoop = Collatz.SolveForLoop(new[] { 1, 2, 2 }, out n);
             Assert.True(!isCollatzLoop && n == new BigRational(23, 5));
-            isCollatzLoop = Collatz2024.SolveForLoop(new[] { 2, 1, 2 }, out n);
+            isCollatzLoop = Collatz.SolveForLoop(new[] { 2, 1, 2 }, out n);
             Assert.True(!isCollatzLoop && n == new BigRational(29, 5));
-            isCollatzLoop = Collatz2024.SolveForLoop(new[] { 2, 2, 1 }, out n);
+            isCollatzLoop = Collatz.SolveForLoop(new[] { 2, 2, 1 }, out n);
             Assert.True(!isCollatzLoop && n == new BigRational(37, 5));
-            isCollatzLoop = Collatz2024.SolveForLoop(new[] { 2, 2, 2 }, out n);
+            isCollatzLoop = Collatz.SolveForLoop(new[] { 2, 2, 2 }, out n);
             Assert.True(isCollatzLoop && n == new BigRational(37, 37));
 
             // All 2s
@@ -72,12 +72,12 @@ namespace Collatz2024Namespace
                 int[] twosExponentArray = new int[i];
                 for (int j = 0; j < twosExponentArray.Length; j++)
                     twosExponentArray[j] = 2;
-                isCollatzLoop = Collatz2024.SolveForLoop(twosExponentArray, out n);
+                isCollatzLoop = Collatz.SolveForLoop(twosExponentArray, out n);
                 Assert.True(isCollatzLoop && n == 1);
             }
 
             // Length 2, order 2: expect {1,2},{2,1},{2,2}
-            List<int[]> permsOrder2Len2List = Collatz2024.GenerateExponentPermutations(2, 2);
+            List<int[]> permsOrder2Len2List = Collatz.GenerateExponentPermutations(2, 2);
             List<string> permsOrder2Len2 = permsOrder2Len2List
                 .Select(a => string.Join(",", a))
                 .OrderBy(s => s)
@@ -87,7 +87,7 @@ namespace Collatz2024Namespace
             foreach (string e in expected2) Assert.Contains(e, permsOrder2Len2);
 
             // Length 2, order 3: expect {1,3},{2,3},{3,1},{3,2},{3,3}
-            List<int[]> permsOrder3Len2List = Collatz2024.GenerateExponentPermutations(2, 3);
+            List<int[]> permsOrder3Len2List = Collatz.GenerateExponentPermutations(2, 3);
             List<string> permsOrder3Len2 = permsOrder3Len2List
                 .Select(a => string.Join(",", a))
                 .OrderBy(s => s)
@@ -97,13 +97,13 @@ namespace Collatz2024Namespace
             foreach (string e in expected3) Assert.Contains(e, permsOrder3Len2);
 
             // Length 1, order k: only [k]
-            List<int[]> single = Collatz2024.GenerateExponentPermutations(1, 5);
+            List<int[]> single = Collatz.GenerateExponentPermutations(1, 5);
             Assert.Single(single);
             Assert.True(single[0][0] == 5);
 
             // Sanity: count formula order^len - (order-1)^len
             int len = 4, ord = 3;
-            List<int[]> permsOrder3Len4List = Collatz2024.GenerateExponentPermutations(len, ord);
+            List<int[]> permsOrder3Len4List = Collatz.GenerateExponentPermutations(len, ord);
             int all = permsOrder3Len4List.Count();
             int expectedCount = (int)(Math.Pow(ord, len) - Math.Pow(ord - 1, len));
             Assert.True(all == expectedCount);
@@ -116,9 +116,9 @@ namespace Collatz2024Namespace
                 sbLen.AppendLine("Order,Permutation,N,IsLoop,Numerator,Denominator,Double");
                 for (int order = 1; order <= 5; order++)
                 {
-                    foreach (int[] perm in Collatz2024.GenerateExponentPermutations(length, order))
+                    foreach (int[] perm in Collatz.GenerateExponentPermutations(length, order))
                     {
-                        bool isLoop = Collatz2024.SolveForLoop(perm, out n);
+                        bool isLoop = Collatz.SolveForLoop(perm, out n);
                         sbLen.Append(order)
                              .Append(",[")
                              .Append(string.Join(' ', perm))
@@ -160,7 +160,7 @@ namespace Collatz2024Namespace
             for (int n = 0; n < LessThanSeedList.Count; n++)
             {
                 int bitLength = GetBitLength(LessThanSeedList[n].PowerOfTwo);
-                string binaryString = Collatz2024.toBinaryBigEndianString(LessThanSeedList[n].Constant);
+                string binaryString = Collatz.toBinaryBigEndianString(LessThanSeedList[n].Constant);
                 string bitPrefix;
                 if (bitLength > binaryString.Length)
                     binaryString = binaryString.PadRight(bitLength, '0');
@@ -199,7 +199,7 @@ namespace Collatz2024Namespace
             for (int n = 0; n < SurvivorList.Count; n++)
             {
                 int bitLength = GetBitLength(SurvivorList[n].PowerOfTwo);
-                string binaryString = Collatz2024.toBinaryBigEndianString(SurvivorList[n].Constant);
+                string binaryString = Collatz.toBinaryBigEndianString(SurvivorList[n].Constant);
                 string bitPrefix;
                 if (bitLength > binaryString.Length)
                     binaryString = binaryString.PadRight(bitLength, '0');
@@ -335,389 +335,389 @@ namespace Collatz2024Namespace
         [Fact]
         public void TestNextOdd()
         {
-            BigInteger clltz = Collatz2024.NextOdd(3);
+            BigInteger clltz = Collatz.NextOdd(3);
             Assert.True(clltz == 5);
-            Assert.True(Collatz2024.toBinaryLittleEndianString(clltz).Equals("101"));
-            Assert.True(Collatz2024.toBinaryBigEndianString(clltz).Equals("101"));
+            Assert.True(Collatz.toBinaryLittleEndianString(clltz).Equals("101"));
+            Assert.True(Collatz.toBinaryBigEndianString(clltz).Equals("101"));
 
-            clltz = Collatz2024.NextOdd(5);
+            clltz = Collatz.NextOdd(5);
             Assert.True(clltz == 1);
-            Assert.True(Collatz2024.toBinaryLittleEndianString(clltz).Equals("1"));
-            Assert.True(Collatz2024.toBinaryBigEndianString(clltz).Equals("1"));
+            Assert.True(Collatz.toBinaryLittleEndianString(clltz).Equals("1"));
+            Assert.True(Collatz.toBinaryBigEndianString(clltz).Equals("1"));
 
-            clltz = Collatz2024.NextOdd(7);
+            clltz = Collatz.NextOdd(7);
             Assert.True(clltz == 11);
-            Assert.True(Collatz2024.toBinaryLittleEndianString(clltz).Equals("1011"));
-            Assert.True(Collatz2024.toBinaryBigEndianString(clltz).Equals("1101"));
+            Assert.True(Collatz.toBinaryLittleEndianString(clltz).Equals("1011"));
+            Assert.True(Collatz.toBinaryBigEndianString(clltz).Equals("1101"));
 
-            clltz = Collatz2024.NextOdd(9);
+            clltz = Collatz.NextOdd(9);
             Assert.True(clltz == 7);
-            Assert.True(Collatz2024.toBinaryLittleEndianString(clltz).Equals("111"));
-            Assert.True(Collatz2024.toBinaryBigEndianString(clltz).Equals("111"));
+            Assert.True(Collatz.toBinaryLittleEndianString(clltz).Equals("111"));
+            Assert.True(Collatz.toBinaryBigEndianString(clltz).Equals("111"));
 
-            clltz = Collatz2024.NextOdd(11);
+            clltz = Collatz.NextOdd(11);
             Assert.True(clltz == 17);
-            Assert.True(Collatz2024.toBinaryLittleEndianString(clltz).Equals("10001"));
-            Assert.True(Collatz2024.toBinaryBigEndianString(clltz).Equals("10001"));
+            Assert.True(Collatz.toBinaryLittleEndianString(clltz).Equals("10001"));
+            Assert.True(Collatz.toBinaryBigEndianString(clltz).Equals("10001"));
 
-            Assert.True(Collatz2024.NextOdd(3) == 5);
-            Assert.True(Collatz2024.NextOdd(5) == 1);
-            Assert.True(Collatz2024.NextOdd(7) == 11);
-            Assert.True(Collatz2024.NextOdd(9) == 7);
-            Assert.True(Collatz2024.NextOdd(11) == 17);
+            Assert.True(Collatz.NextOdd(3) == 5);
+            Assert.True(Collatz.NextOdd(5) == 1);
+            Assert.True(Collatz.NextOdd(7) == 11);
+            Assert.True(Collatz.NextOdd(9) == 7);
+            Assert.True(Collatz.NextOdd(11) == 17);
 
         }
         [Fact]
         public void TestCollapseInOne()
         {
-            BigInteger clltz = Collatz2024.CollapseInOne(1);
+            BigInteger clltz = Collatz.CollapseInOne(1);
             Assert.True(clltz == 1);
-            Assert.True(Collatz2024.toBinaryLittleEndianString(clltz).Equals("1"));
-            Assert.True(Collatz2024.toBinaryBigEndianString(clltz).Equals("1"));
+            Assert.True(Collatz.toBinaryLittleEndianString(clltz).Equals("1"));
+            Assert.True(Collatz.toBinaryBigEndianString(clltz).Equals("1"));
 
-            clltz = Collatz2024.CollapseInOne(2);
+            clltz = Collatz.CollapseInOne(2);
             Assert.True(clltz == (BigInteger)5);
-            Assert.True(Collatz2024.toBinaryLittleEndianString(clltz).Equals("101"));
-            Assert.True(Collatz2024.toBinaryBigEndianString(clltz).Equals("101"));
+            Assert.True(Collatz.toBinaryLittleEndianString(clltz).Equals("101"));
+            Assert.True(Collatz.toBinaryBigEndianString(clltz).Equals("101"));
 
-            clltz = Collatz2024.CollapseInOne(3);
+            clltz = Collatz.CollapseInOne(3);
             Assert.True(clltz == (BigInteger)21);
-            Assert.True(Collatz2024.toBinaryLittleEndianString(clltz).Equals("10101"));
-            Assert.True(Collatz2024.toBinaryBigEndianString(clltz).Equals("10101"));
+            Assert.True(Collatz.toBinaryLittleEndianString(clltz).Equals("10101"));
+            Assert.True(Collatz.toBinaryBigEndianString(clltz).Equals("10101"));
 
-            clltz = Collatz2024.CollapseInOne(4);
+            clltz = Collatz.CollapseInOne(4);
             Assert.True(clltz == (BigInteger)85);
-            Assert.True(Collatz2024.toBinaryLittleEndianString(clltz).Equals("1010101"));
-            Assert.True(Collatz2024.toBinaryBigEndianString(clltz).Equals("1010101"));
+            Assert.True(Collatz.toBinaryLittleEndianString(clltz).Equals("1010101"));
+            Assert.True(Collatz.toBinaryBigEndianString(clltz).Equals("1010101"));
 
-            clltz = Collatz2024.CollapseInOne(5);
+            clltz = Collatz.CollapseInOne(5);
             Assert.True(clltz == (BigInteger)341);
-            Assert.True(Collatz2024.toBinaryLittleEndianString(clltz).Equals("101010101"));
-            Assert.True(Collatz2024.toBinaryBigEndianString(clltz).Equals("101010101"));
+            Assert.True(Collatz.toBinaryLittleEndianString(clltz).Equals("101010101"));
+            Assert.True(Collatz.toBinaryBigEndianString(clltz).Equals("101010101"));
 
-            clltz = Collatz2024.CollapseInOne(6);
+            clltz = Collatz.CollapseInOne(6);
             Assert.True(clltz == (BigInteger)1365);
-            Assert.True(Collatz2024.toBinaryLittleEndianString(clltz).Equals("10101010101"));
-            Assert.True(Collatz2024.toBinaryBigEndianString(clltz).Equals("10101010101"));
+            Assert.True(Collatz.toBinaryLittleEndianString(clltz).Equals("10101010101"));
+            Assert.True(Collatz.toBinaryBigEndianString(clltz).Equals("10101010101"));
 
-            clltz = Collatz2024.CollapseInOne(7);
+            clltz = Collatz.CollapseInOne(7);
             Assert.True(clltz == (BigInteger)5461);
-            Assert.True(Collatz2024.toBinaryLittleEndianString(clltz).Equals("1010101010101"));
-            Assert.True(Collatz2024.toBinaryBigEndianString(clltz).Equals("1010101010101"));
+            Assert.True(Collatz.toBinaryLittleEndianString(clltz).Equals("1010101010101"));
+            Assert.True(Collatz.toBinaryBigEndianString(clltz).Equals("1010101010101"));
 
-            clltz = Collatz2024.CollapseInOne(8);
+            clltz = Collatz.CollapseInOne(8);
             Assert.True(clltz == (BigInteger)21845);
-            Assert.True(Collatz2024.toBinaryLittleEndianString(clltz).Equals("101010101010101"));
-            Assert.True(Collatz2024.toBinaryBigEndianString(clltz).Equals("101010101010101"));
+            Assert.True(Collatz.toBinaryLittleEndianString(clltz).Equals("101010101010101"));
+            Assert.True(Collatz.toBinaryBigEndianString(clltz).Equals("101010101010101"));
 
-            clltz = Collatz2024.CollapseInOne(9);
+            clltz = Collatz.CollapseInOne(9);
             Assert.True(clltz == (BigInteger)87381);
-            Assert.True(Collatz2024.toBinaryLittleEndianString(clltz).Equals("10101010101010101"));
-            Assert.True(Collatz2024.toBinaryBigEndianString(clltz).Equals("10101010101010101"));
+            Assert.True(Collatz.toBinaryLittleEndianString(clltz).Equals("10101010101010101"));
+            Assert.True(Collatz.toBinaryBigEndianString(clltz).Equals("10101010101010101"));
 
-            clltz = Collatz2024.CollapseInOne(10);
+            clltz = Collatz.CollapseInOne(10);
             Assert.True(clltz == (BigInteger)349525);
-            Assert.True(Collatz2024.toBinaryLittleEndianString(clltz).Equals("1010101010101010101"));
-            Assert.True(Collatz2024.toBinaryBigEndianString(clltz).Equals("1010101010101010101"));
+            Assert.True(Collatz.toBinaryLittleEndianString(clltz).Equals("1010101010101010101"));
+            Assert.True(Collatz.toBinaryBigEndianString(clltz).Equals("1010101010101010101"));
 
-            Assert.True(Collatz2024.CollapseInOne(1) == (BigInteger)1);
-            Assert.True(Collatz2024.CollapseInOne(2) == (BigInteger)5);
-            Assert.True(Collatz2024.CollapseInOne(3) == (BigInteger)21);
-            Assert.True(Collatz2024.CollapseInOne(4) == (BigInteger)85);
-            Assert.True(Collatz2024.CollapseInOne(5) == (BigInteger)341);
-            Assert.True(Collatz2024.CollapseInOne(6) == (BigInteger)1365);
-            Assert.True(Collatz2024.CollapseInOne(7) == (BigInteger)5461);
-            Assert.True(Collatz2024.CollapseInOne(8) == (BigInteger)21845);
-            Assert.True(Collatz2024.CollapseInOne(9) == (BigInteger)87381);
-            Assert.True(Collatz2024.CollapseInOne(10) == (BigInteger)349525);
+            Assert.True(Collatz.CollapseInOne(1) == (BigInteger)1);
+            Assert.True(Collatz.CollapseInOne(2) == (BigInteger)5);
+            Assert.True(Collatz.CollapseInOne(3) == (BigInteger)21);
+            Assert.True(Collatz.CollapseInOne(4) == (BigInteger)85);
+            Assert.True(Collatz.CollapseInOne(5) == (BigInteger)341);
+            Assert.True(Collatz.CollapseInOne(6) == (BigInteger)1365);
+            Assert.True(Collatz.CollapseInOne(7) == (BigInteger)5461);
+            Assert.True(Collatz.CollapseInOne(8) == (BigInteger)21845);
+            Assert.True(Collatz.CollapseInOne(9) == (BigInteger)87381);
+            Assert.True(Collatz.CollapseInOne(10) == (BigInteger)349525);
         }
         [Fact]
         public void TestCollapseInOne_ModOneOut()
         {
-            BigInteger clltz = Collatz2024.CollapseInOne_ModOneOut(1);
+            BigInteger clltz = Collatz.CollapseInOne_ModOneOut(1);
             Assert.True(clltz == (BigInteger)85);
-            Assert.True(Collatz2024.toBinaryLittleEndianString(clltz).Equals("1010101"));
-            Assert.True(Collatz2024.toBinaryBigEndianString(clltz).Equals("1010101"));
+            Assert.True(Collatz.toBinaryLittleEndianString(clltz).Equals("1010101"));
+            Assert.True(Collatz.toBinaryBigEndianString(clltz).Equals("1010101"));
 
-            clltz = Collatz2024.CollapseInOne_ModOneOut(2);
+            clltz = Collatz.CollapseInOne_ModOneOut(2);
             Assert.True(clltz == (BigInteger)5461);
-            Assert.True(Collatz2024.toBinaryLittleEndianString(clltz).Equals("1010101010101"));
-            Assert.True(Collatz2024.toBinaryBigEndianString(clltz).Equals("1010101010101"));
+            Assert.True(Collatz.toBinaryLittleEndianString(clltz).Equals("1010101010101"));
+            Assert.True(Collatz.toBinaryBigEndianString(clltz).Equals("1010101010101"));
 
-            clltz = Collatz2024.CollapseInOne_ModOneOut(3);
+            clltz = Collatz.CollapseInOne_ModOneOut(3);
             Assert.True(clltz == (BigInteger)349525);
-            Assert.True(Collatz2024.toBinaryLittleEndianString(clltz).Equals("1010101010101010101"));
-            Assert.True(Collatz2024.toBinaryBigEndianString(clltz).Equals("1010101010101010101"));
+            Assert.True(Collatz.toBinaryLittleEndianString(clltz).Equals("1010101010101010101"));
+            Assert.True(Collatz.toBinaryBigEndianString(clltz).Equals("1010101010101010101"));
 
-            clltz = Collatz2024.CollapseInOne_ModOneOut(4);
+            clltz = Collatz.CollapseInOne_ModOneOut(4);
             Assert.True(clltz == (BigInteger)22369621);
-            Assert.True(Collatz2024.toBinaryLittleEndianString(clltz).Equals("1010101010101010101010101"));
-            Assert.True(Collatz2024.toBinaryBigEndianString(clltz).Equals("1010101010101010101010101"));
+            Assert.True(Collatz.toBinaryLittleEndianString(clltz).Equals("1010101010101010101010101"));
+            Assert.True(Collatz.toBinaryBigEndianString(clltz).Equals("1010101010101010101010101"));
 
-            clltz = Collatz2024.CollapseInOne_ModOneOut(5);
+            clltz = Collatz.CollapseInOne_ModOneOut(5);
             Assert.True(clltz == (BigInteger)1431655765);
-            Assert.True(Collatz2024.toBinaryLittleEndianString(clltz).Equals("1010101010101010101010101010101"));
-            Assert.True(Collatz2024.toBinaryBigEndianString(clltz).Equals("1010101010101010101010101010101"));
+            Assert.True(Collatz.toBinaryLittleEndianString(clltz).Equals("1010101010101010101010101010101"));
+            Assert.True(Collatz.toBinaryBigEndianString(clltz).Equals("1010101010101010101010101010101"));
 
-            Assert.True(Collatz2024.CollapseInOne_ModOneOut(1) == (BigInteger)85);
-            Assert.True(Collatz2024.CollapseInOne_ModOneOut(2) == (BigInteger)5461);
-            Assert.True(Collatz2024.CollapseInOne_ModOneOut(3) == (BigInteger)349525);
-            Assert.True(Collatz2024.CollapseInOne_ModOneOut(4) == (BigInteger)22369621);
-            Assert.True(Collatz2024.CollapseInOne_ModOneOut(5) == (BigInteger)1431655765);
+            Assert.True(Collatz.CollapseInOne_ModOneOut(1) == (BigInteger)85);
+            Assert.True(Collatz.CollapseInOne_ModOneOut(2) == (BigInteger)5461);
+            Assert.True(Collatz.CollapseInOne_ModOneOut(3) == (BigInteger)349525);
+            Assert.True(Collatz.CollapseInOne_ModOneOut(4) == (BigInteger)22369621);
+            Assert.True(Collatz.CollapseInOne_ModOneOut(5) == (BigInteger)1431655765);
         }
         [Fact]
         public void TestCollapseInOne_ModTwoOut()
         {
-            BigInteger clltz = Collatz2024.CollapseInOne_ModTwoOut(1);
+            BigInteger clltz = Collatz.CollapseInOne_ModTwoOut(1);
             Assert.True(clltz == (BigInteger)5);
-            Assert.True(Collatz2024.toBinaryLittleEndianString(clltz).Equals("101"));
-            Assert.True(Collatz2024.toBinaryBigEndianString(clltz).Equals("101"));
+            Assert.True(Collatz.toBinaryLittleEndianString(clltz).Equals("101"));
+            Assert.True(Collatz.toBinaryBigEndianString(clltz).Equals("101"));
 
-            clltz = Collatz2024.CollapseInOne_ModTwoOut(2);
+            clltz = Collatz.CollapseInOne_ModTwoOut(2);
             Assert.True(clltz == (BigInteger)341);
-            Assert.True(Collatz2024.toBinaryLittleEndianString(clltz).Equals("101010101"));
-            Assert.True(Collatz2024.toBinaryBigEndianString(clltz).Equals("101010101"));
+            Assert.True(Collatz.toBinaryLittleEndianString(clltz).Equals("101010101"));
+            Assert.True(Collatz.toBinaryBigEndianString(clltz).Equals("101010101"));
 
-            clltz = Collatz2024.CollapseInOne_ModTwoOut(3);
+            clltz = Collatz.CollapseInOne_ModTwoOut(3);
             Assert.True(clltz == (BigInteger)21845);
-            Assert.True(Collatz2024.toBinaryLittleEndianString(clltz).Equals("101010101010101"));
-            Assert.True(Collatz2024.toBinaryBigEndianString(clltz).Equals("101010101010101"));
+            Assert.True(Collatz.toBinaryLittleEndianString(clltz).Equals("101010101010101"));
+            Assert.True(Collatz.toBinaryBigEndianString(clltz).Equals("101010101010101"));
 
-            clltz = Collatz2024.CollapseInOne_ModTwoOut(4);
+            clltz = Collatz.CollapseInOne_ModTwoOut(4);
             Assert.True(clltz == (BigInteger)1398101);
-            Assert.True(Collatz2024.toBinaryLittleEndianString(clltz).Equals("101010101010101010101"));
-            Assert.True(Collatz2024.toBinaryBigEndianString(clltz).Equals("101010101010101010101"));
+            Assert.True(Collatz.toBinaryLittleEndianString(clltz).Equals("101010101010101010101"));
+            Assert.True(Collatz.toBinaryBigEndianString(clltz).Equals("101010101010101010101"));
 
-            clltz = Collatz2024.CollapseInOne_ModTwoOut(5);
+            clltz = Collatz.CollapseInOne_ModTwoOut(5);
             Assert.True(clltz == (BigInteger)89478485);
-            Assert.True(Collatz2024.toBinaryLittleEndianString(clltz).Equals("101010101010101010101010101"));
-            Assert.True(Collatz2024.toBinaryBigEndianString(clltz).Equals("101010101010101010101010101"));
+            Assert.True(Collatz.toBinaryLittleEndianString(clltz).Equals("101010101010101010101010101"));
+            Assert.True(Collatz.toBinaryBigEndianString(clltz).Equals("101010101010101010101010101"));
 
-            Assert.True(Collatz2024.CollapseInOne_ModTwoOut(1) == (BigInteger)5);
-            Assert.True(Collatz2024.CollapseInOne_ModTwoOut(2) == (BigInteger)341);
-            Assert.True(Collatz2024.CollapseInOne_ModTwoOut(3) == (BigInteger)21845);
-            Assert.True(Collatz2024.CollapseInOne_ModTwoOut(4) == (BigInteger)1398101);
-            Assert.True(Collatz2024.CollapseInOne_ModTwoOut(5) == (BigInteger)89478485);
+            Assert.True(Collatz.CollapseInOne_ModTwoOut(1) == (BigInteger)5);
+            Assert.True(Collatz.CollapseInOne_ModTwoOut(2) == (BigInteger)341);
+            Assert.True(Collatz.CollapseInOne_ModTwoOut(3) == (BigInteger)21845);
+            Assert.True(Collatz.CollapseInOne_ModTwoOut(4) == (BigInteger)1398101);
+            Assert.True(Collatz.CollapseInOne_ModTwoOut(5) == (BigInteger)89478485);
         }
         [Fact]
         public void TestCollapseInTwo_ModOne()
         {
-            BigInteger clltz = Collatz2024.CollapseInTwo_ModOne(1, 1);
+            BigInteger clltz = Collatz.CollapseInTwo_ModOne(1, 1);
             Assert.True(clltz == (BigInteger)113);
-            Assert.True(Collatz2024.toBinaryLittleEndianString(clltz).Equals("1110001"));
-            Assert.True(Collatz2024.toBinaryBigEndianString(clltz).Equals("1000111"));
+            Assert.True(Collatz.toBinaryLittleEndianString(clltz).Equals("1110001"));
+            Assert.True(Collatz.toBinaryBigEndianString(clltz).Equals("1000111"));
 
-            Assert.True(Collatz2024.CollapseInTwo_ModOne(1, 1) == (BigInteger)113);
+            Assert.True(Collatz.CollapseInTwo_ModOne(1, 1) == (BigInteger)113);
 
-            clltz = Collatz2024.CollapseInTwo_ModOne(1, 2);
+            clltz = Collatz.CollapseInTwo_ModOne(1, 2);
             Assert.True(clltz == (BigInteger)453);
-            Assert.True(Collatz2024.toBinaryLittleEndianString(clltz).Equals("111000101"));
-            Assert.True(Collatz2024.toBinaryBigEndianString(clltz).Equals("101000111"));
+            Assert.True(Collatz.toBinaryLittleEndianString(clltz).Equals("111000101"));
+            Assert.True(Collatz.toBinaryBigEndianString(clltz).Equals("101000111"));
 
-            clltz = Collatz2024.CollapseInTwo_ModOne(2, 1);
+            clltz = Collatz.CollapseInTwo_ModOne(2, 1);
             Assert.True(clltz == (BigInteger)7281);
-            Assert.True(Collatz2024.toBinaryLittleEndianString(clltz).Equals("1110001110001"));
-            Assert.True(Collatz2024.toBinaryBigEndianString(clltz).Equals("1000111000111"));
+            Assert.True(Collatz.toBinaryLittleEndianString(clltz).Equals("1110001110001"));
+            Assert.True(Collatz.toBinaryBigEndianString(clltz).Equals("1000111000111"));
 
-            clltz = Collatz2024.CollapseInTwo_ModOne(2, 2);
+            clltz = Collatz.CollapseInTwo_ModOne(2, 2);
             Assert.True(clltz == (BigInteger)29125);
-            Assert.True(Collatz2024.toBinaryLittleEndianString(clltz).Equals("111000111000101"));
-            Assert.True(Collatz2024.toBinaryBigEndianString(clltz).Equals("101000111000111"));
+            Assert.True(Collatz.toBinaryLittleEndianString(clltz).Equals("111000111000101"));
+            Assert.True(Collatz.toBinaryBigEndianString(clltz).Equals("101000111000111"));
 
-            Assert.True(Collatz2024.CollapseInTwo_ModOne(1, 2) == (BigInteger)453);
-            Assert.True(Collatz2024.CollapseInTwo_ModOne(2, 1) == (BigInteger)7281);
-            Assert.True(Collatz2024.CollapseInTwo_ModOne(2, 2) == (BigInteger)29125);
+            Assert.True(Collatz.CollapseInTwo_ModOne(1, 2) == (BigInteger)453);
+            Assert.True(Collatz.CollapseInTwo_ModOne(2, 1) == (BigInteger)7281);
+            Assert.True(Collatz.CollapseInTwo_ModOne(2, 2) == (BigInteger)29125);
 
-            clltz = Collatz2024.CollapseInTwo_ModOne(1, 3);
+            clltz = Collatz.CollapseInTwo_ModOne(1, 3);
             Assert.True(clltz == (BigInteger)1813);
-            Assert.True(Collatz2024.toBinaryLittleEndianString(clltz).Equals("11100010101"));
-            Assert.True(Collatz2024.toBinaryBigEndianString(clltz).Equals("10101000111"));
+            Assert.True(Collatz.toBinaryLittleEndianString(clltz).Equals("11100010101"));
+            Assert.True(Collatz.toBinaryBigEndianString(clltz).Equals("10101000111"));
 
-            clltz = Collatz2024.CollapseInTwo_ModOne(2, 3);
+            clltz = Collatz.CollapseInTwo_ModOne(2, 3);
             Assert.True(clltz == (BigInteger)116501);
-            Assert.True(Collatz2024.toBinaryLittleEndianString(clltz).Equals("11100011100010101"));
-            Assert.True(Collatz2024.toBinaryBigEndianString(clltz).Equals("10101000111000111"));
+            Assert.True(Collatz.toBinaryLittleEndianString(clltz).Equals("11100011100010101"));
+            Assert.True(Collatz.toBinaryBigEndianString(clltz).Equals("10101000111000111"));
 
-            clltz = Collatz2024.CollapseInTwo_ModOne(3, 1);
+            clltz = Collatz.CollapseInTwo_ModOne(3, 1);
             Assert.True(clltz == (BigInteger)466033);
-            Assert.True(Collatz2024.toBinaryLittleEndianString(clltz).Equals("1110001110001110001"));
-            Assert.True(Collatz2024.toBinaryBigEndianString(clltz).Equals("1000111000111000111"));
+            Assert.True(Collatz.toBinaryLittleEndianString(clltz).Equals("1110001110001110001"));
+            Assert.True(Collatz.toBinaryBigEndianString(clltz).Equals("1000111000111000111"));
 
-            clltz = Collatz2024.CollapseInTwo_ModOne(3, 2);
+            clltz = Collatz.CollapseInTwo_ModOne(3, 2);
             Assert.True(clltz == (BigInteger)1864133);
-            Assert.True(Collatz2024.toBinaryLittleEndianString(clltz).Equals("111000111000111000101"));
-            Assert.True(Collatz2024.toBinaryBigEndianString(clltz).Equals("101000111000111000111"));
+            Assert.True(Collatz.toBinaryLittleEndianString(clltz).Equals("111000111000111000101"));
+            Assert.True(Collatz.toBinaryBigEndianString(clltz).Equals("101000111000111000111"));
 
-            clltz = Collatz2024.CollapseInTwo_ModOne(3, 3);
+            clltz = Collatz.CollapseInTwo_ModOne(3, 3);
             Assert.True(clltz == (BigInteger)7456533);
-            Assert.True(Collatz2024.toBinaryLittleEndianString(clltz).Equals("11100011100011100010101"));
-            Assert.True(Collatz2024.toBinaryBigEndianString(clltz).Equals("10101000111000111000111"));
+            Assert.True(Collatz.toBinaryLittleEndianString(clltz).Equals("11100011100011100010101"));
+            Assert.True(Collatz.toBinaryBigEndianString(clltz).Equals("10101000111000111000111"));
 
-            Assert.True(Collatz2024.CollapseInTwo_ModOne(1, 3) == (BigInteger)1813);
-            Assert.True(Collatz2024.CollapseInTwo_ModOne(2, 3) == (BigInteger)116501);
-            Assert.True(Collatz2024.CollapseInTwo_ModOne(3, 1) == (BigInteger)466033);
-            Assert.True(Collatz2024.CollapseInTwo_ModOne(3, 2) == (BigInteger)1864133);
-            Assert.True(Collatz2024.CollapseInTwo_ModOne(3, 3) == (BigInteger)7456533);
+            Assert.True(Collatz.CollapseInTwo_ModOne(1, 3) == (BigInteger)1813);
+            Assert.True(Collatz.CollapseInTwo_ModOne(2, 3) == (BigInteger)116501);
+            Assert.True(Collatz.CollapseInTwo_ModOne(3, 1) == (BigInteger)466033);
+            Assert.True(Collatz.CollapseInTwo_ModOne(3, 2) == (BigInteger)1864133);
+            Assert.True(Collatz.CollapseInTwo_ModOne(3, 3) == (BigInteger)7456533);
 
-            clltz = Collatz2024.CollapseInTwo_ModOne(1, 4);
+            clltz = Collatz.CollapseInTwo_ModOne(1, 4);
             Assert.True(clltz == (BigInteger)7253);
-            Assert.True(Collatz2024.toBinaryLittleEndianString(clltz).Equals("1110001010101"));
-            Assert.True(Collatz2024.toBinaryBigEndianString(clltz).Equals("1010101000111"));
+            Assert.True(Collatz.toBinaryLittleEndianString(clltz).Equals("1110001010101"));
+            Assert.True(Collatz.toBinaryBigEndianString(clltz).Equals("1010101000111"));
 
-            clltz = Collatz2024.CollapseInTwo_ModOne(2, 4);
+            clltz = Collatz.CollapseInTwo_ModOne(2, 4);
             Assert.True(clltz == (BigInteger)466005);
-            Assert.True(Collatz2024.toBinaryLittleEndianString(clltz).Equals("1110001110001010101"));
-            Assert.True(Collatz2024.toBinaryBigEndianString(clltz).Equals("1010101000111000111"));
+            Assert.True(Collatz.toBinaryLittleEndianString(clltz).Equals("1110001110001010101"));
+            Assert.True(Collatz.toBinaryBigEndianString(clltz).Equals("1010101000111000111"));
 
-            clltz = Collatz2024.CollapseInTwo_ModOne(3, 4);
+            clltz = Collatz.CollapseInTwo_ModOne(3, 4);
             Assert.True(clltz == (BigInteger)29826133);
-            Assert.True(Collatz2024.toBinaryLittleEndianString(clltz).Equals("1110001110001110001010101"));
-            Assert.True(Collatz2024.toBinaryBigEndianString(clltz).Equals("1010101000111000111000111"));
+            Assert.True(Collatz.toBinaryLittleEndianString(clltz).Equals("1110001110001110001010101"));
+            Assert.True(Collatz.toBinaryBigEndianString(clltz).Equals("1010101000111000111000111"));
 
-            clltz = Collatz2024.CollapseInTwo_ModOne(4, 1);
+            clltz = Collatz.CollapseInTwo_ModOne(4, 1);
             Assert.True(clltz == (BigInteger)29826161);
-            Assert.True(Collatz2024.toBinaryLittleEndianString(clltz).Equals("1110001110001110001110001"));
-            Assert.True(Collatz2024.toBinaryBigEndianString(clltz).Equals("1000111000111000111000111"));
+            Assert.True(Collatz.toBinaryLittleEndianString(clltz).Equals("1110001110001110001110001"));
+            Assert.True(Collatz.toBinaryBigEndianString(clltz).Equals("1000111000111000111000111"));
 
-            clltz = Collatz2024.CollapseInTwo_ModOne(4, 2);
+            clltz = Collatz.CollapseInTwo_ModOne(4, 2);
             Assert.True(clltz == (BigInteger)119304645);
-            Assert.True(Collatz2024.toBinaryLittleEndianString(clltz).Equals("111000111000111000111000101"));
-            Assert.True(Collatz2024.toBinaryBigEndianString(clltz).Equals("101000111000111000111000111"));
+            Assert.True(Collatz.toBinaryLittleEndianString(clltz).Equals("111000111000111000111000101"));
+            Assert.True(Collatz.toBinaryBigEndianString(clltz).Equals("101000111000111000111000111"));
 
-            clltz = Collatz2024.CollapseInTwo_ModOne(4, 3);
+            clltz = Collatz.CollapseInTwo_ModOne(4, 3);
             Assert.True(clltz == (BigInteger)477218581);
-            Assert.True(Collatz2024.toBinaryLittleEndianString(clltz).Equals("11100011100011100011100010101"));
-            Assert.True(Collatz2024.toBinaryBigEndianString(clltz).Equals("10101000111000111000111000111"));
+            Assert.True(Collatz.toBinaryLittleEndianString(clltz).Equals("11100011100011100011100010101"));
+            Assert.True(Collatz.toBinaryBigEndianString(clltz).Equals("10101000111000111000111000111"));
 
-            clltz = Collatz2024.CollapseInTwo_ModOne(4, 4);
+            clltz = Collatz.CollapseInTwo_ModOne(4, 4);
             Assert.True(clltz == (BigInteger)1908874325);
-            Assert.True(Collatz2024.toBinaryLittleEndianString(clltz).Equals("1110001110001110001110001010101"));
-            Assert.True(Collatz2024.toBinaryBigEndianString(clltz).Equals("1010101000111000111000111000111"));
+            Assert.True(Collatz.toBinaryLittleEndianString(clltz).Equals("1110001110001110001110001010101"));
+            Assert.True(Collatz.toBinaryBigEndianString(clltz).Equals("1010101000111000111000111000111"));
 
-            Assert.True(Collatz2024.CollapseInTwo_ModOne(1, 4) == (BigInteger)7253);
-            Assert.True(Collatz2024.CollapseInTwo_ModOne(2, 4) == (BigInteger)466005);
-            Assert.True(Collatz2024.CollapseInTwo_ModOne(3, 4) == (BigInteger)29826133);
-            Assert.True(Collatz2024.CollapseInTwo_ModOne(4, 1) == (BigInteger)29826161);
-            Assert.True(Collatz2024.CollapseInTwo_ModOne(4, 2) == (BigInteger)119304645);
-            Assert.True(Collatz2024.CollapseInTwo_ModOne(4, 3) == (BigInteger)477218581);
-            Assert.True(Collatz2024.CollapseInTwo_ModOne(4, 4) == (BigInteger)1908874325);
+            Assert.True(Collatz.CollapseInTwo_ModOne(1, 4) == (BigInteger)7253);
+            Assert.True(Collatz.CollapseInTwo_ModOne(2, 4) == (BigInteger)466005);
+            Assert.True(Collatz.CollapseInTwo_ModOne(3, 4) == (BigInteger)29826133);
+            Assert.True(Collatz.CollapseInTwo_ModOne(4, 1) == (BigInteger)29826161);
+            Assert.True(Collatz.CollapseInTwo_ModOne(4, 2) == (BigInteger)119304645);
+            Assert.True(Collatz.CollapseInTwo_ModOne(4, 3) == (BigInteger)477218581);
+            Assert.True(Collatz.CollapseInTwo_ModOne(4, 4) == (BigInteger)1908874325);
         }
         [Fact]
         public void TestCollapseInTwo_ModTwo()
         {
-            BigInteger clltz = Collatz2024.CollapseInTwo_ModTwo(1, 1);
+            BigInteger clltz = Collatz.CollapseInTwo_ModTwo(1, 1);
             Assert.True(clltz == (BigInteger)3);
-            Assert.True(Collatz2024.toBinaryLittleEndianString(clltz).Equals("11"));
-            Assert.True(Collatz2024.toBinaryBigEndianString(clltz).Equals("11"));
+            Assert.True(Collatz.toBinaryLittleEndianString(clltz).Equals("11"));
+            Assert.True(Collatz.toBinaryBigEndianString(clltz).Equals("11"));
 
-            Assert.True(Collatz2024.CollapseInTwo_ModTwo(1, 1) == (BigInteger)3);
+            Assert.True(Collatz.CollapseInTwo_ModTwo(1, 1) == (BigInteger)3);
 
-            clltz = Collatz2024.CollapseInTwo_ModTwo(1, 2);
+            clltz = Collatz.CollapseInTwo_ModTwo(1, 2);
             Assert.True(clltz == (BigInteger)13);
-            Assert.True(Collatz2024.toBinaryLittleEndianString(clltz).Equals("1101"));
-            Assert.True(Collatz2024.toBinaryBigEndianString(clltz).Equals("1011"));
+            Assert.True(Collatz.toBinaryLittleEndianString(clltz).Equals("1101"));
+            Assert.True(Collatz.toBinaryBigEndianString(clltz).Equals("1011"));
 
-            clltz = Collatz2024.CollapseInTwo_ModTwo(2, 1);
+            clltz = Collatz.CollapseInTwo_ModTwo(2, 1);
             Assert.True(clltz == (BigInteger)227);
-            Assert.True(Collatz2024.toBinaryLittleEndianString(clltz).Equals("11100011"));
-            Assert.True(Collatz2024.toBinaryBigEndianString(clltz).Equals("11000111"));
+            Assert.True(Collatz.toBinaryLittleEndianString(clltz).Equals("11100011"));
+            Assert.True(Collatz.toBinaryBigEndianString(clltz).Equals("11000111"));
 
-            clltz = Collatz2024.CollapseInTwo_ModTwo(2, 2);
+            clltz = Collatz.CollapseInTwo_ModTwo(2, 2);
             Assert.True(clltz == (BigInteger)909);
-            Assert.True(Collatz2024.toBinaryLittleEndianString(clltz).Equals("1110001101"));
-            Assert.True(Collatz2024.toBinaryBigEndianString(clltz).Equals("1011000111"));
+            Assert.True(Collatz.toBinaryLittleEndianString(clltz).Equals("1110001101"));
+            Assert.True(Collatz.toBinaryBigEndianString(clltz).Equals("1011000111"));
 
-            Assert.True(Collatz2024.CollapseInTwo_ModTwo(1, 2) == (BigInteger)13);
-            Assert.True(Collatz2024.CollapseInTwo_ModTwo(2, 1) == (BigInteger)227);
-            Assert.True(Collatz2024.CollapseInTwo_ModTwo(2, 2) == (BigInteger)909);
+            Assert.True(Collatz.CollapseInTwo_ModTwo(1, 2) == (BigInteger)13);
+            Assert.True(Collatz.CollapseInTwo_ModTwo(2, 1) == (BigInteger)227);
+            Assert.True(Collatz.CollapseInTwo_ModTwo(2, 2) == (BigInteger)909);
 
-            clltz = Collatz2024.CollapseInTwo_ModTwo(1, 3);
+            clltz = Collatz.CollapseInTwo_ModTwo(1, 3);
             Assert.True(clltz == (BigInteger)53);
-            Assert.True(Collatz2024.toBinaryLittleEndianString(clltz).Equals("110101"));
-            Assert.True(Collatz2024.toBinaryBigEndianString(clltz).Equals("101011"));
+            Assert.True(Collatz.toBinaryLittleEndianString(clltz).Equals("110101"));
+            Assert.True(Collatz.toBinaryBigEndianString(clltz).Equals("101011"));
 
-            clltz = Collatz2024.CollapseInTwo_ModTwo(2, 3);
+            clltz = Collatz.CollapseInTwo_ModTwo(2, 3);
             Assert.True(clltz == (BigInteger)3637);
-            Assert.True(Collatz2024.toBinaryLittleEndianString(clltz).Equals("111000110101"));
-            Assert.True(Collatz2024.toBinaryBigEndianString(clltz).Equals("101011000111"));
+            Assert.True(Collatz.toBinaryLittleEndianString(clltz).Equals("111000110101"));
+            Assert.True(Collatz.toBinaryBigEndianString(clltz).Equals("101011000111"));
 
-            clltz = Collatz2024.CollapseInTwo_ModTwo(3, 1);
+            clltz = Collatz.CollapseInTwo_ModTwo(3, 1);
             Assert.True(clltz == (BigInteger)14563);
-            Assert.True(Collatz2024.toBinaryLittleEndianString(clltz).Equals("11100011100011"));
-            Assert.True(Collatz2024.toBinaryBigEndianString(clltz).Equals("11000111000111"));
+            Assert.True(Collatz.toBinaryLittleEndianString(clltz).Equals("11100011100011"));
+            Assert.True(Collatz.toBinaryBigEndianString(clltz).Equals("11000111000111"));
 
-            clltz = Collatz2024.CollapseInTwo_ModTwo(3, 2);
+            clltz = Collatz.CollapseInTwo_ModTwo(3, 2);
             Assert.True(clltz == (BigInteger)58253);
-            Assert.True(Collatz2024.toBinaryLittleEndianString(clltz).Equals("1110001110001101"));
-            Assert.True(Collatz2024.toBinaryBigEndianString(clltz).Equals("1011000111000111"));
+            Assert.True(Collatz.toBinaryLittleEndianString(clltz).Equals("1110001110001101"));
+            Assert.True(Collatz.toBinaryBigEndianString(clltz).Equals("1011000111000111"));
 
-            clltz = Collatz2024.CollapseInTwo_ModTwo(3, 3);
+            clltz = Collatz.CollapseInTwo_ModTwo(3, 3);
             Assert.True(clltz == (BigInteger)233013);
-            Assert.True(Collatz2024.toBinaryLittleEndianString(clltz).Equals("111000111000110101"));
-            Assert.True(Collatz2024.toBinaryBigEndianString(clltz).Equals("101011000111000111"));
+            Assert.True(Collatz.toBinaryLittleEndianString(clltz).Equals("111000111000110101"));
+            Assert.True(Collatz.toBinaryBigEndianString(clltz).Equals("101011000111000111"));
 
-            Assert.True(Collatz2024.CollapseInTwo_ModTwo(1, 3) == (BigInteger)53);
-            Assert.True(Collatz2024.CollapseInTwo_ModTwo(2, 3) == (BigInteger)3637);
-            Assert.True(Collatz2024.CollapseInTwo_ModTwo(3, 1) == (BigInteger)14563);
-            Assert.True(Collatz2024.CollapseInTwo_ModTwo(3, 2) == (BigInteger)58253);
-            Assert.True(Collatz2024.CollapseInTwo_ModTwo(3, 3) == (BigInteger)233013);
+            Assert.True(Collatz.CollapseInTwo_ModTwo(1, 3) == (BigInteger)53);
+            Assert.True(Collatz.CollapseInTwo_ModTwo(2, 3) == (BigInteger)3637);
+            Assert.True(Collatz.CollapseInTwo_ModTwo(3, 1) == (BigInteger)14563);
+            Assert.True(Collatz.CollapseInTwo_ModTwo(3, 2) == (BigInteger)58253);
+            Assert.True(Collatz.CollapseInTwo_ModTwo(3, 3) == (BigInteger)233013);
 
-            clltz = Collatz2024.CollapseInTwo_ModTwo(1, 4);
+            clltz = Collatz.CollapseInTwo_ModTwo(1, 4);
             Assert.True(clltz == (BigInteger)213);
-            Assert.True(Collatz2024.toBinaryLittleEndianString(clltz).Equals("11010101"));
-            Assert.True(Collatz2024.toBinaryBigEndianString(clltz).Equals("10101011"));
+            Assert.True(Collatz.toBinaryLittleEndianString(clltz).Equals("11010101"));
+            Assert.True(Collatz.toBinaryBigEndianString(clltz).Equals("10101011"));
 
-            clltz = Collatz2024.CollapseInTwo_ModTwo(2, 4);
+            clltz = Collatz.CollapseInTwo_ModTwo(2, 4);
             Assert.True(clltz == (BigInteger)14549);
-            Assert.True(Collatz2024.toBinaryLittleEndianString(clltz).Equals("11100011010101"));
-            Assert.True(Collatz2024.toBinaryBigEndianString(clltz).Equals("10101011000111"));
+            Assert.True(Collatz.toBinaryLittleEndianString(clltz).Equals("11100011010101"));
+            Assert.True(Collatz.toBinaryBigEndianString(clltz).Equals("10101011000111"));
 
-            clltz = Collatz2024.CollapseInTwo_ModTwo(3, 4);
+            clltz = Collatz.CollapseInTwo_ModTwo(3, 4);
             Assert.True(clltz == (BigInteger)932053);
-            Assert.True(Collatz2024.toBinaryLittleEndianString(clltz).Equals("11100011100011010101"));
-            Assert.True(Collatz2024.toBinaryBigEndianString(clltz).Equals("10101011000111000111"));
+            Assert.True(Collatz.toBinaryLittleEndianString(clltz).Equals("11100011100011010101"));
+            Assert.True(Collatz.toBinaryBigEndianString(clltz).Equals("10101011000111000111"));
 
-            clltz = Collatz2024.CollapseInTwo_ModTwo(4, 1);
+            clltz = Collatz.CollapseInTwo_ModTwo(4, 1);
             Assert.True(clltz == (BigInteger)932067);
-            Assert.True(Collatz2024.toBinaryLittleEndianString(clltz).Equals("11100011100011100011"));
-            Assert.True(Collatz2024.toBinaryBigEndianString(clltz).Equals("11000111000111000111"));
+            Assert.True(Collatz.toBinaryLittleEndianString(clltz).Equals("11100011100011100011"));
+            Assert.True(Collatz.toBinaryBigEndianString(clltz).Equals("11000111000111000111"));
 
-            clltz = Collatz2024.CollapseInTwo_ModTwo(4, 2);
+            clltz = Collatz.CollapseInTwo_ModTwo(4, 2);
             Assert.True(clltz == (BigInteger)3728269);
-            Assert.True(Collatz2024.toBinaryLittleEndianString(clltz).Equals("1110001110001110001101"));
-            Assert.True(Collatz2024.toBinaryBigEndianString(clltz).Equals("1011000111000111000111"));
+            Assert.True(Collatz.toBinaryLittleEndianString(clltz).Equals("1110001110001110001101"));
+            Assert.True(Collatz.toBinaryBigEndianString(clltz).Equals("1011000111000111000111"));
 
-            clltz = Collatz2024.CollapseInTwo_ModTwo(4, 3);
+            clltz = Collatz.CollapseInTwo_ModTwo(4, 3);
             Assert.True(clltz == (BigInteger)14913077);
-            Assert.True(Collatz2024.toBinaryLittleEndianString(clltz).Equals("111000111000111000110101"));
-            Assert.True(Collatz2024.toBinaryBigEndianString(clltz).Equals("101011000111000111000111"));
+            Assert.True(Collatz.toBinaryLittleEndianString(clltz).Equals("111000111000111000110101"));
+            Assert.True(Collatz.toBinaryBigEndianString(clltz).Equals("101011000111000111000111"));
 
-            clltz = Collatz2024.CollapseInTwo_ModTwo(4, 4);
+            clltz = Collatz.CollapseInTwo_ModTwo(4, 4);
             Assert.True(clltz == (BigInteger)59652309);
-            Assert.True(Collatz2024.toBinaryLittleEndianString(clltz).Equals("11100011100011100011010101"));
-            Assert.True(Collatz2024.toBinaryBigEndianString(clltz).Equals("10101011000111000111000111"));
+            Assert.True(Collatz.toBinaryLittleEndianString(clltz).Equals("11100011100011100011010101"));
+            Assert.True(Collatz.toBinaryBigEndianString(clltz).Equals("10101011000111000111000111"));
 
-            Assert.True(Collatz2024.CollapseInTwo_ModTwo(1, 4) == (BigInteger)213);
-            Assert.True(Collatz2024.CollapseInTwo_ModTwo(2, 4) == (BigInteger)14549);
-            Assert.True(Collatz2024.CollapseInTwo_ModTwo(3, 4) == (BigInteger)932053);
-            Assert.True(Collatz2024.CollapseInTwo_ModTwo(4, 1) == (BigInteger)932067);
-            Assert.True(Collatz2024.CollapseInTwo_ModTwo(4, 2) == (BigInteger)3728269);
-            Assert.True(Collatz2024.CollapseInTwo_ModTwo(4, 3) == (BigInteger)14913077);
-            Assert.True(Collatz2024.CollapseInTwo_ModTwo(4, 4) == (BigInteger)59652309);
+            Assert.True(Collatz.CollapseInTwo_ModTwo(1, 4) == (BigInteger)213);
+            Assert.True(Collatz.CollapseInTwo_ModTwo(2, 4) == (BigInteger)14549);
+            Assert.True(Collatz.CollapseInTwo_ModTwo(3, 4) == (BigInteger)932053);
+            Assert.True(Collatz.CollapseInTwo_ModTwo(4, 1) == (BigInteger)932067);
+            Assert.True(Collatz.CollapseInTwo_ModTwo(4, 2) == (BigInteger)3728269);
+            Assert.True(Collatz.CollapseInTwo_ModTwo(4, 3) == (BigInteger)14913077);
+            Assert.True(Collatz.CollapseInTwo_ModTwo(4, 4) == (BigInteger)59652309);
         }
         [Fact]
         public void TestBinaryStringToBigInt()
         {
             BigInteger gtUint64max = BigInteger.Parse("818446744073709551615"); // Larger than UInt64.MaxValue
-            string czTxt = Collatz2024.toBinaryLittleEndianString(gtUint64max);
-            BigInteger clltz = Collatz2024.toBigIntegerFromBinaryLittleEndianString(czTxt);
+            string czTxt = Collatz.toBinaryLittleEndianString(gtUint64max);
+            BigInteger clltz = Collatz.toBigIntegerFromBinaryLittleEndianString(czTxt);
             Assert.True(clltz == gtUint64max);
 
-            clltz = Collatz2024.toBigIntegerFromBinaryLittleEndianString("1");
+            clltz = Collatz.toBigIntegerFromBinaryLittleEndianString("1");
             Assert.True(clltz == 1);
-            clltz = Collatz2024.toBigIntegerFromBinaryLittleEndianString("11100011100011100011010101");
+            clltz = Collatz.toBigIntegerFromBinaryLittleEndianString("11100011100011100011010101");
             Assert.True(clltz == 59652309);
-            clltz = Collatz2024.toBigIntegerFromBinaryBigEndianString("10101011000111000111000111");
+            clltz = Collatz.toBigIntegerFromBinaryBigEndianString("10101011000111000111000111");
             Assert.True(clltz == 59652309);
         }
         [Fact]
@@ -735,9 +735,9 @@ namespace Collatz2024Namespace
                 for (int i = 0; i < trials; i++)
                 {
                     seedBinaryBE = sb.ToString();
-                    seed = Collatz2024.toBigIntegerFromBinaryBigEndianString(seedBinaryBE);
+                    seed = Collatz.toBigIntegerFromBinaryBigEndianString(seedBinaryBE);
                     Assert.True(seed == pow4sum);
-                    Assert.True(Collatz2024.NextOdd(seed) == 1);
+                    Assert.True(Collatz.NextOdd(seed) == 1);
                     Assert.True(seed % 3 == mod3);
                     if (++mod3 == 3)
                         mod3 = 0;
@@ -806,11 +806,11 @@ namespace Collatz2024Namespace
                     isCase[j] = false;
                 BigInteger seed, pow4 = 1, pow4sum = 1;
                 int mod3 = 1, i = 0;
-                foreach (string seedBinaryBE in Collatz2024.GetBinaryBigEndianDecaysInOne().Take(100))
+                foreach (string seedBinaryBE in Collatz.GetBinaryBigEndianDecaysInOne().Take(100))
                 {
-                    seed = Collatz2024.toBigIntegerFromBinaryBigEndianString(seedBinaryBE);
+                    seed = Collatz.toBigIntegerFromBinaryBigEndianString(seedBinaryBE);
                     Assert.True(seed == pow4sum);
-                    Assert.True(Collatz2024.NextOdd(seed) == 1);
+                    Assert.True(Collatz.NextOdd(seed) == 1);
                     Assert.True(seed % 3 == mod3);
                     if (++mod3 == 3)
                         mod3 = 0;
@@ -901,7 +901,7 @@ namespace Collatz2024Namespace
                 currIdx = loopIdx;
                 while (true)
                 {
-                    nxtOdd = Collatz2024.NextOdd(nxtOdd);
+                    nxtOdd = Collatz.NextOdd(nxtOdd);
                     if (nxtOdd == 1)
                     {
                         for (int i = 0; i < thisOddList.Count; i++)
@@ -938,7 +938,7 @@ namespace Collatz2024Namespace
                 if (seedList[i] != 0)
                 {
                     BigInteger bi = OddOfIndex(i);
-                    Assert.True(seedList[i] == Collatz2024.OddStepCountToOne(bi));
+                    Assert.True(seedList[i] == Collatz.OddStepCountToOne(bi));
                 }
             }
             StringBuilder sb = new();
@@ -951,7 +951,7 @@ namespace Collatz2024Namespace
                     List<BigInteger> decayInN_List = [];
                     decayInN_List.Add(OddOfIndex(i));
                     for (ulong j = 1; j < targetDecay; j++)
-                        decayInN_List.Add(Collatz2024.NextOdd(decayInN_List[decayInN_List.Count - 1]));
+                        decayInN_List.Add(Collatz.NextOdd(decayInN_List[decayInN_List.Count - 1]));
                     for (int j = 0; j < decayInN_List.Count; j++)
                         sb.Append(decayInN_List[j].ToString() + ',');
                     sb.AppendLine();
@@ -969,7 +969,7 @@ namespace Collatz2024Namespace
             foreach ((BigInteger DecayInTarget, BigInteger FirstDecay, uint _PowTwo) tuple in decayInN_FirstDecayPairList)
             {
                 bigEndSb.Clear();
-                bigEndSb.Append(Collatz2024.toBinaryBigEndianString(tuple.DecayInTarget));
+                bigEndSb.Append(Collatz.toBinaryBigEndianString(tuple.DecayInTarget));
                 string bigEndTxt = bigEndSb.ToString();
                 string bigEndCore = Strip_10_000111_BigEnd(bigEndSb.ToString());
                 sb.AppendLine(tuple.DecayInTarget.ToString() + ',' + (tuple.DecayInTarget % 3).ToString() + ',' +
@@ -1045,7 +1045,7 @@ namespace Collatz2024Namespace
             while (true)
             {
                 seed += 2;
-                firstDecay = Collatz2024.NextOdd(seed);
+                firstDecay = Collatz.NextOdd(seed);
                 nextDecay = firstDecay;
                 decayCt = 1;
                 while (true)
@@ -1061,7 +1061,7 @@ namespace Collatz2024Namespace
                     }
                     if (decayCt == _DayTarget)
                         break;
-                    nextDecay = Collatz2024.NextOdd(nextDecay);
+                    nextDecay = Collatz.NextOdd(nextDecay);
                     ++decayCt;
                 }
                 if (decayInN_List.Count >= _MaxListCount || seed > _MaxSeed)
@@ -1096,16 +1096,16 @@ namespace Collatz2024Namespace
         //    //for (int i = 0; i < trials; i++)
         //    //{
         //    //    BigEndDecayIn2.Insert(1, "1");
-        //    //    decayIn2 = Collatz2024.toBigIntegerFromBinaryBigEndianString(BigEndDecayIn2.ToString());
-        //    //    decayIn1 = Collatz2024.NextOdd(decayIn2);
-        //    //    Assert.True(Collatz2024.NextOdd(decayIn1) == 1);
+        //    //    decayIn2 = Collatz.toBigIntegerFromBinaryBigEndianString(BigEndDecayIn2.ToString());
+        //    //    decayIn1 = Collatz.NextOdd(decayIn2);
+        //    //    Assert.True(Collatz.NextOdd(decayIn1) == 1);
         //    //    BigEndEchoIn2.Clear().Append(BigEndDecayIn2);
         //    //    for (int j = 0; j < trials; j++)
         //    //    {
         //    //        BigEndEchoIn2.Insert(0, echoPrefix);
-        //    //        decayIn2 = Collatz2024.toBigIntegerFromBinaryBigEndianString(BigEndEchoIn2.ToString());
-        //    //        decayIn1 = Collatz2024.NextOdd(decayIn2);
-        //    //        Assert.True(Collatz2024.NextOdd(decayIn1) == 1);
+        //    //        decayIn2 = Collatz.toBigIntegerFromBinaryBigEndianString(BigEndEchoIn2.ToString());
+        //    //        decayIn1 = Collatz.NextOdd(decayIn2);
+        //    //        Assert.True(Collatz.NextOdd(decayIn1) == 1);
         //    //    }
         //    //    if (i < 32)
         //    //        BigEndDecayIn2.Insert(0, "10");
@@ -1115,43 +1115,43 @@ namespace Collatz2024Namespace
         //    BigEndDecayIn2.Clear().Append("1");
         //    for (int i = 0; i < trials; i++)
         //    {
-        //        decayIn2 = Collatz2024.toBigIntegerFromBinaryBigEndianString(BigEndDecayIn2.ToString());
-        //        decayIn1 = Collatz2024.NextOdd(decayIn2);
-        //        Assert.True(Collatz2024.NextOdd(decayIn1) == 1);
+        //        decayIn2 = Collatz.toBigIntegerFromBinaryBigEndianString(BigEndDecayIn2.ToString());
+        //        decayIn1 = Collatz.NextOdd(decayIn2);
+        //        Assert.True(Collatz.NextOdd(decayIn1) == 1);
         //        BigEndEchoIn2.Clear().Append(BigEndDecayIn2);
         //        for (int j = 0; j < trials; j++)
         //        {
         //            BigEndEchoIn2.Insert(0, echoPrefix);
-        //            decayIn2 = Collatz2024.toBigIntegerFromBinaryBigEndianString(BigEndEchoIn2.ToString());
-        //            decayIn1 = Collatz2024.NextOdd(decayIn2);
-        //            Assert.True(Collatz2024.NextOdd(decayIn1) == 1);
+        //            decayIn2 = Collatz.toBigIntegerFromBinaryBigEndianString(BigEndEchoIn2.ToString());
+        //            decayIn1 = Collatz.NextOdd(decayIn2);
+        //            Assert.True(Collatz.NextOdd(decayIn1) == 1);
         //        }
         //        if (i < 8)
         //            BigEndDecayIn2.Insert(1, "1");
         //        else
         //            BigEndDecayIn2.Insert(1, '0');
         //    }
-        //    foreach (string seedBinaryBE in Collatz2024.GetBinaryBigEndianDecaysInTwo())
+        //    foreach (string seedBinaryBE in Collatz.GetBinaryBigEndianDecaysInTwo())
         //    {
-        //        decayIn2 = Collatz2024.toBigIntegerFromBinaryBigEndianString(seedBinaryBE);
-        //        decayIn1 = Collatz2024.NextOdd(decayIn2);
-        //        Assert.True(Collatz2024.NextOdd(decayIn1) == 1);
+        //        decayIn2 = Collatz.toBigIntegerFromBinaryBigEndianString(seedBinaryBE);
+        //        decayIn1 = Collatz.NextOdd(decayIn2);
+        //        Assert.True(Collatz.NextOdd(decayIn1) == 1);
         //        BigEndEchoIn2.Clear().Append(seedBinaryBE);
         //        for (int j = 0; j < trials; j++)
         //        {
         //            BigEndEchoIn2.Insert(0, echoPrefix);
-        //            decayIn2 = Collatz2024.toBigIntegerFromBinaryBigEndianString(BigEndEchoIn2.ToString());
-        //            decayIn1 = Collatz2024.NextOdd(decayIn2);
-        //            Assert.True(Collatz2024.NextOdd(decayIn1) == 1);
+        //            decayIn2 = Collatz.toBigIntegerFromBinaryBigEndianString(BigEndEchoIn2.ToString());
+        //            decayIn1 = Collatz.NextOdd(decayIn2);
+        //            Assert.True(Collatz.NextOdd(decayIn1) == 1);
         //        }
         //    }
         //    StringBuilder sb = new();
         //    sb.AppendLine("Anchor,DecayIn1,DecayIn2,Steps");
-        //    foreach (string ln in Collatz2024.GetBinaryBigEndianDecaysInTwo().Take(256))
+        //    foreach (string ln in Collatz.GetBinaryBigEndianDecaysInTwo().Take(256))
         //    {
-        //        decayIn2 = Collatz2024.toBigIntegerFromBinaryBigEndianString(ln);
-        //        decayIn1 = Collatz2024.NextOdd(decayIn2);
-        //        sb.AppendLine(ln + ',' + decayIn1.ToString() + ',' + decayIn2.ToString() + ',' + Collatz2024.OddStepCountToSmaller(decayIn2).ToString());
+        //        decayIn2 = Collatz.toBigIntegerFromBinaryBigEndianString(ln);
+        //        decayIn1 = Collatz.NextOdd(decayIn2);
+        //        sb.AppendLine(ln + ',' + decayIn1.ToString() + ',' + decayIn2.ToString() + ',' + Collatz.OddStepCountToSmaller(decayIn2).ToString());
         //    }
         //    string csv = sb.ToString();
         //    Assert.True(true);
@@ -1174,17 +1174,17 @@ namespace Collatz2024Namespace
         //    //    for (int i = 0; i < 100; i++)
         //    //    {
         //    //        seedTxt = sbSeed.ToString();
-        //    //        seed = Collatz2024.toBigIntegerFromBinaryBigEndianString(seedTxt);
-        //    //        decayOnce = Collatz2024.NextOdd(seed);
-        //    //        Assert.True(Collatz2024.NextOdd(decayOnce) == 1);
+        //    //        seed = Collatz.toBigIntegerFromBinaryBigEndianString(seedTxt);
+        //    //        decayOnce = Collatz.NextOdd(seed);
+        //    //        Assert.True(Collatz.NextOdd(decayOnce) == 1);
         //    //        sbEcho = new StringBuilder(sbEcho.ToString());
         //    //        for (int j = 0; j < 100; j++)
         //    //        {
         //    //            sbSeed.Insert(0, echoPrefix);
         //    //            seedTxt = sbSeed.ToString();
-        //    //            seed = Collatz2024.toBigIntegerFromBinaryBigEndianString(seedTxt);
-        //    //            decayOnce = Collatz2024.NextOdd(seed);
-        //    //            Assert.True(Collatz2024.NextOdd(decayOnce) == 1);
+        //    //            seed = Collatz.toBigIntegerFromBinaryBigEndianString(seedTxt);
+        //    //            decayOnce = Collatz.NextOdd(seed);
+        //    //            Assert.True(Collatz.NextOdd(decayOnce) == 1);
         //    //        }
         //    //        sbSeed.Append(seedSuffix);
         //    //    }
@@ -1192,30 +1192,30 @@ namespace Collatz2024Namespace
         //    sbSeed = new StringBuilder(mod1SeedTxt);
         //    for (int i = 0; i < 100; i++)
         //    {
-        //        seed = Collatz2024.toBigIntegerFromBinaryBigEndianString(sbSeed.ToString());
-        //        decayOnce = Collatz2024.NextOdd(seed);
-        //        Assert.True(Collatz2024.NextOdd(decayOnce) == 1);
+        //        seed = Collatz.toBigIntegerFromBinaryBigEndianString(sbSeed.ToString());
+        //        decayOnce = Collatz.NextOdd(seed);
+        //        Assert.True(Collatz.NextOdd(decayOnce) == 1);
         //        sbEcho = new StringBuilder(sbEcho.ToString());
         //        for (int j = 0; j < 100; j++)
         //        {
         //            sbEcho.Insert(0, echoPrefix);
-        //            decayOnce = Collatz2024.NextOdd(seed);
-        //            Assert.True(Collatz2024.NextOdd(decayOnce) == 1);
+        //            decayOnce = Collatz.NextOdd(seed);
+        //            Assert.True(Collatz.NextOdd(decayOnce) == 1);
         //        }
         //        sbSeed.Append(seedSuffix);
         //    }
         //    sbSeed = new StringBuilder(mod2SeedTxt);
         //    for (int i = 0; i < 100; i++)
         //    {
-        //        seed = Collatz2024.toBigIntegerFromBinaryBigEndianString(sbSeed.ToString());
-        //        decayOnce = Collatz2024.NextOdd(seed);
-        //        Assert.True(Collatz2024.NextOdd(decayOnce) == 1);
+        //        seed = Collatz.toBigIntegerFromBinaryBigEndianString(sbSeed.ToString());
+        //        decayOnce = Collatz.NextOdd(seed);
+        //        Assert.True(Collatz.NextOdd(decayOnce) == 1);
         //        sbEcho = new StringBuilder(sbEcho.ToString());
         //        for (int j = 0; j < 100; j++)
         //        {
         //            sbEcho.Insert(0, echoPrefix);
-        //            decayOnce = Collatz2024.NextOdd(seed);
-        //            Assert.True(Collatz2024.NextOdd(decayOnce) == 1);
+        //            decayOnce = Collatz.NextOdd(seed);
+        //            Assert.True(Collatz.NextOdd(decayOnce) == 1);
         //        }
         //        sbSeed.Append(seedSuffix);
         //    }
@@ -1233,76 +1233,76 @@ namespace Collatz2024Namespace
         //    targetDecayIn1 = 5;
         //    targetDecayInThreeBigEnd = "10001";
         //    trialParity = targetDecayInThreeBigEnd[1] == '0' ? 0 : 1;
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString(targetDecayInThreeBigEnd) == 17);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("110001") == 35);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("10001110001") == 1137);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("110001110001") == 2275);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("10001110001110001") == 72817);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("110001110001110001") == 145635);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("10001110001110001110001") == 4660337);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("110001110001110001110001") == 9320675);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("10001110001110001110001110001") == 298261617);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("110001110001110001110001110001") == 596523235);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("10001110001110001110001110001110001") == 19088743537);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("110001110001110001110001110001110001") == 38177487075);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString(targetDecayInThreeBigEnd) == 17);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("110001") == 35);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("10001110001") == 1137);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("110001110001") == 2275);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("10001110001110001") == 72817);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("110001110001110001") == 145635);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("10001110001110001110001") == 4660337);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("110001110001110001110001") == 9320675);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("10001110001110001110001110001") == 298261617);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("110001110001110001110001110001") == 596523235);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("10001110001110001110001110001110001") == 19088743537);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("110001110001110001110001110001110001") == 38177487075);
         //    BigEndAnchor = new(targetDecayInThreeBigEnd);
         //    for (int i = 0; i < trials; i++)
         //    {
-        //        decayIn3 = Collatz2024.toBigIntegerFromBinaryBigEndianString(BigEndAnchor.ToString());
-        //        decayIn2 = Collatz2024.NextOdd(decayIn3);
-        //        decayIn1 = Collatz2024.NextOdd(decayIn2);
-        //        Assert.True(Collatz2024.NextOdd(decayIn1) == 1);
+        //        decayIn3 = Collatz.toBigIntegerFromBinaryBigEndianString(BigEndAnchor.ToString());
+        //        decayIn2 = Collatz.NextOdd(decayIn3);
+        //        decayIn1 = Collatz.NextOdd(decayIn2);
+        //        Assert.True(Collatz.NextOdd(decayIn1) == 1);
         //        Assert.True(decayIn1 == targetDecayIn1);
         //        BigEndEcho.Clear().Append(BigEndAnchor);
         //        for (int j = 0; j < trials; j++)
         //        {
         //            BigEndEcho.Insert(0, echoPrefix);
-        //            decayIn3 = Collatz2024.toBigIntegerFromBinaryBigEndianString(BigEndEcho.ToString());
-        //            decayIn2 = Collatz2024.NextOdd(decayIn3);
-        //            decayIn1 = Collatz2024.NextOdd(decayIn2);
-        //            Assert.True(Collatz2024.NextOdd(decayIn1) == 1);
+        //            decayIn3 = Collatz.toBigIntegerFromBinaryBigEndianString(BigEndEcho.ToString());
+        //            decayIn2 = Collatz.NextOdd(decayIn3);
+        //            decayIn1 = Collatz.NextOdd(decayIn2);
+        //            Assert.True(Collatz.NextOdd(decayIn1) == 1);
         //            Assert.True(decayIn1 == targetDecayIn1);
         //        }
         //        string insertTxt = (i & 1) == trialParity ? "1" : "00011";
         //        BigEndAnchor.Insert(1, insertTxt);
         //    }
         //    // 5 echo
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("1010001") == 69);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("101010001") == 277);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("10101010001") == 1109);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("1010101010001") == 4437);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("10110001") == 141);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("1010110001") == 565);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("101010110001") == 2261);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("10101010110001") == 9045);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("1010001110001") == 4549);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("101010001110001") == 18197);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("10101010001110001") == 72789);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("1010101010001110001") == 291157);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("1010001") == 69);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("101010001") == 277);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("10101010001") == 1109);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("1010101010001") == 4437);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("10110001") == 141);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("1010110001") == 565);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("101010110001") == 2261);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("10101010110001") == 9045);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("1010001110001") == 4549);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("101010001110001") == 18197);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("10101010001110001") == 72789);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("1010101010001110001") == 291157);
 
         //    // 85 anchor
         //    targetDecayIn1 = 85;
         //    targetDecayInThreeBigEnd = "1101001";
         //    trialParity = targetDecayInThreeBigEnd[1] == '0' ? 0 : 1;
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString(targetDecayInThreeBigEnd) == 75);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("100011101001") == 2417);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("1100011101001") == 4835);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString(targetDecayInThreeBigEnd) == 75);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("100011101001") == 2417);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("1100011101001") == 4835);
         //    BigEndAnchor = new(targetDecayInThreeBigEnd);
         //    for (int i = 0; i < trials; i++)
         //    {
-        //        decayIn3 = Collatz2024.toBigIntegerFromBinaryBigEndianString(BigEndAnchor.ToString());
-        //        decayIn2 = Collatz2024.NextOdd(decayIn3);
-        //        decayIn1 = Collatz2024.NextOdd(decayIn2);
-        //        Assert.True(Collatz2024.NextOdd(decayIn1) == 1);
+        //        decayIn3 = Collatz.toBigIntegerFromBinaryBigEndianString(BigEndAnchor.ToString());
+        //        decayIn2 = Collatz.NextOdd(decayIn3);
+        //        decayIn1 = Collatz.NextOdd(decayIn2);
+        //        Assert.True(Collatz.NextOdd(decayIn1) == 1);
         //        Assert.True(decayIn1 == targetDecayIn1);
         //        BigEndEcho.Clear().Append(BigEndAnchor);
         //        for (int j = 0; j < trials; j++)
         //        {
         //            BigEndEcho.Insert(0, echoPrefix);
-        //            decayIn3 = Collatz2024.toBigIntegerFromBinaryBigEndianString(BigEndEcho.ToString());
-        //            decayIn2 = Collatz2024.NextOdd(decayIn3);
-        //            decayIn1 = Collatz2024.NextOdd(decayIn2);
-        //            Assert.True(Collatz2024.NextOdd(decayIn1) == 1);
+        //            decayIn3 = Collatz.toBigIntegerFromBinaryBigEndianString(BigEndEcho.ToString());
+        //            decayIn2 = Collatz.NextOdd(decayIn3);
+        //            decayIn1 = Collatz.NextOdd(decayIn2);
+        //            Assert.True(Collatz.NextOdd(decayIn1) == 1);
         //            Assert.True(decayIn1 == targetDecayIn1);
         //        }
         //        string insertTxt = (i & 1) == trialParity ? "1" : "00011";
@@ -1310,42 +1310,42 @@ namespace Collatz2024Namespace
         //    }
 
         //    // 85 echo
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("101101001") == 301);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("10101101001") == 1205);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("1010101101001") == 4821);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("10101010110001") == 19285);
-        //    Assert.True(Collatz2024.toBinaryLittleEndianString(191).Equals("10111111"));
-        //    Assert.True(Collatz2024.toBinaryBigEndianString(191).Equals("11111010"));
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("101101001") == 301);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("10101101001") == 1205);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("1010101101001") == 4821);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("10101010110001") == 19285);
+        //    Assert.True(Collatz.toBinaryLittleEndianString(191).Equals("10111111"));
+        //    Assert.True(Collatz.toBinaryBigEndianString(191).Equals("11111010"));
 
         //    // 341 anchor
         //    targetDecayIn1 = 341;
         //    targetDecayInThreeBigEnd = "11101001";
         //    trialParity = targetDecayInThreeBigEnd[1] == '0' ? 0 : 1;
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString(targetDecayInThreeBigEnd) == 151);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("1000111101001") == 4849);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("11000111101001") == 9699);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("1000111000111101001") == 310385);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("11000111000111101001") == 620771);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("1000111000111000111101001") == 19864689);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("11000111000111000111101001") == 39729379);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("1000111000111000111000111101001") == 1271340145);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("11000111000111000111000111101001") == 2542680291);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString(targetDecayInThreeBigEnd) == 151);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("1000111101001") == 4849);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("11000111101001") == 9699);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("1000111000111101001") == 310385);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("11000111000111101001") == 620771);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("1000111000111000111101001") == 19864689);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("11000111000111000111101001") == 39729379);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("1000111000111000111000111101001") == 1271340145);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("11000111000111000111000111101001") == 2542680291);
         //    BigEndAnchor = new(targetDecayInThreeBigEnd);
         //    for (int i = 0; i < trials; i++)
         //    {
-        //        decayIn3 = Collatz2024.toBigIntegerFromBinaryBigEndianString(BigEndAnchor.ToString());
-        //        decayIn2 = Collatz2024.NextOdd(decayIn3);
-        //        decayIn1 = Collatz2024.NextOdd(decayIn2);
-        //        Assert.True(Collatz2024.NextOdd(decayIn1) == 1);
+        //        decayIn3 = Collatz.toBigIntegerFromBinaryBigEndianString(BigEndAnchor.ToString());
+        //        decayIn2 = Collatz.NextOdd(decayIn3);
+        //        decayIn1 = Collatz.NextOdd(decayIn2);
+        //        Assert.True(Collatz.NextOdd(decayIn1) == 1);
         //        Assert.True(decayIn1 == targetDecayIn1);
         //        BigEndEcho.Clear().Append(BigEndAnchor);
         //        for (int j = 0; j < trials; j++)
         //        {
         //            BigEndEcho.Insert(0, echoPrefix);
-        //            decayIn3 = Collatz2024.toBigIntegerFromBinaryBigEndianString(BigEndEcho.ToString());
-        //            decayIn2 = Collatz2024.NextOdd(decayIn3);
-        //            decayIn1 = Collatz2024.NextOdd(decayIn2);
-        //            Assert.True(Collatz2024.NextOdd(decayIn1) == 1);
+        //            decayIn3 = Collatz.toBigIntegerFromBinaryBigEndianString(BigEndEcho.ToString());
+        //            decayIn2 = Collatz.NextOdd(decayIn3);
+        //            decayIn1 = Collatz.NextOdd(decayIn2);
+        //            Assert.True(Collatz.NextOdd(decayIn1) == 1);
         //            Assert.True(decayIn1 == targetDecayIn1);
         //        }
         //        string insertTxt = (i & 1) == trialParity ? "1" : "00011";
@@ -1353,179 +1353,179 @@ namespace Collatz2024Namespace
         //    }
 
         //    // 341 echo
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("1011101001") == 605);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("101011101001") == 2421);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("10101011101001") == 9685);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("1010101011101001") == 38741);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("101000111101001") == 19397);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("10101000111101001") == 77589);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("1010101000111101001") == 310357);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("101010101000111101001") == 1241429);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("1011000111101001") == 38797);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("10101100011101001") == 155189);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("10101011000111101001") == 620757);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("1010101011000111101001") == 2483029);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("1011101001") == 605);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("101011101001") == 2421);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("10101011101001") == 9685);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("1010101011101001") == 38741);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("101000111101001") == 19397);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("10101000111101001") == 77589);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("1010101000111101001") == 310357);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("101010101000111101001") == 1241429);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("1011000111101001") == 38797);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("10101100011101001") == 155189);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("10101011000111101001") == 620757);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("1010101011000111101001") == 2483029);
 
         //    // 5461 anchor
         //    targetDecayIn1 = 5461;
         //    targetDecayInThreeBigEnd = "1000110111101001";
         //    trialParity = targetDecayInThreeBigEnd[1] == '0' ? 0 : 1;
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString(targetDecayInThreeBigEnd) == 38833);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("11000110111101001") == 77667);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("1000111000110111101001") == 2485361);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("11000111000111101001") == 497073);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("1000111000111000111101001") == 19864689);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("11000111000111000111101001") == 39729379);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("1000111000111000111000111101001") == 1271340145);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("11000111000111000111000111101001") == 2542680291);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString(targetDecayInThreeBigEnd) == 38833);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("11000110111101001") == 77667);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("1000111000110111101001") == 2485361);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("11000111000111101001") == 497073);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("1000111000111000111101001") == 19864689);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("11000111000111000111101001") == 39729379);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("1000111000111000111000111101001") == 1271340145);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("11000111000111000111000111101001") == 2542680291);
         //    BigEndAnchor = new(targetDecayInThreeBigEnd);
         //    for (int i = 0; i < trials; i++)
         //    {
-        //        decayIn3 = Collatz2024.toBigIntegerFromBinaryBigEndianString(BigEndAnchor.ToString());
-        //        decayIn2 = Collatz2024.NextOdd(decayIn3);
-        //        decayIn1 = Collatz2024.NextOdd(decayIn2);
-        //        Assert.True(Collatz2024.NextOdd(decayIn1) == 1);
+        //        decayIn3 = Collatz.toBigIntegerFromBinaryBigEndianString(BigEndAnchor.ToString());
+        //        decayIn2 = Collatz.NextOdd(decayIn3);
+        //        decayIn1 = Collatz.NextOdd(decayIn2);
+        //        Assert.True(Collatz.NextOdd(decayIn1) == 1);
         //        Assert.True(decayIn1 == targetDecayIn1);
         //        BigEndEcho.Clear().Append(BigEndAnchor);
         //        for (int j = 0; j < trials; j++)
         //        {
         //            BigEndEcho.Insert(0, echoPrefix);
-        //            decayIn3 = Collatz2024.toBigIntegerFromBinaryBigEndianString(BigEndEcho.ToString());
-        //            decayIn2 = Collatz2024.NextOdd(decayIn3);
-        //            decayIn1 = Collatz2024.NextOdd(decayIn2);
-        //            Assert.True(Collatz2024.NextOdd(decayIn1) == 1);
+        //            decayIn3 = Collatz.toBigIntegerFromBinaryBigEndianString(BigEndEcho.ToString());
+        //            decayIn2 = Collatz.NextOdd(decayIn3);
+        //            decayIn1 = Collatz.NextOdd(decayIn2);
+        //            Assert.True(Collatz.NextOdd(decayIn1) == 1);
         //            Assert.True(decayIn1 == targetDecayIn1);
         //        }
         //        string insertTxt = (i & 1) == trialParity ? "1" : "00011";
         //        BigEndAnchor.Insert(1, insertTxt);
         //    }
         //    // 5461 echo
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("101000110111101001") == 155333);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("10101000110111101001") == 621365);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("1010101000110111101001") == 2485333);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("101010101000110111101001") == 9941333);
-        //    Assert.True(Collatz2024.toBinaryLittleEndianString(191).Equals("10111111"));
-        //    Assert.True(Collatz2024.toBinaryBigEndianString(191).Equals("11111010"));
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("101000110111101001") == 155333);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("10101000110111101001") == 621365);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("1010101000110111101001") == 2485333);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("101010101000110111101001") == 9941333);
+        //    Assert.True(Collatz.toBinaryLittleEndianString(191).Equals("10111111"));
+        //    Assert.True(Collatz.toBinaryBigEndianString(191).Equals("11111010"));
 
         //    // 21845 anchor
         //    targetDecayIn1 = 21845;
         //    targetDecayInThreeBigEnd = "100110111101001";
         //    trialParity = targetDecayInThreeBigEnd[1] == '0' ? 0 : 1;
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString(targetDecayInThreeBigEnd) == 19417);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("1100110111101001") == 38835);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("100011100110111101001") == 1242737);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("1100011100110111101001") == 2485475);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString(targetDecayInThreeBigEnd) == 19417);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("1100110111101001") == 38835);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("100011100110111101001") == 1242737);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("1100011100110111101001") == 2485475);
         //    BigEndAnchor = new(targetDecayInThreeBigEnd);
         //    for (int i = 0; i < trials; i++)
         //    {
-        //        decayIn3 = Collatz2024.toBigIntegerFromBinaryBigEndianString(BigEndAnchor.ToString());
-        //        decayIn2 = Collatz2024.NextOdd(decayIn3);
-        //        decayIn1 = Collatz2024.NextOdd(decayIn2);
-        //        Assert.True(Collatz2024.NextOdd(decayIn1) == 1);
+        //        decayIn3 = Collatz.toBigIntegerFromBinaryBigEndianString(BigEndAnchor.ToString());
+        //        decayIn2 = Collatz.NextOdd(decayIn3);
+        //        decayIn1 = Collatz.NextOdd(decayIn2);
+        //        Assert.True(Collatz.NextOdd(decayIn1) == 1);
         //        Assert.True(decayIn1 == targetDecayIn1);
         //        BigEndEcho.Clear().Append(BigEndAnchor);
         //        for (int j = 0; j < trials; j++)
         //        {
         //            BigEndEcho.Insert(0, echoPrefix);
-        //            decayIn3 = Collatz2024.toBigIntegerFromBinaryBigEndianString(BigEndEcho.ToString());
-        //            decayIn2 = Collatz2024.NextOdd(decayIn3);
-        //            decayIn1 = Collatz2024.NextOdd(decayIn2);
-        //            Assert.True(Collatz2024.NextOdd(decayIn1) == 1);
+        //            decayIn3 = Collatz.toBigIntegerFromBinaryBigEndianString(BigEndEcho.ToString());
+        //            decayIn2 = Collatz.NextOdd(decayIn3);
+        //            decayIn1 = Collatz.NextOdd(decayIn2);
+        //            Assert.True(Collatz.NextOdd(decayIn1) == 1);
         //            Assert.True(decayIn1 == targetDecayIn1);
         //        }
         //        string insertTxt = (i & 1) == trialParity ? "1" : "00011";
         //        BigEndAnchor.Insert(1, insertTxt);
         //    }
         //    // 21845 echo
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("10100110111101001") == 77669);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("1010100110111101001") == 310677);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("101010100110111101001") == 1242709);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("10101010100110111101001") == 4970837);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("101100110111101001") == 155341);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("10101100110111101001") == 621365);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("1010101100110111101001") == 2485461);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("101010101100110111101001") == 9941845);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("10100011100110111101001") == 4970949);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("1010100011100110111101001") == 19883797);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("101010100011100110111101001") == 79535189);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("10101010100011100110111101001") == 318140757);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("101100011100110111101001") == 9941901);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("10101100011100110111101001") == 39767605);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("1010101100011100110111101001") == 159070421);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("101010101100011100110111101001") == 636281685);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("10100110111101001") == 77669);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("1010100110111101001") == 310677);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("101010100110111101001") == 1242709);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("10101010100110111101001") == 4970837);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("101100110111101001") == 155341);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("10101100110111101001") == 621365);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("1010101100110111101001") == 2485461);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("101010101100110111101001") == 9941845);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("10100011100110111101001") == 4970949);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("1010100011100110111101001") == 19883797);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("101010100011100110111101001") == 79535189);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("10101010100011100110111101001") == 318140757);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("101100011100110111101001") == 9941901);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("10101100011100110111101001") == 39767605);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("1010101100011100110111101001") == 159070421);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("101010101100011100110111101001") == 636281685);
 
         //    // 349525 anchor
         //    targetDecayIn1 = 349525;
         //    targetDecayInThreeBigEnd = "10000010110111101001";
         //    trialParity = targetDecayInThreeBigEnd[1] == '0' ? 0 : 1;
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString(targetDecayInThreeBigEnd) == 621377);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("110000010110111101001") == 1242755);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("10001110000010110111101001") == 39768177);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("110001110000010110111101001") == 79536355);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("1000111000111000111101001") == 19864689);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("11000111000111000111101001") == 39729379);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("1000111000111000111000111101001") == 1271340145);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("11000111000111000111000111101001") == 2542680291);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString(targetDecayInThreeBigEnd) == 621377);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("110000010110111101001") == 1242755);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("10001110000010110111101001") == 39768177);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("110001110000010110111101001") == 79536355);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("1000111000111000111101001") == 19864689);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("11000111000111000111101001") == 39729379);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("1000111000111000111000111101001") == 1271340145);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("11000111000111000111000111101001") == 2542680291);
         //    BigEndAnchor = new(targetDecayInThreeBigEnd);
         //    for (int i = 0; i < trials; i++)
         //    {
-        //        decayIn3 = Collatz2024.toBigIntegerFromBinaryBigEndianString(BigEndAnchor.ToString());
-        //        decayIn2 = Collatz2024.NextOdd(decayIn3);
-        //        decayIn1 = Collatz2024.NextOdd(decayIn2);
-        //        Assert.True(Collatz2024.NextOdd(decayIn1) == 1);
+        //        decayIn3 = Collatz.toBigIntegerFromBinaryBigEndianString(BigEndAnchor.ToString());
+        //        decayIn2 = Collatz.NextOdd(decayIn3);
+        //        decayIn1 = Collatz.NextOdd(decayIn2);
+        //        Assert.True(Collatz.NextOdd(decayIn1) == 1);
         //        Assert.True(decayIn1 == targetDecayIn1);
         //        BigEndEcho.Clear().Append(BigEndAnchor);
         //        for (int j = 0; j < trials; j++)
         //        {
         //            BigEndEcho.Insert(0, echoPrefix);
-        //            decayIn3 = Collatz2024.toBigIntegerFromBinaryBigEndianString(BigEndEcho.ToString());
-        //            decayIn2 = Collatz2024.NextOdd(decayIn3);
-        //            decayIn1 = Collatz2024.NextOdd(decayIn2);
-        //            Assert.True(Collatz2024.NextOdd(decayIn1) == 1);
+        //            decayIn3 = Collatz.toBigIntegerFromBinaryBigEndianString(BigEndEcho.ToString());
+        //            decayIn2 = Collatz.NextOdd(decayIn3);
+        //            decayIn1 = Collatz.NextOdd(decayIn2);
+        //            Assert.True(Collatz.NextOdd(decayIn1) == 1);
         //            Assert.True(decayIn1 == targetDecayIn1);
         //        }
         //        string insertTxt = (i & 1) == trialParity ? "1" : "00011";
         //        BigEndAnchor.Insert(1, insertTxt);
         //    }
         //    // 349525 echo
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("1010000010110111101001") == 2485509);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("101010000010110111101001") == 9942037);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("10101010000010110111101001") == 39768149);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("1010101010000010110111101001") == 159072597);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("10110000010110111101001") == 4971021);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("1010110000010110111101001") == 19884085);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("101010110000010110111101001") == 79536341);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("10101010110000010110111101001") == 318145365);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("1010001110000010110111101001") == 159072709);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("101010001110000010110111101001") == 636290837);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("10101010001110000010110111101001") == 2545163349);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("1010101010001110000010110111101001") == 10180653397);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("10110001110000010110111101001") == 318145421);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("1010110001110000010110111101001") == 1272581685);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("101010110001110000010110111101001") == 5090326741);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("10101010110001110000010110111101001") == 20361306965);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("1010000010110111101001") == 2485509);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("101010000010110111101001") == 9942037);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("10101010000010110111101001") == 39768149);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("1010101010000010110111101001") == 159072597);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("10110000010110111101001") == 4971021);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("1010110000010110111101001") == 19884085);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("101010110000010110111101001") == 79536341);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("10101010110000010110111101001") == 318145365);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("1010001110000010110111101001") == 159072709);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("101010001110000010110111101001") == 636290837);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("10101010001110000010110111101001") == 2545163349);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("1010101010001110000010110111101001") == 10180653397);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("10110001110000010110111101001") == 318145421);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("1010110001110000010110111101001") == 1272581685);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("101010110001110000010110111101001") == 5090326741);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("10101010110001110000010110111101001") == 20361306965);
 
         //    // 1398101 anchor
         //    targetDecayIn1 = 1398101;
         //    targetDecayInThreeBigEnd = "10001000010110111101001";
         //    trialParity = targetDecayInThreeBigEnd[1] == '0' ? 0 : 1;
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString(targetDecayInThreeBigEnd) == 4971025);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString(targetDecayInThreeBigEnd) == 4971025);
         //    BigEndAnchor = new(targetDecayInThreeBigEnd);
         //    for (int i = 0; i < trials; i++)
         //    {
-        //        decayIn3 = Collatz2024.toBigIntegerFromBinaryBigEndianString(BigEndAnchor.ToString());
-        //        decayIn2 = Collatz2024.NextOdd(decayIn3);
-        //        decayIn1 = Collatz2024.NextOdd(decayIn2);
-        //        Assert.True(Collatz2024.NextOdd(decayIn1) == 1);
+        //        decayIn3 = Collatz.toBigIntegerFromBinaryBigEndianString(BigEndAnchor.ToString());
+        //        decayIn2 = Collatz.NextOdd(decayIn3);
+        //        decayIn1 = Collatz.NextOdd(decayIn2);
+        //        Assert.True(Collatz.NextOdd(decayIn1) == 1);
         //        Assert.True(decayIn1 == targetDecayIn1);
         //        BigEndEcho.Clear().Append(BigEndAnchor);
         //        for (int j = 0; j < trials; j++)
         //        {
         //            BigEndEcho.Insert(0, echoPrefix);
-        //            decayIn3 = Collatz2024.toBigIntegerFromBinaryBigEndianString(BigEndEcho.ToString());
-        //            decayIn2 = Collatz2024.NextOdd(decayIn3);
-        //            decayIn1 = Collatz2024.NextOdd(decayIn2);
-        //            Assert.True(Collatz2024.NextOdd(decayIn1) == 1);
+        //            decayIn3 = Collatz.toBigIntegerFromBinaryBigEndianString(BigEndEcho.ToString());
+        //            decayIn2 = Collatz.NextOdd(decayIn3);
+        //            decayIn1 = Collatz.NextOdd(decayIn2);
+        //            Assert.True(Collatz.NextOdd(decayIn1) == 1);
         //            Assert.True(decayIn1 == targetDecayIn1);
         //        }
         //        string insertTxt = (i & 1) == trialParity ? "1" : "00011";
@@ -1536,23 +1536,23 @@ namespace Collatz2024Namespace
         //    targetDecayIn1 = 22369621;
         //    targetDecayInThreeBigEnd = "1101001000010110111101001";
         //    trialParity = targetDecayInThreeBigEnd[1] == '0' ? 0 : 1;
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString(targetDecayInThreeBigEnd) == 19884107);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString(targetDecayInThreeBigEnd) == 19884107);
         //    BigEndAnchor = new(targetDecayInThreeBigEnd);
         //    for (int i = 0; i < trials; i++)
         //    {
-        //        decayIn3 = Collatz2024.toBigIntegerFromBinaryBigEndianString(BigEndAnchor.ToString());
-        //        decayIn2 = Collatz2024.NextOdd(decayIn3);
-        //        decayIn1 = Collatz2024.NextOdd(decayIn2);
-        //        Assert.True(Collatz2024.NextOdd(decayIn1) == 1);
+        //        decayIn3 = Collatz.toBigIntegerFromBinaryBigEndianString(BigEndAnchor.ToString());
+        //        decayIn2 = Collatz.NextOdd(decayIn3);
+        //        decayIn1 = Collatz.NextOdd(decayIn2);
+        //        Assert.True(Collatz.NextOdd(decayIn1) == 1);
         //        Assert.True(decayIn1 == targetDecayIn1);
         //        BigEndEcho.Clear().Append(BigEndAnchor);
         //        for (int j = 0; j < trials; j++)
         //        {
         //            BigEndEcho.Insert(0, echoPrefix);
-        //            decayIn3 = Collatz2024.toBigIntegerFromBinaryBigEndianString(BigEndEcho.ToString());
-        //            decayIn2 = Collatz2024.NextOdd(decayIn3);
-        //            decayIn1 = Collatz2024.NextOdd(decayIn2);
-        //            Assert.True(Collatz2024.NextOdd(decayIn1) == 1);
+        //            decayIn3 = Collatz.toBigIntegerFromBinaryBigEndianString(BigEndEcho.ToString());
+        //            decayIn2 = Collatz.NextOdd(decayIn3);
+        //            decayIn1 = Collatz.NextOdd(decayIn2);
+        //            Assert.True(Collatz.NextOdd(decayIn1) == 1);
         //            Assert.True(decayIn1 == targetDecayIn1);
         //        }
         //        string insertTxt = (i & 1) == trialParity ? "1" : "00011";
@@ -1563,29 +1563,29 @@ namespace Collatz2024Namespace
         //    targetDecayIn1 = 89478485;
         //    targetDecayInThreeBigEnd = "11101001000010110111101001";
         //    trialParity = targetDecayInThreeBigEnd[1] == '0' ? 0 : 1;
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString(targetDecayInThreeBigEnd) == 39768215);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("1000111101001000010110111101001") == 1272582897);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("11000111101001000010110111101001") == 2545165795);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("100011000111101001000010110111101001") == 40722652721);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString(targetDecayInThreeBigEnd) == 39768215);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("1000111101001000010110111101001") == 1272582897);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("11000111101001000010110111101001") == 2545165795);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("100011000111101001000010110111101001") == 40722652721);
         //    BigEndAnchor = new(targetDecayInThreeBigEnd);
         //    for (int i = 0; i < trials; i++)
         //    {
         //        string BigEndTxt = BigEndAnchor.ToString();
-        //        decayIn3 = Collatz2024.toBigIntegerFromBinaryBigEndianString(BigEndAnchor.ToString());
-        //        string LittleEndTxt = Collatz2024.toBinaryLittleEndianString(decayIn3);
-        //        Assert.True(Collatz2024.toBigIntegerFromBinaryLittleEndianString(LittleEndTxt) == decayIn3);
-        //        decayIn2 = Collatz2024.NextOdd(decayIn3);
-        //        decayIn1 = Collatz2024.NextOdd(decayIn2);
-        //        Assert.True(Collatz2024.NextOdd(decayIn1) == 1);
+        //        decayIn3 = Collatz.toBigIntegerFromBinaryBigEndianString(BigEndAnchor.ToString());
+        //        string LittleEndTxt = Collatz.toBinaryLittleEndianString(decayIn3);
+        //        Assert.True(Collatz.toBigIntegerFromBinaryLittleEndianString(LittleEndTxt) == decayIn3);
+        //        decayIn2 = Collatz.NextOdd(decayIn3);
+        //        decayIn1 = Collatz.NextOdd(decayIn2);
+        //        Assert.True(Collatz.NextOdd(decayIn1) == 1);
         //        Assert.True(decayIn1 == targetDecayIn1);
         //        BigEndEcho.Clear().Append(BigEndAnchor);
         //        for (int j = 0; j < trials; j++)
         //        {
         //            BigEndEcho.Insert(0, echoPrefix);
-        //            decayIn3 = Collatz2024.toBigIntegerFromBinaryBigEndianString(BigEndEcho.ToString());
-        //            decayIn2 = Collatz2024.NextOdd(decayIn3);
-        //            decayIn1 = Collatz2024.NextOdd(decayIn2);
-        //            Assert.True(Collatz2024.NextOdd(decayIn1) == 1);
+        //            decayIn3 = Collatz.toBigIntegerFromBinaryBigEndianString(BigEndEcho.ToString());
+        //            decayIn2 = Collatz.NextOdd(decayIn3);
+        //            decayIn1 = Collatz.NextOdd(decayIn2);
+        //            Assert.True(Collatz.NextOdd(decayIn1) == 1);
         //            Assert.True(decayIn1 == targetDecayIn1);
         //        }
         //        string insertTxt = (i & 1) == trialParity ? "1" : "00011";
@@ -1596,28 +1596,28 @@ namespace Collatz2024Namespace
         //    targetDecayIn1 = 1431655765;
         //    targetDecayInThreeBigEnd = "1000110111101001000010110111101001";
         //    trialParity = targetDecayInThreeBigEnd[1] == '0' ? 0 : 1;
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString(targetDecayInThreeBigEnd) == 10180663217);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("11000110111101001000010110111101001") == 20361326435);
-        //    Assert.True(Collatz2024.toBigIntegerFromBinaryBigEndianString("1000111000110111101001000010110111101001") == 651562445937);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString(targetDecayInThreeBigEnd) == 10180663217);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("11000110111101001000010110111101001") == 20361326435);
+        //    Assert.True(Collatz.toBigIntegerFromBinaryBigEndianString("1000111000110111101001000010110111101001") == 651562445937);
         //    BigEndAnchor = new(targetDecayInThreeBigEnd);
         //    for (int i = 0; i < trials; i++)
         //    {
         //        string BigEndTxt = BigEndAnchor.ToString();
-        //        decayIn3 = Collatz2024.toBigIntegerFromBinaryBigEndianString(BigEndAnchor.ToString());
-        //        string LittleEndTxt = Collatz2024.toBinaryLittleEndianString(decayIn3);
-        //        Assert.True(Collatz2024.toBigIntegerFromBinaryLittleEndianString(LittleEndTxt) == decayIn3);
-        //        decayIn2 = Collatz2024.NextOdd(decayIn3);
-        //        decayIn1 = Collatz2024.NextOdd(decayIn2);
-        //        Assert.True(Collatz2024.NextOdd(decayIn1) == 1);
+        //        decayIn3 = Collatz.toBigIntegerFromBinaryBigEndianString(BigEndAnchor.ToString());
+        //        string LittleEndTxt = Collatz.toBinaryLittleEndianString(decayIn3);
+        //        Assert.True(Collatz.toBigIntegerFromBinaryLittleEndianString(LittleEndTxt) == decayIn3);
+        //        decayIn2 = Collatz.NextOdd(decayIn3);
+        //        decayIn1 = Collatz.NextOdd(decayIn2);
+        //        Assert.True(Collatz.NextOdd(decayIn1) == 1);
         //        Assert.True(decayIn1 == targetDecayIn1);
         //        BigEndEcho.Clear().Append(BigEndAnchor);
         //        for (int j = 0; j < trials; j++)
         //        {
         //            BigEndEcho.Insert(0, echoPrefix);
-        //            decayIn3 = Collatz2024.toBigIntegerFromBinaryBigEndianString(BigEndEcho.ToString());
-        //            decayIn2 = Collatz2024.NextOdd(decayIn3);
-        //            decayIn1 = Collatz2024.NextOdd(decayIn2);
-        //            Assert.True(Collatz2024.NextOdd(decayIn1) == 1);
+        //            decayIn3 = Collatz.toBigIntegerFromBinaryBigEndianString(BigEndEcho.ToString());
+        //            decayIn2 = Collatz.NextOdd(decayIn3);
+        //            decayIn1 = Collatz.NextOdd(decayIn2);
+        //            Assert.True(Collatz.NextOdd(decayIn1) == 1);
         //            Assert.True(decayIn1 == targetDecayIn1);
         //        }
         //        string insertTxt = (i & 1) == trialParity ? "1" : "00011";
@@ -1625,9 +1625,9 @@ namespace Collatz2024Namespace
         //    }
         //    StringBuilder sb = new();
         //    sb.AppendLine("DecayIn3,DecayIn2,DecayIn1,Binary");
-        //    foreach ((BigInteger decayIn3, BigInteger decayIn2, BigInteger decayIn1) in Collatz2024.GetBinaryBigEndianDecaysInThree().Take(1024))
+        //    foreach ((BigInteger decayIn3, BigInteger decayIn2, BigInteger decayIn1) in Collatz.GetBinaryBigEndianDecaysInThree().Take(1024))
         //    {
-        //        sb.AppendLine(decayIn3 + "," + decayIn2 + "," + decayIn1 + ',' + Collatz2024.toBinaryBigEndianString(decayIn3));
+        //        sb.AppendLine(decayIn3 + "," + decayIn2 + "," + decayIn1 + ',' + Collatz.toBinaryBigEndianString(decayIn3));
         //    }
         //    string txt = sb.ToString();
         //    Assert.True(true);
@@ -1649,7 +1649,7 @@ namespace Collatz2024Namespace
             bool isContains;
             for (ulong odd = 1; odd < trials; odd += 2)
             {
-                oddDecaySteps = Collatz2024.OddStepCountToOne(odd);
+                oddDecaySteps = Collatz.OddStepCountToOne(odd);
                 switch (oddDecaySteps)
                 {
                     case 1:
@@ -1666,7 +1666,7 @@ namespace Collatz2024Namespace
                             if ((decaysTo - 1) % 4 != 0)
                                 Assert.True(false);
                             decaysTo = (decaysTo - 1) / 4;
-                            Assert.True(Collatz2024.OddStepCountToOne(decaysTo) == oddDecaySteps);
+                            Assert.True(Collatz.OddStepCountToOne(decaysTo) == oddDecaySteps);
                         }
                         break;
                     default:
@@ -1689,12 +1689,12 @@ namespace Collatz2024Namespace
             // Test decay in 1
             for (int odd = 1; odd < trials; odd++)
             {
-                oddDecaySteps = Collatz2024.OddStepCountToOne(odd);
+                oddDecaySteps = Collatz.OddStepCountToOne(odd);
                 if (oddDecaySteps == 1)
                 {
-                    if (Collatz2024.DecayInN_FormulaList(odd, collatzDecayFormulaRecursive) != 1)
+                    if (Collatz.DecayInN_FormulaList(odd, collatzDecayFormulaRecursive) != 1)
                         Assert.True(true);
-                    Assert.True(Collatz2024.DecayInN_FormulaList(odd, collatzDecayFormulaRecursive) == 1);
+                    Assert.True(Collatz.DecayInN_FormulaList(odd, collatzDecayFormulaRecursive) == 1);
                     if (!collatzDecayFormulaRecursive.IsMember(odd))
                         Assert.True(true);
                     Assert.True(collatzDecayFormulaRecursive.IsMember(odd));
@@ -1707,7 +1707,7 @@ namespace Collatz2024Namespace
                 }
                 else
                 {
-                    Assert.False(Collatz2024.DecayInN_FormulaList(odd, collatzDecayFormulaRecursive) == 1);
+                    Assert.False(Collatz.DecayInN_FormulaList(odd, collatzDecayFormulaRecursive) == 1);
                     Assert.False(collatzDecayFormula.IsMember(odd));
                     if (collatzDecayFormulaBitManipulation.IsMember(odd))
                         Assert.False(collatzDecayFormulaBitManipulation.IsMember(odd));
@@ -1756,7 +1756,7 @@ namespace Collatz2024Namespace
             collatzFormulaList.Add(CollatzDecayFormulaBitManipulationList[0]);
             for (int odd = 1; odd < trials; odd++)
             {
-                oddDecaySteps = Collatz2024.OddStepCountToOne(odd);
+                oddDecaySteps = Collatz.OddStepCountToOne(odd);
                 isMemberCt = 0;
                 foreach (CollatzDecayFormulaRecursive cdfr in collatzDecayFormulaRecursiveList)
                 {
@@ -1807,7 +1807,7 @@ namespace Collatz2024Namespace
             }
             for (int odd = 1; odd < trials; odd++)
             {
-                oddDecaySteps = Collatz2024.OddStepCountToOne(odd);
+                oddDecaySteps = Collatz.OddStepCountToOne(odd);
                 isMemberCt = 0;
                 foreach (ICollatzDecayFormula collatzFormula in collatzFormulaList)
                 {
@@ -1833,7 +1833,7 @@ namespace Collatz2024Namespace
             bool isMember;
             for (int odd = 1; odd < trials; odd += 2)
             {
-                oddDecaySteps = Collatz2024.OddStepCountToOne(odd);
+                oddDecaySteps = Collatz.OddStepCountToOne(odd);
                 isMember = collatzDecayFormulaBitManipulationIn3.IsMember(odd);
                 if ((oddDecaySteps == 3) != isMember)
                     collatzDecayFormulaBitManipulationIn3.IsMember(odd);
@@ -1861,11 +1861,11 @@ namespace Collatz2024Namespace
                 }
                 if (c == odd || c.IsEven)
                     continue;
-                oddDecaySteps = Collatz2024.OddStepCountToOne(odd);
-                fourNplusOneSteps = Collatz2024.OddStepCountToOne(c);
+                oddDecaySteps = Collatz.OddStepCountToOne(odd);
+                fourNplusOneSteps = Collatz.OddStepCountToOne(c);
                 if (oddDecaySteps != fourNplusOneSteps)
                     Assert.True(true);
-                Assert.True(Collatz2024.OddStepCountToOne(odd) == Collatz2024.OddStepCountToOne(c));
+                Assert.True(Collatz.OddStepCountToOne(odd) == Collatz.OddStepCountToOne(c));
             }
         }
         [Fact]
@@ -1880,7 +1880,7 @@ namespace Collatz2024Namespace
             // Test decay in 1 step
             for (int odd = 1; odd < trials; odd++)
             {
-                oddDecaySteps = Collatz2024.OddStepCountToOne(odd);
+                oddDecaySteps = Collatz.OddStepCountToOne(odd);
                 isMemberCt = 0;
                 foreach (ICollatzDecayFormula collatzFormula in collatzFormulaInOneStepList)
                 {
@@ -1898,7 +1898,7 @@ namespace Collatz2024Namespace
             collatzFormulaInTwoStepsList.Add(new CollatzDecayFormulaRecursive(collatzFormulaInOneStepList[0], 1));
             for (int odd = 1; odd < trials; odd++)
             {
-                oddDecaySteps = Collatz2024.OddStepCountToOne(odd);
+                oddDecaySteps = Collatz.OddStepCountToOne(odd);
                 isMemberCt = 0;
                 foreach (ICollatzDecayFormula collatzFormula in collatzFormulaInTwoStepsList)
                 {
@@ -1918,7 +1918,7 @@ namespace Collatz2024Namespace
             collatzFormulaInThreeStepsList.Add(new CollatzDecayFormulaRecursive(collatzFormulaInTwoStepsList[1], 1));
             for (int odd = 1; odd < trials; odd++)
             {
-                oddDecaySteps = Collatz2024.OddStepCountToOne(odd);
+                oddDecaySteps = Collatz.OddStepCountToOne(odd);
                 isMemberCt = 0;
                 foreach (ICollatzDecayFormula collatzFormula in collatzFormulaInThreeStepsList)
                 {
@@ -1947,14 +1947,14 @@ namespace Collatz2024Namespace
             HashSet<(BigInteger DecayIn2, BigInteger DecayIn1)> DecayIn21HashSet = new();
             for (int i = 1; i < trials; i++)
             {
-                if (Collatz2024.OddStepCountToOne(i) != 2)
+                if (Collatz.OddStepCountToOne(i) != 2)
                     continue;
                 if ((i & 1) == 0) // even
                     continue;
                 int decayIn2candidate = i;
                 DecayIn2HashSet.Add(i);
-                decayIn1 = Collatz2024.NextOdd(i);
-                Assert.True(Collatz2024.OddStepCountToOne(decayIn1) == 1);
+                decayIn1 = Collatz.NextOdd(i);
+                Assert.True(Collatz.OddStepCountToOne(decayIn1) == 1);
                 DecayIn1HashSet.Add(decayIn1);
                 DecayIn21HashSet.Add((i, decayIn1));
             }
@@ -1969,7 +1969,7 @@ namespace Collatz2024Namespace
             StringBuilder sb21 = new();
             foreach ((BigInteger DecayIn2, BigInteger DecayIn1) c21 in DecayIn21HashSet)
                 sb21.AppendLine(c21.DecayIn2.ToString() + ',' + c21.DecayIn1.ToString()
-                    + ',' + Collatz2024.toBinaryBigEndianString(c21.DecayIn2));
+                    + ',' + Collatz.toBinaryBigEndianString(c21.DecayIn2));
             string s21 = sb21.ToString();
             Assert.True(true);
         }
@@ -1985,17 +1985,17 @@ namespace Collatz2024Namespace
             HashSet<(BigInteger DecayIn3, BigInteger DecayIn2, BigInteger DecayIn1)> DecayIn321HashSet = new();
             for (int i = 1; i < trials; i++)
             {
-                if (Collatz2024.OddStepCountToOne(i) != 3)
+                if (Collatz.OddStepCountToOne(i) != 3)
                     continue;
                 if ((i & 1) == 0) // even
                     continue;
                 int decayIn3candidate = i;
                 DecayIn3HashSet.Add(decayIn3candidate);
-                decayIn2 = Collatz2024.NextOdd(decayIn3candidate);
-                Assert.True(Collatz2024.OddStepCountToOne(decayIn2) == 2);
+                decayIn2 = Collatz.NextOdd(decayIn3candidate);
+                Assert.True(Collatz.OddStepCountToOne(decayIn2) == 2);
                 DecayIn2HashSet.Add(decayIn2);
-                decayIn1 = Collatz2024.NextOdd(decayIn2);
-                Assert.True(Collatz2024.OddStepCountToOne(decayIn1) == 1);
+                decayIn1 = Collatz.NextOdd(decayIn2);
+                Assert.True(Collatz.OddStepCountToOne(decayIn1) == 1);
                 DecayIn1HashSet.Add(decayIn1);
                 DecayIn321HashSet.Add((decayIn3candidate, decayIn2, decayIn1));
             }
@@ -2014,8 +2014,8 @@ namespace Collatz2024Namespace
             StringBuilder sb321 = new();
             foreach ((BigInteger DecayIn3, BigInteger DecayIn2, BigInteger DecayIn1) c321 in DecayIn321HashSet)
                 sb321.AppendLine(c321.DecayIn3.ToString() + ',' + c321.DecayIn2.ToString() + ',' + c321.DecayIn1.ToString()
-                    + ',' + Collatz2024.toBinaryBigEndianString(c321.DecayIn3)
-                    + ',' + Collatz2024.toBinaryBigEndianString(c321.DecayIn2));
+                    + ',' + Collatz.toBinaryBigEndianString(c321.DecayIn3)
+                    + ',' + Collatz.toBinaryBigEndianString(c321.DecayIn2));
             string s321 = sb321.ToString();
             Assert.True(true);
         }
@@ -2026,10 +2026,10 @@ namespace Collatz2024Namespace
             List<string> sampleList = new();
             StringBuilder sb1 = new("1000110111101001");
             int idx1 = sb1.Length;
-            BigInteger odd1 = Collatz2024.toBigIntegerFromBinaryBigEndianString(sb1.ToString());
+            BigInteger odd1 = Collatz.toBigIntegerFromBinaryBigEndianString(sb1.ToString());
             StringBuilder sb2 = new("1000111000110111101001");
             int idx2 = sb2.Length;
-            BigInteger odd2 = Collatz2024.toBigIntegerFromBinaryBigEndianString(sb2.ToString());
+            BigInteger odd2 = Collatz.toBigIntegerFromBinaryBigEndianString(sb2.ToString());
 
             BigInteger decayIn3, decayIn2, decayIn1;
             while (sampleList.Count < sampleCt)
@@ -2041,7 +2041,7 @@ namespace Collatz2024Namespace
                         sb1.Insert(0, "1");
                     else
                         sb1.Insert(sb1.Length - idx1, sb1[sb1.Length - idx1 - 1] == '0' ? '1' : '0');
-                    odd1 = Collatz2024.toBigIntegerFromBinaryBigEndianString(sb1.ToString());
+                    odd1 = Collatz.toBigIntegerFromBinaryBigEndianString(sb1.ToString());
                 }
                 else
                 {
@@ -2050,20 +2050,20 @@ namespace Collatz2024Namespace
                         sb2.Insert(0, "1");
                     else
                         sb2.Insert(sb2.Length - idx2, sb2[sb2.Length - idx2 - 1] == '0' ? '1' : '0');
-                    odd2 = Collatz2024.toBigIntegerFromBinaryBigEndianString(sb2.ToString());
+                    odd2 = Collatz.toBigIntegerFromBinaryBigEndianString(sb2.ToString());
                 }
-                Assert.True(Collatz2024.OddStepCountToOne(decayIn3) == 3);
-                decayIn2 = Collatz2024.NextOdd(decayIn3);
-                Assert.True(Collatz2024.OddStepCountToOne(decayIn2) == 2);
-                decayIn1 = Collatz2024.NextOdd(decayIn2);
-                Assert.True(Collatz2024.OddStepCountToOne(decayIn1) == 1);
+                Assert.True(Collatz.OddStepCountToOne(decayIn3) == 3);
+                decayIn2 = Collatz.NextOdd(decayIn3);
+                Assert.True(Collatz.OddStepCountToOne(decayIn2) == 2);
+                decayIn1 = Collatz.NextOdd(decayIn2);
+                Assert.True(Collatz.OddStepCountToOne(decayIn1) == 1);
                 BigInteger c = decayIn3;
                 while ((c & 3) == 1) // Equivalent to c % 4 == 1
                     c = (c - 1) >> 2; // Equivalent to (c - 1) / 4
                 if (c.IsEven)
                     c = (c << 2) + 1;
                 sampleList.Add(new string(decayIn3.ToString() + ',' + decayIn2.ToString() + ',' + decayIn1.ToString()
-                    + ',' + Collatz2024.toBinaryBigEndianString(decayIn3)));
+                    + ',' + Collatz.toBinaryBigEndianString(decayIn3)));
             }
             StringBuilder sb = new();
             foreach (string ln in sampleList)
@@ -2087,14 +2087,14 @@ namespace Collatz2024Namespace
             StringBuilder sb = new();
             while (true)
             {
-                Assert.True(Collatz2024.OddStepCountToOne(decayIn3) == 3);
-                decayIn2 = Collatz2024.NextOdd(decayIn3);
-                Assert.True(Collatz2024.OddStepCountToOne(decayIn2) == 2);
-                decayIn1 = Collatz2024.NextOdd(decayIn2);
-                Assert.True(Collatz2024.OddStepCountToOne(decayIn1) == 1);
+                Assert.True(Collatz.OddStepCountToOne(decayIn3) == 3);
+                decayIn2 = Collatz.NextOdd(decayIn3);
+                Assert.True(Collatz.OddStepCountToOne(decayIn2) == 2);
+                decayIn1 = Collatz.NextOdd(decayIn2);
+                Assert.True(Collatz.OddStepCountToOne(decayIn1) == 1);
                 Assert.True(decayIn1 == 5461);
                 sb.AppendLine(decayIn3.ToString() + ',' + decayIn2.ToString() + ',' + decayIn1.ToString()
-                    + ',' + Collatz2024.toBinaryBigEndianString(decayIn3));
+                    + ',' + Collatz.toBinaryBigEndianString(decayIn3));
                 if (++ct > 10)
                     break;
                 if (is32_17)
@@ -2120,14 +2120,14 @@ namespace Collatz2024Namespace
             StringBuilder sb = new();
             while (true)
             {
-                Assert.True(Collatz2024.OddStepCountToOne(decayIn3) == 3);
-                decayIn2 = Collatz2024.NextOdd(decayIn3);
-                Assert.True(Collatz2024.OddStepCountToOne(decayIn2) == 2);
-                decayIn1 = Collatz2024.NextOdd(decayIn2);
-                Assert.True(Collatz2024.OddStepCountToOne(decayIn1) == 1);
+                Assert.True(Collatz.OddStepCountToOne(decayIn3) == 3);
+                decayIn2 = Collatz.NextOdd(decayIn3);
+                Assert.True(Collatz.OddStepCountToOne(decayIn2) == 2);
+                decayIn1 = Collatz.NextOdd(decayIn2);
+                Assert.True(Collatz.OddStepCountToOne(decayIn1) == 1);
                 Assert.True(decayIn1 == 349525);
                 sb.AppendLine(decayIn3.ToString() + ',' + decayIn2.ToString() + ',' + decayIn1.ToString()
-                    + ',' + Collatz2024.toBinaryBigEndianString(decayIn3));
+                    + ',' + Collatz.toBinaryBigEndianString(decayIn3));
                 if (++ct > 10)
                     break;
                 if (is32_17)
@@ -2151,14 +2151,14 @@ namespace Collatz2024Namespace
             StringBuilder sb = new();
             while (true)
             {
-                Assert.True(Collatz2024.OddStepCountToOne(decayIn3) == 3);
-                decayIn2 = Collatz2024.NextOdd(decayIn3);
-                Assert.True(Collatz2024.OddStepCountToOne(decayIn2) == 2);
-                decayIn1 = Collatz2024.NextOdd(decayIn2);
-                Assert.True(Collatz2024.OddStepCountToOne(decayIn1) == 1);
+                Assert.True(Collatz.OddStepCountToOne(decayIn3) == 3);
+                decayIn2 = Collatz.NextOdd(decayIn3);
+                Assert.True(Collatz.OddStepCountToOne(decayIn2) == 2);
+                decayIn1 = Collatz.NextOdd(decayIn2);
+                Assert.True(Collatz.OddStepCountToOne(decayIn1) == 1);
                 Assert.True(decayIn1 == 1398101);
                 sb.AppendLine(decayIn3.ToString() + ',' + decayIn2.ToString() + ',' + decayIn1.ToString()
-                    + ',' + Collatz2024.toBinaryBigEndianString(decayIn3));
+                    + ',' + Collatz.toBinaryBigEndianString(decayIn3));
                 if (++ct > 10)
                     break;
                 if (is32_17)
@@ -2181,14 +2181,14 @@ namespace Collatz2024Namespace
             StringBuilder sb = new();
             while (true)
             {
-                Assert.True(Collatz2024.OddStepCountToOne(decayIn3) == 3);
-                decayIn2 = Collatz2024.NextOdd(decayIn3);
-                Assert.True(Collatz2024.OddStepCountToOne(decayIn2) == 2);
-                decayIn1 = Collatz2024.NextOdd(decayIn2);
-                Assert.True(Collatz2024.OddStepCountToOne(decayIn1) == 1);
+                Assert.True(Collatz.OddStepCountToOne(decayIn3) == 3);
+                decayIn2 = Collatz.NextOdd(decayIn3);
+                Assert.True(Collatz.OddStepCountToOne(decayIn2) == 2);
+                decayIn1 = Collatz.NextOdd(decayIn2);
+                Assert.True(Collatz.OddStepCountToOne(decayIn1) == 1);
                 Assert.True(decayIn1 == 22369621);
                 sb.AppendLine(decayIn3.ToString() + ',' + decayIn2.ToString() + ',' + decayIn1.ToString()
-                    + ',' + Collatz2024.toBinaryBigEndianString(decayIn3));
+                    + ',' + Collatz.toBinaryBigEndianString(decayIn3));
                 if (++ct > 10)
                     break;
                 if (is32_17)
@@ -2211,14 +2211,14 @@ namespace Collatz2024Namespace
             StringBuilder sb = new();
             while (true)
             {
-                Assert.True(Collatz2024.OddStepCountToOne(decayIn3) == 3);
-                decayIn2 = Collatz2024.NextOdd(decayIn3);
-                Assert.True(Collatz2024.OddStepCountToOne(decayIn2) == 2);
-                decayIn1 = Collatz2024.NextOdd(decayIn2);
-                Assert.True(Collatz2024.OddStepCountToOne(decayIn1) == 1);
+                Assert.True(Collatz.OddStepCountToOne(decayIn3) == 3);
+                decayIn2 = Collatz.NextOdd(decayIn3);
+                Assert.True(Collatz.OddStepCountToOne(decayIn2) == 2);
+                decayIn1 = Collatz.NextOdd(decayIn2);
+                Assert.True(Collatz.OddStepCountToOne(decayIn1) == 1);
                 Assert.True(decayIn1 == 89478485);
                 sb.AppendLine(decayIn3.ToString() + ',' + decayIn2.ToString() + ',' + decayIn1.ToString()
-                    + ',' + Collatz2024.toBinaryBigEndianString(decayIn3));
+                    + ',' + Collatz.toBinaryBigEndianString(decayIn3));
                 if (++ct > 10)
                     break;
                 if (is32_17)
@@ -2239,12 +2239,12 @@ namespace Collatz2024Namespace
             int multStepCt;
             while (sb.Length < 128)
             {
-                c = Collatz2024.toBigIntegerFromBinaryBigEndianString(sb.ToString());
+                c = Collatz.toBigIntegerFromBinaryBigEndianString(sb.ToString());
                 multStepCt = 0;
                 while (true)
                 {
-                    csvSb.AppendLine(c.ToString() + ',' + Collatz2024.toBinaryBigEndianString(c));
-                    c = Collatz2024.NextOdd(c);
+                    csvSb.AppendLine(c.ToString() + ',' + Collatz.toBinaryBigEndianString(c));
+                    c = Collatz.NextOdd(c);
                     ++multStepCt;
                     if (c == 341)
                         Assert.True(true);
@@ -2326,15 +2326,15 @@ namespace Collatz2024Namespace
                         break;
                     pow2 <<= 1;
                 }
-                UInt64 stepsToSmaller = Collatz2024.OddStepCountToSmaller(i);
-                sb.AppendLine(pow2.ToString() + ',' + (i - pow2).ToString() + ',' + i.ToString() + ',' + Collatz2024.OddStepCountToOne(i).ToString() + ',' + stepsToSmaller.ToString());
+                UInt64 stepsToSmaller = Collatz.OddStepCountToSmaller(i);
+                sb.AppendLine(pow2.ToString() + ',' + (i - pow2).ToString() + ',' + i.ToString() + ',' + Collatz.OddStepCountToOne(i).ToString() + ',' + stepsToSmaller.ToString());
             }
             string csv = sb.ToString();
             Assert.True(true);
             List<List<int>> oddStepCountToSmallerList = new();
             for (BigInteger i = 3; i < trials; i += 2)
             {
-                int stepsToSmaller = (int)Collatz2024.OddStepCountToSmaller(i);
+                int stepsToSmaller = (int)Collatz.OddStepCountToSmaller(i);
                 if (stepsToSmaller >= oddStepCountToSmallerList.Count)
                 {
                     int ct = oddStepCountToSmallerList.Count;
@@ -2402,16 +2402,16 @@ namespace Collatz2024Namespace
         #region Helper Methods
         private void AssertDecayIn1(string _AnchorBigEnd)
         {
-            BigInteger currOdd = Collatz2024.toBigIntegerFromBinaryBigEndianString(_AnchorBigEnd.ToString());
-            Assert.True(Collatz2024.NextOdd(currOdd) == 1);
+            BigInteger currOdd = Collatz.toBigIntegerFromBinaryBigEndianString(_AnchorBigEnd.ToString());
+            Assert.True(Collatz.NextOdd(currOdd) == 1);
         }
         private void AssertDecayIn2(int _EchoTrials, string _DecayInTwoBigEnd)
         {
-            BigInteger decayIn2 = Collatz2024.toBigIntegerFromBinaryBigEndianString(_DecayInTwoBigEnd);
+            BigInteger decayIn2 = Collatz.toBigIntegerFromBinaryBigEndianString(_DecayInTwoBigEnd);
             Assert.True(decayIn2 != 1);
-            BigInteger decayIn1 = Collatz2024.NextOdd(decayIn2);
+            BigInteger decayIn1 = Collatz.NextOdd(decayIn2);
             Assert.True(decayIn1 != 1);
-            Assert.True(Collatz2024.NextOdd(decayIn1) == 1);
+            Assert.True(Collatz.NextOdd(decayIn1) == 1);
 
             BigInteger decayIn1Anchor = decayIn1;
             const string echoPrefix = "10";
@@ -2419,11 +2419,11 @@ namespace Collatz2024Namespace
             for (int echoTrialId = 0; echoTrialId < _EchoTrials; echoTrialId++)
             {
                 echoBinBE.Insert(0, echoPrefix);
-                decayIn2 = Collatz2024.toBigIntegerFromBinaryBigEndianString(_DecayInTwoBigEnd);
+                decayIn2 = Collatz.toBigIntegerFromBinaryBigEndianString(_DecayInTwoBigEnd);
                 Assert.True(decayIn2 != 1);
-                decayIn1 = Collatz2024.NextOdd(decayIn2);
+                decayIn1 = Collatz.NextOdd(decayIn2);
                 Assert.True(decayIn1 == decayIn1Anchor);
-                Assert.True(Collatz2024.NextOdd(decayIn1) == 1);
+                Assert.True(Collatz.NextOdd(decayIn1) == 1);
             }
         }
         private void AssertDecayInN(int _DecayInN, int _Trials, BigInteger _TargetDecayInOneBigInt, string _TargetDecayInN_BigEnd)
@@ -2434,11 +2434,11 @@ namespace Collatz2024Namespace
             for (int i = 0; i < _Trials; i++)
             {
                 string BigEndTxt = BigEndAnchor.ToString();
-                BigInteger nextOdd, currOdd = Collatz2024.toBigIntegerFromBinaryBigEndianString(BigEndAnchor.ToString());
+                BigInteger nextOdd, currOdd = Collatz.toBigIntegerFromBinaryBigEndianString(BigEndAnchor.ToString());
                 n = _DecayInN;
                 while (true)
                 {
-                    nextOdd = Collatz2024.NextOdd(currOdd);
+                    nextOdd = Collatz.NextOdd(currOdd);
                     if (--n == 0)
                     {
                         Assert.True(currOdd == _TargetDecayInOneBigInt);
@@ -2451,11 +2451,11 @@ namespace Collatz2024Namespace
                 for (int j = 0; j < _Trials; j++)
                 {
                     BigEndEcho.Insert(0, echoPrefix);
-                    currOdd = Collatz2024.toBigIntegerFromBinaryBigEndianString(BigEndEcho.ToString());
+                    currOdd = Collatz.toBigIntegerFromBinaryBigEndianString(BigEndEcho.ToString());
                     n = _DecayInN;
                     while (true)
                     {
-                        nextOdd = Collatz2024.NextOdd(currOdd);
+                        nextOdd = Collatz.NextOdd(currOdd);
                         if (--n == 0)
                         {
                             Assert.True(currOdd == _TargetDecayInOneBigInt);
@@ -2492,7 +2492,7 @@ namespace Collatz2024Namespace
             BigInteger collapseInTwoEcho = collapseInTwo * (3 - collapseInTwoMod3) * 2;
             Assert.True((collapseInTwoEcho - 1) % 3 == 0);
             BigInteger collapseInThree = (collapseInTwoEcho - 1) / 3;
-            _ParamCsv = $"decayInThreeList.Add(({collapseInOne}, {collapseInThree}, \"{Collatz2024.toBinaryBigEndianString(collapseInThree)}\"));";
+            _ParamCsv = $"decayInThreeList.Add(({collapseInOne}, {collapseInThree}, \"{Collatz.toBinaryBigEndianString(collapseInThree)}\"));";
 
             return true;
         }
@@ -2507,7 +2507,7 @@ namespace Collatz2024Namespace
             BigInteger decayInOne = pow2 - 1;
             Assert.True(decayInOne % 3 == 0);
             decayInOne /= 3;
-            Assert.True(Collatz2024.NextOdd(decayInOne) == 1);
+            Assert.True(Collatz.NextOdd(decayInOne) == 1);
             Assert.True(decayInOne == (BigInteger.Pow(2, 2 * _N + 2) - 1) / 3);
             return decayInOne;
         }
@@ -2523,8 +2523,8 @@ namespace Collatz2024Namespace
             --decayInTwo;
             Assert.True(decayInTwo % 3 == 0);
             decayInTwo /= 3;
-            BigInteger decayInOne = Collatz2024.NextOdd(decayInTwo);
-            Assert.True(Collatz2024.NextOdd(decayInOne) == 1);
+            BigInteger decayInOne = Collatz.NextOdd(decayInTwo);
+            Assert.True(Collatz.NextOdd(decayInOne) == 1);
             Assert.True(decayInTwo == (BigInteger.Pow(2, 6 * _N - 1) - 5) / 9);
             return decayInTwo;
         }
@@ -2540,8 +2540,8 @@ namespace Collatz2024Namespace
             --decayInTwo;
             Assert.True(decayInTwo % 3 == 0);
             decayInTwo /= 3;
-            BigInteger decayInOne = Collatz2024.NextOdd(decayInTwo);
-            Assert.True(Collatz2024.NextOdd(decayInOne) == 1);
+            BigInteger decayInOne = Collatz.NextOdd(decayInTwo);
+            Assert.True(Collatz.NextOdd(decayInOne) == 1);
             Assert.True(decayInTwo == (BigInteger.Pow(2, 6 * _N + 4) - 7) / 9);
             return decayInTwo;
         }

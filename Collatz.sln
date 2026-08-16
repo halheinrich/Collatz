@@ -1,11 +1,11 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34601.278
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Collatz2024", "Collatz2024\Collatz2024.csproj", "{2743CCBD-BFCA-4B9B-8F54-A2E44034FCEF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Collatz", "Collatz\Collatz.csproj", "{2743CCBD-BFCA-4B9B-8F54-A2E44034FCEF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Collatz2024.Tests", "Collatz2024.Tests\Collatz2024.Tests.csproj", "{BDE8F6D3-642D-43BE-B3E7-CB55907A9A69}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Collatz.Tests", "Collatz.Tests\Collatz.Tests.csproj", "{BDE8F6D3-642D-43BE-B3E7-CB55907A9A69}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BigRationalLibrary", "..\BigRationalLibrary\BigRationalLibrary\BigRationalLibrary.csproj", "{21F24CBE-ADC1-178C-E0D4-98CFF3DF6AA0}"
 EndProject
