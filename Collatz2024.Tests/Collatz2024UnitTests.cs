@@ -1,4 +1,4 @@
-using BigRationalLibraryNamespace;
+using HalHeinrich.Numerics;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
