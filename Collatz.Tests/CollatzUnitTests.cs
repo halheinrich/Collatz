@@ -1526,8 +1526,6 @@ public class CollatzUnitTests
                     break;
                 case 2:
                     ulong decaysTo = odd;
-                    //if (decaysTo == 853)
-                    //    Assert.True(true);
                     while (!ToOneInTwoSet.Contains(decaysTo))
                     {
                         if ((decaysTo - 1) % 4 != 0)
@@ -1559,17 +1557,9 @@ public class CollatzUnitTests
             oddDecaySteps = CollatzMath.OddStepCountToOne(odd);
             if (oddDecaySteps == 1)
             {
-                if (CollatzMath.DecayInNFormulaList(odd, collatzDecayFormulaRecursive) != 1)
-                    Assert.True(true);
                 Assert.True(CollatzMath.DecayInNFormulaList(odd, collatzDecayFormulaRecursive) == 1);
-                if (!collatzDecayFormulaRecursive.IsMember(odd))
-                    Assert.True(true);
                 Assert.True(collatzDecayFormulaRecursive.IsMember(odd));
-                if (!collatzDecayFormula.IsMember(odd))
-                    Assert.True(true);
                 Assert.True(collatzDecayFormula.IsMember(odd));
-                if (!collatzDecayFormulaBitManipulation.IsMember(odd))
-                    Assert.True(true);
                 Assert.True(collatzDecayFormulaBitManipulation.IsMember(odd));
             }
             else
@@ -1626,24 +1616,16 @@ public class CollatzUnitTests
             isMemberCt = 0;
             foreach (CollatzDecayFormulaRecursive cdfr in collatzDecayFormulaRecursiveList)
             {
-                //if (odd == 453 && cdfr.AdditiveConstant == 49)
-                //    cdfr.IsMember(odd);
                 if (cdfr.IsMember(odd))
                 {
-                    if (cdfr.StepsToOne != oddDecaySteps)
-                        cdfr.IsMember(odd);
                     Assert.True(cdfr.StepsToOne == oddDecaySteps);
                     ++isMemberCt;
                 }
             }
-            if (!((isMemberCt == 1) == (oddDecaySteps == 2)))
-                Assert.True(true);
             Assert.True((isMemberCt == 1) == (oddDecaySteps == 2));
             isMemberCt = 0;
             foreach (CollatzDecayFormula cdf in collatzDecayFormulaList)
             {
-                //if (odd == 113 && cdf.SubtractiveConstant == 7)
-                //    cdf.IsMember(odd);
                 if (cdf.IsMember(odd))
                 {
                     if (cdf.StepsToOne != oddDecaySteps)
@@ -1659,16 +1641,12 @@ public class CollatzUnitTests
             {
                 if (cdbm.IsMember(odd))
                 {
-                    if (cdbm.StepsToOne != oddDecaySteps)
-                        cdbm.IsMember(odd);
                     Assert.True(cdbm.StepsToOne == oddDecaySteps);
                     ++isMemberCt;
                 }
                 //else
                 //    Assert.False(cdbm.StepsToOne == oddDecaySteps);
             }
-            if (!(isMemberCt == 1) == (oddDecaySteps == 2))
-                CollatzDecayFormulaBitManipulationList[0].IsMember(odd);
             Assert.True((isMemberCt == 1) == (oddDecaySteps == 2));
         }
         for (int odd = 1; odd < trials; odd++)
@@ -1700,8 +1678,6 @@ public class CollatzUnitTests
         {
             oddDecaySteps = CollatzMath.OddStepCountToOne(odd);
             isMember = collatzDecayFormulaBitManipulationIn3.IsMember(odd);
-            if ((oddDecaySteps == 3) != isMember)
-                collatzDecayFormulaBitManipulationIn3.IsMember(odd);
             Assert.True((oddDecaySteps == 3) == isMember);
         }
     }
@@ -1712,8 +1688,6 @@ public class CollatzUnitTests
         ulong oddDecaySteps = 0, fourNplusOneSteps = 0;
         for (int odd = 1; odd < trials; odd += 2)
         {
-            //if (odd == 9)
-            //    Assert.True(true);
             BigInteger c = odd;
             while ((c - 1) % 4 == 0 && c > 4)
             {
@@ -1728,9 +1702,7 @@ public class CollatzUnitTests
                 continue;
             oddDecaySteps = CollatzMath.OddStepCountToOne(odd);
             fourNplusOneSteps = CollatzMath.OddStepCountToOne(c);
-            if (oddDecaySteps != fourNplusOneSteps)
-                Assert.True(true);
-            Assert.True(CollatzMath.OddStepCountToOne(odd) == CollatzMath.OddStepCountToOne(c));
+            Assert.True(oddDecaySteps == fourNplusOneSteps);
         }
     }
     [Fact]
@@ -1792,14 +1764,11 @@ public class CollatzUnitTests
             }
             if (oddDecaySteps == 3)
             {
-                if (isMemberCt != 1)
-                    Assert.True(true);
                 Assert.True(isMemberCt == 1);
             }
             else
                 Assert.True(isMemberCt == 0);
         }
-        Assert.True(true);
     }
     [Fact]
     public void TestDecayInTwoSuccessorDecaysInOne()
@@ -1881,11 +1850,6 @@ public class CollatzUnitTests
             sampleList.Add(new string(decayIn3.ToString(CultureInfo.InvariantCulture) + ',' + decayIn2.ToString(CultureInfo.InvariantCulture) + ',' + decayIn1.ToString(CultureInfo.InvariantCulture)
                 + ',' + CollatzMath.toBinaryBigEndianString(decayIn3)));
         }
-        StringBuilder sb = new();
-        foreach (string ln in sampleList)
-            sb.AppendLine(ln);
-        string csv = sb.ToString();
-        Assert.True(true);
     }
     [Fact]
     public void ExploreTo5461()
@@ -1900,7 +1864,6 @@ public class CollatzUnitTests
         BigInteger decayIn3 = 38833, decayIn2, decayIn1;
         bool is32_17 = false;
         int ct = 0;
-        StringBuilder sb = new();
         while (true)
         {
             Assert.True(CollatzMath.OddStepCountToOne(decayIn3) == 3);
@@ -1909,8 +1872,6 @@ public class CollatzUnitTests
             decayIn1 = CollatzMath.NextOdd(decayIn2);
             Assert.True(CollatzMath.OddStepCountToOne(decayIn1) == 1);
             Assert.True(decayIn1 == 5461);
-            sb.AppendLine(decayIn3.ToString(CultureInfo.InvariantCulture) + ',' + decayIn2.ToString(CultureInfo.InvariantCulture) + ',' + decayIn1.ToString(CultureInfo.InvariantCulture)
-                + ',' + CollatzMath.toBinaryBigEndianString(decayIn3));
             if (++ct > 10)
                 break;
             if (is32_17)
@@ -1919,8 +1880,6 @@ public class CollatzUnitTests
                 decayIn3 = decayIn3 * 2 + 1;
             is32_17 = !is32_17;
         }
-        string csv = sb.ToString();
-        Assert.True(true);
     }
     [Fact]
     public void ExploreTo349525()
@@ -1933,7 +1892,6 @@ public class CollatzUnitTests
         BigInteger decayIn3 = 621377, decayIn2, decayIn1;
         bool is32_17 = false;
         int ct = 0;
-        StringBuilder sb = new();
         while (true)
         {
             Assert.True(CollatzMath.OddStepCountToOne(decayIn3) == 3);
@@ -1942,8 +1900,6 @@ public class CollatzUnitTests
             decayIn1 = CollatzMath.NextOdd(decayIn2);
             Assert.True(CollatzMath.OddStepCountToOne(decayIn1) == 1);
             Assert.True(decayIn1 == 349525);
-            sb.AppendLine(decayIn3.ToString(CultureInfo.InvariantCulture) + ',' + decayIn2.ToString(CultureInfo.InvariantCulture) + ',' + decayIn1.ToString(CultureInfo.InvariantCulture)
-                + ',' + CollatzMath.toBinaryBigEndianString(decayIn3));
             if (++ct > 10)
                 break;
             if (is32_17)
@@ -1952,8 +1908,6 @@ public class CollatzUnitTests
                 decayIn3 = decayIn3 * 2 + 1;
             is32_17 = !is32_17;
         }
-        string csv = sb.ToString();
-        Assert.True(true);
     }
     [Fact]
     public void ExploreTo1398101()
@@ -1964,7 +1918,6 @@ public class CollatzUnitTests
         BigInteger decayIn3 = 4971025, decayIn2, decayIn1;
         bool is32_17 = false;
         int ct = 0;
-        StringBuilder sb = new();
         while (true)
         {
             Assert.True(CollatzMath.OddStepCountToOne(decayIn3) == 3);
@@ -1973,8 +1926,6 @@ public class CollatzUnitTests
             decayIn1 = CollatzMath.NextOdd(decayIn2);
             Assert.True(CollatzMath.OddStepCountToOne(decayIn1) == 1);
             Assert.True(decayIn1 == 1398101);
-            sb.AppendLine(decayIn3.ToString(CultureInfo.InvariantCulture) + ',' + decayIn2.ToString(CultureInfo.InvariantCulture) + ',' + decayIn1.ToString(CultureInfo.InvariantCulture)
-                + ',' + CollatzMath.toBinaryBigEndianString(decayIn3));
             if (++ct > 10)
                 break;
             if (is32_17)
@@ -1983,8 +1934,6 @@ public class CollatzUnitTests
                 decayIn3 = decayIn3 * 2 + 1;
             is32_17 = !is32_17;
         }
-        string csv = sb.ToString();
-        Assert.True(true);
     }
     [Fact]
     public void ExploreTo22369621()
@@ -1994,7 +1943,6 @@ public class CollatzUnitTests
         BigInteger decayIn3 = 19884107, decayIn2, decayIn1;
         bool is32_17 = true;
         int ct = 0;
-        StringBuilder sb = new();
         while (true)
         {
             Assert.True(CollatzMath.OddStepCountToOne(decayIn3) == 3);
@@ -2003,8 +1951,6 @@ public class CollatzUnitTests
             decayIn1 = CollatzMath.NextOdd(decayIn2);
             Assert.True(CollatzMath.OddStepCountToOne(decayIn1) == 1);
             Assert.True(decayIn1 == 22369621);
-            sb.AppendLine(decayIn3.ToString(CultureInfo.InvariantCulture) + ',' + decayIn2.ToString(CultureInfo.InvariantCulture) + ',' + decayIn1.ToString(CultureInfo.InvariantCulture)
-                + ',' + CollatzMath.toBinaryBigEndianString(decayIn3));
             if (++ct > 10)
                 break;
             if (is32_17)
@@ -2013,8 +1959,6 @@ public class CollatzUnitTests
                 decayIn3 = decayIn3 * 2 + 1;
             is32_17 = !is32_17;
         }
-        string csv = sb.ToString();
-        Assert.True(true);
     }
     [Fact]
     public void ExploreTo89478485()
@@ -2024,7 +1968,6 @@ public class CollatzUnitTests
         BigInteger decayIn3 = 39768215, decayIn2, decayIn1;
         bool is32_17 = true;
         int ct = 0;
-        StringBuilder sb = new();
         while (true)
         {
             Assert.True(CollatzMath.OddStepCountToOne(decayIn3) == 3);
@@ -2033,8 +1976,6 @@ public class CollatzUnitTests
             decayIn1 = CollatzMath.NextOdd(decayIn2);
             Assert.True(CollatzMath.OddStepCountToOne(decayIn1) == 1);
             Assert.True(decayIn1 == 89478485);
-            sb.AppendLine(decayIn3.ToString(CultureInfo.InvariantCulture) + ',' + decayIn2.ToString(CultureInfo.InvariantCulture) + ',' + decayIn1.ToString(CultureInfo.InvariantCulture)
-                + ',' + CollatzMath.toBinaryBigEndianString(decayIn3));
             if (++ct > 10)
                 break;
             if (is32_17)
@@ -2043,8 +1984,6 @@ public class CollatzUnitTests
                 decayIn3 = decayIn3 * 2 + 1;
             is32_17 = !is32_17;
         }
-        string csv = sb.ToString();
-        Assert.True(true);
     }
     #endregion Fact Methods
     #region Helper Methods
@@ -2052,97 +1991,6 @@ public class CollatzUnitTests
     {
         BigInteger currOdd = CollatzMath.toBigIntegerFromBinaryBigEndianString(_AnchorBigEnd.ToString());
         Assert.True(CollatzMath.NextOdd(currOdd) == 1);
-    }
-    private static void AssertDecayIn2(int _EchoTrials, string _DecayInTwoBigEnd)
-    {
-        BigInteger decayIn2 = CollatzMath.toBigIntegerFromBinaryBigEndianString(_DecayInTwoBigEnd);
-        Assert.True(decayIn2 != 1);
-        BigInteger decayIn1 = CollatzMath.NextOdd(decayIn2);
-        Assert.True(decayIn1 != 1);
-        Assert.True(CollatzMath.NextOdd(decayIn1) == 1);
-
-        BigInteger decayIn1Anchor = decayIn1;
-        const string echoPrefix = "10";
-        StringBuilder echoBinBE = new(_DecayInTwoBigEnd);
-        for (int echoTrialId = 0; echoTrialId < _EchoTrials; echoTrialId++)
-        {
-            echoBinBE.Insert(0, echoPrefix);
-            decayIn2 = CollatzMath.toBigIntegerFromBinaryBigEndianString(_DecayInTwoBigEnd);
-            Assert.True(decayIn2 != 1);
-            decayIn1 = CollatzMath.NextOdd(decayIn2);
-            Assert.True(decayIn1 == decayIn1Anchor);
-            Assert.True(CollatzMath.NextOdd(decayIn1) == 1);
-        }
-    }
-    private static void AssertDecayInN(int _DecayInN, int _Trials, BigInteger _TargetDecayInOneBigInt, string _TargetDecayInN_BigEnd)
-    {
-        string echoPrefix = "10", mult2Add1Txt = "1", mult32Add24Txt = "00011";
-        StringBuilder BigEndAnchor = new(_TargetDecayInN_BigEnd), BigEndEcho = new();
-        int n, trialParity = _TargetDecayInN_BigEnd[1] == '0' ? 0 : 1;
-        for (int i = 0; i < _Trials; i++)
-        {
-            string BigEndTxt = BigEndAnchor.ToString();
-            BigInteger nextOdd, currOdd = CollatzMath.toBigIntegerFromBinaryBigEndianString(BigEndAnchor.ToString());
-            n = _DecayInN;
-            while (true)
-            {
-                nextOdd = CollatzMath.NextOdd(currOdd);
-                if (--n == 0)
-                {
-                    Assert.True(currOdd == _TargetDecayInOneBigInt);
-                    Assert.True(nextOdd == 1);
-                    break;
-                }
-                currOdd = nextOdd;
-            }
-            BigEndEcho.Clear().Append(BigEndAnchor);
-            for (int j = 0; j < _Trials; j++)
-            {
-                BigEndEcho.Insert(0, echoPrefix);
-                currOdd = CollatzMath.toBigIntegerFromBinaryBigEndianString(BigEndEcho.ToString());
-                n = _DecayInN;
-                while (true)
-                {
-                    nextOdd = CollatzMath.NextOdd(currOdd);
-                    if (--n == 0)
-                    {
-                        Assert.True(currOdd == _TargetDecayInOneBigInt);
-                        Assert.True(nextOdd == 1);
-                        break;
-                    }
-                    currOdd = nextOdd;
-                }
-            }
-            string insertTxt = (i & 1) == trialParity ? mult2Add1Txt : mult32Add24Txt;
-            BigEndAnchor.Insert(1, insertTxt);
-        }
-    }
-    private static bool getDecayInThree_Parameters(int _N, out string _ParamCsv)
-    {
-        _ParamCsv = "";
-        BigInteger fourToNplus1 = BigInteger.Pow(4, _N + 1);
-        Assert.True((fourToNplus1 - 1) % 3 == 0);
-        BigInteger collapseInOne = (fourToNplus1 - 1) / 3;
-        int collapseInOneMod3 = (int)(collapseInOne % 3);
-        if (collapseInOneMod3 == 0)
-            return false;
-        BigInteger collapseInOneEcho = collapseInOne * (3 - collapseInOneMod3) * 2;
-        Assert.True((collapseInOneEcho - 1) % 3 == 0);
-        BigInteger collapseInTwo = (collapseInOneEcho - 1) / 3;
-        int collapseInTwoMod3 = (int)(collapseInTwo % 3);
-        if (collapseInTwoMod3 == 0)
-        {
-            Assert.True((4 * collapseInOneEcho - 1) % 3 == 0);
-            collapseInTwo = (4 * collapseInOneEcho - 1) / 3;
-        }
-        collapseInTwoMod3 = (int)(collapseInTwo % 3);
-        Assert.True(collapseInTwoMod3 != 0);
-        BigInteger collapseInTwoEcho = collapseInTwo * (3 - collapseInTwoMod3) * 2;
-        Assert.True((collapseInTwoEcho - 1) % 3 == 0);
-        BigInteger collapseInThree = (collapseInTwoEcho - 1) / 3;
-        _ParamCsv = $"decayInThreeList.Add(({collapseInOne}, {collapseInThree}, \"{CollatzMath.toBinaryBigEndianString(collapseInThree)}\"));";
-
-        return true;
     }
     private static BigInteger fnDecayToOneInOne(int _N)
     {
