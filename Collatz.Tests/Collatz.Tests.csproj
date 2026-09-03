@@ -1,12 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+  <!--
+    TargetFramework, LangVersion, Nullable, ImplicitUsings and analyzer
+    settings come from Directory.Build.props. Test projects opt out of XML
+    doc generation, as that file documents.
+  -->
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-
+    <RootNamespace>HalHeinrich.Numerics.Collatz</RootNamespace>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
