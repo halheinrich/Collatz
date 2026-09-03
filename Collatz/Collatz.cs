@@ -165,29 +165,23 @@ public static class CollatzMath
         string binaryString = Convert.ToString((long)bigInt, 2);
         char[] binaryCharArray = binaryString.ToCharArray();
         Array.Reverse(binaryCharArray);
-        string retval = new string(binaryCharArray);
-        //if (bigInt <= long.MaxValue)
-        //{
-        //    string hh = toBinaryBigEndianStringGtInt64(bigInt);
-        //    if (!retval.Equals(hh))
-        //        Debug.Assert(true);
-        //}
-        return retval;
+        return new string(binaryCharArray);
     }
     /// <summary>
     /// Returns the base-2 digits of <paramref name="bigInt"/>, most-significant digit first, or
     /// <c>"0"</c> when <paramref name="bigInt"/> is zero.
     /// </summary>
     /// <remarks>
-    /// Despite the name, the digit order produced is most-significant-first, and the loop handles any
-    /// non-negative <see cref="BigInteger"/> rather than only values above <see cref="long.MaxValue"/>.
+    /// The name is wrong twice over and is left alone for now: the digit order produced is
+    /// most-significant-first, and the loop below handles any non-negative
+    /// <see cref="BigInteger"/> rather than only values above <see cref="long.MaxValue"/>.
+    /// That second point is why halheinrich/Math#1's guard could be deleted outright rather
+    /// than repaired - there was nothing for it to delegate to.
     /// </remarks>
     public static string toBinaryLittleEndianStringGtInt64(BigInteger bigInt)
     {
         // Special case for zero
         if (bigInt == 0) return "0";
-        if (bigInt > long.MaxValue)
-            return toBinaryLittleEndianStringGtInt64(bigInt);
 
         StringBuilder binaryString = new StringBuilder();
         BigInteger tempBigInt = bigInt;
@@ -199,14 +193,7 @@ public static class CollatzMath
             binaryString.Insert(0, (tempBigInt & 1) == 1 ? '1' : '0');
             tempBigInt >>= 1; // Right shift to get the next bit
         }
-        string retval = binaryString.ToString();
-        //if (bigInt <= long.MaxValue)
-        //{
-        //    string hh = toBinaryLittleEndianStringGtInt64(bigInt);
-        //    if (!retval.Equals(hh))
-        //        Debug.Assert(true);
-        //}
-        return retval;
+        return binaryString.ToString();
     }
     /// <summary>
     /// Returns the base-2 digits of <paramref name="bigInt"/>, least-significant digit first, or

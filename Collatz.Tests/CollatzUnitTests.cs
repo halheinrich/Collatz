@@ -35,6 +35,20 @@ public class CollatzUnitTests
     private static readonly int[] Exp_2_2_1 = [2, 2, 1];
     private static readonly int[] Exp_2_2_2 = [2, 2, 2];
 
+    // Straddles long.MaxValue and mixes symmetric with asymmetric bit patterns, so a
+    // most-significant-first result cannot be mistaken for a least-significant-first one.
+    private static readonly BigInteger[] BinaryRoundTripValues =
+    [
+        BigInteger.Zero,
+        BigInteger.One,
+        (BigInteger)long.MaxValue - 1,
+        long.MaxValue,
+        (BigInteger)long.MaxValue + 1,
+        (BigInteger.One << 64) + 1,
+        BigInteger.One << 100,
+        BigInteger.Parse("818446744073709551615", CultureInfo.InvariantCulture),
+    ];
+
     #region Fact Methods
     [Fact]
     public void TextSolveForLoop()
@@ -743,6 +757,30 @@ public class CollatzUnitTests
         Assert.True(clltz == 59652309);
         clltz = CollatzMath.toBigIntegerFromBinaryBigEndianString("10101011000111000111000111");
         Assert.True(clltz == 59652309);
+    }
+
+    [Fact]
+    public void TestToBinaryLittleEndianStringGtInt64_AboveInt64()
+    {
+        // halheinrich/Math#1: this method guarded values above long.MaxValue by calling itself
+        // with the argument unchanged, so every such value recursed until the stack ran out.
+        // Measured on SDK 10.0.400 before the fix: "Stack overflow." and a dead process, in both
+        // Debug and Release - no tail call saves it. A stack overflow cannot be caught, so the
+        // failure this test now prevents was the test host dying, not a red test.
+        BigInteger twoPow63 = (BigInteger)long.MaxValue + 1;
+        Assert.Equal("1" + new string('0', 63), CollatzMath.toBinaryLittleEndianStringGtInt64(twoPow63));
+
+        BigInteger twoPow64Plus1 = (BigInteger.One << 64) + 1;
+        Assert.Equal("1" + new string('0', 63) + "1", CollatzMath.toBinaryLittleEndianStringGtInt64(twoPow64Plus1));
+
+        // Cross-check against the sibling implementation, which appends where this one prepends,
+        // over values on both sides of the boundary the deleted guard claimed to police.
+        foreach (BigInteger value in BinaryRoundTripValues)
+        {
+            char[] reversed = CollatzMath.toBinaryBigEndianStringGtInt64(value).ToCharArray();
+            Array.Reverse(reversed);
+            Assert.Equal(new string(reversed), CollatzMath.toBinaryLittleEndianStringGtInt64(value));
+        }
     }
     [Fact]
     public void TestDecayInOneViaBinaryBigendianText()
