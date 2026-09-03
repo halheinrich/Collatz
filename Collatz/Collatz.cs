@@ -32,25 +32,14 @@ public static class CollatzMath
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(length);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(order);
 
-        // Optional capacity hint (guard against overflow / huge allocations)
-        List<int[]> result;
-        try
-        {
-            // count = order^length - (order-1)^length
-            double countD = Math.Pow(order, length) - Math.Pow(order - 1, length);
-            int capacity = countD > int.MaxValue ? int.MaxValue : (int)countD;
-            result = new List<int[]>(capacity);
-        }
-        catch (ArgumentOutOfRangeException)
-        {
-            // Negative capacity from an overflowed cast: fall back to the default.
-            result = new List<int[]>();
-        }
-        catch (OutOfMemoryException)
-        {
-            // The hint asked for more than the heap can give: fall back to the default.
-            result = new List<int[]>();
-        }
+        // Capacity hint: count = order^length - (order-1)^length, computed exactly and clamped
+        // to int. This is not a computational path - a capacity hint cannot change what the
+        // method returns - so the Math.Pow this replaces was not an exactness violation the way
+        // the log2ratio derivation in CollatzDecayFormulaRecursive was. It is exact anyway,
+        // because an apparent violation costs a reader's attention every time they meet it.
+        BigInteger count = BigInteger.Pow(order, length) - BigInteger.Pow(order - 1, length);
+        int capacity = count > int.MaxValue ? int.MaxValue : (int)count;
+        List<int[]> result = new List<int[]>(capacity);
 
         int[] current = new int[length];
 
@@ -393,6 +382,34 @@ public static class CollatzMath
         return isInteger && n > 0;
     }
     #endregion Public Methods
+    #region Internal Methods
+    /// <summary>
+    /// Returns the exact floor of log2(<paramref name="numerator"/> / <paramref name="denominator"/>)
+    /// for two positive values, without leaving integer arithmetic.
+    /// </summary>
+    /// <param name="numerator">Must be positive.</param>
+    /// <param name="denominator">Must be positive.</param>
+    /// <exception cref="ArgumentOutOfRangeException">Either argument is zero or negative.</exception>
+    /// <remarks>
+    /// The bit-length difference alone is not the answer. For positive a and b, a lies in
+    /// [2^(la-1), 2^la) and b in [2^(lb-1), 2^lb), so a/b lies in (2^(la-lb-1), 2^(la-lb+1)) and
+    /// the floor is either la-lb or one less. Which of the two it is cannot be read off the
+    /// lengths; it is settled below by the exact comparison a &#8805; b&#183;2^(la-lb), written as a
+    /// shift so that no division and no rounding takes place.
+    /// </remarks>
+    internal static int FloorLog2Ratio(BigInteger numerator, BigInteger denominator)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(numerator);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(denominator);
+
+        // A BigInteger cannot hold more than int.MaxValue bits, so the difference fits an int.
+        int bitDelta = (int)(numerator.GetBitLength() - denominator.GetBitLength());
+        bool reachesBitDelta = bitDelta >= 0
+            ? numerator >= denominator << bitDelta
+            : numerator << -bitDelta >= denominator;
+        return reachesBitDelta ? bitDelta : bitDelta - 1;
+    }
+    #endregion Internal Methods
 }
 /// <summary>
 /// A family of odd integers that reach one in a fixed number of odd Collatz steps.
@@ -511,8 +528,9 @@ public class CollatzDecayFormulaRecursive : ICollatzDecayFormula
                 DecayAnchorHashSet.Add(anchor);
                 if (DecayAnchorList.Count > 1)
                 {
-                    double ratio = (double)DecayAnchorList[DecayAnchorList.Count - 1] / (double)DecayAnchorList[DecayAnchorList.Count - 2];
-                    log2ratio = (int)Math.Truncate(Math.Log(ratio, 2));
+                    log2ratio = CollatzMath.FloorLog2Ratio(
+                        DecayAnchorList[DecayAnchorList.Count - 1],
+                        DecayAnchorList[DecayAnchorList.Count - 2]);
                     pow2 = BigInteger.One << log2ratio;
                     addConst = (Int64)(DecayAnchorList[DecayAnchorList.Count - 1] - pow2 * DecayAnchorList[DecayAnchorList.Count - 2]);
                     isOk = true;

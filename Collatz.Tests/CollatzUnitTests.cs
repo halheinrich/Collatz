@@ -143,7 +143,7 @@ public class CollatzUnitTests
         int len = 4, ord = 3;
         IReadOnlyList<int[]> permsOrder3Len4List = CollatzMath.GenerateExponentPermutations(len, ord);
         int all = permsOrder3Len4List.Count;
-        int expectedCount = (int)(Math.Pow(ord, len) - Math.Pow(ord - 1, len));
+        int expectedCount = (int)(BigInteger.Pow(ord, len) - BigInteger.Pow(ord - 1, len));
         Assert.True(all == expectedCount);
 
         // Build one summary string per length (1..5)
@@ -151,6 +151,11 @@ public class CollatzUnitTests
         for (int length = 1; length <= 5; length++)
         {
             StringBuilder sbLen = new();
+            // The trailing Double column is presentation: it is written to a string and never
+            // read back, so no result depends on it. That is what separates it from the log2ratio
+            // derivation halheinrich/Math#5 removed, where a double decided pow2 and thence
+            // addConst. § Exactness discipline bans floating point upstream of presentation, not
+            // in it.
             sbLen.AppendLine("Order,Permutation,N,IsLoop,Numerator,Denominator,Double");
             for (int order = 1; order <= 5; order++)
             {
@@ -781,6 +786,70 @@ public class CollatzUnitTests
             Array.Reverse(reversed);
             Assert.Equal(new string(reversed), CollatzMath.toBinaryLittleEndianStringGtInt64(value));
         }
+    }
+
+    [Fact]
+    public void TestFloorLog2Ratio_MatchesExactReference()
+    {
+        // halheinrich/Math#5(a). Exhaustive over small values, against a reference that shares no
+        // machinery with the implementation: it doubles and compares and never reads a bit length.
+        for (int a = 1; a <= 64; a++)
+            for (int b = 1; b <= 64; b++)
+                Assert.Equal(ReferenceFloorLog2Ratio(a, b), CollatzMath.FloorLog2Ratio(a, b));
+    }
+
+    [Fact]
+    public void TestFloorLog2Ratio_ExactPowersOfTwo()
+    {
+        // Ratios sitting exactly on a power of two are the boundary either side of which the
+        // bit-length difference alone gives a different answer from the truth.
+        Assert.Equal(0, CollatzMath.FloorLog2Ratio(1, 1));
+        Assert.Equal(1, CollatzMath.FloorLog2Ratio(2, 1));
+        Assert.Equal(-1, CollatzMath.FloorLog2Ratio(1, 2));
+        Assert.Equal(3, CollatzMath.FloorLog2Ratio(24, 3));
+        Assert.Equal(-3, CollatzMath.FloorLog2Ratio(3, 24));
+        Assert.Equal(100, CollatzMath.FloorLog2Ratio(BigInteger.One << 100, BigInteger.One));
+        Assert.Equal(63, CollatzMath.FloorLog2Ratio(BigInteger.One << 200, BigInteger.One << 137));
+    }
+
+    [Fact]
+    public void TestFloorLog2Ratio_CasesTheDoubleDerivationGotWrong()
+    {
+        // Each expectation below is the exact answer; the value in the comment is what the
+        // deleted derivation - (int)Math.Truncate(Math.Log((double)a / (double)b, 2)) - actually
+        // returned, measured on SDK 10.0.400.
+
+        // 2^60 - 1 rounds up to 2^60 in a 53-bit mantissa. Old answer: 60.
+        Assert.Equal(59, CollatzMath.FloorLog2Ratio((BigInteger.One << 60) - 1, BigInteger.One));
+
+        // The ratio overflows a double to infinity and the cast saturates. Old answer:
+        // int.MaxValue, which the caller would then have fed to BigInteger.One << log2ratio.
+        Assert.Equal(1000, CollatzMath.FloorLog2Ratio(BigInteger.One << 2000, BigInteger.One << 1000));
+
+        // The bit-length difference is 63 but the true floor is 62 - the case the exact
+        // comparison exists to settle. Old answer: 63.
+        Assert.Equal(62, CollatzMath.FloorLog2Ratio(BigInteger.One << 200, (BigInteger.One << 137) + 1));
+    }
+
+    [Fact]
+    public void TestFloorLog2Ratio_RejectsNonPositiveArguments()
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() => CollatzMath.FloorLog2Ratio(0, 1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => CollatzMath.FloorLog2Ratio(1, 0));
+        Assert.Throws<ArgumentOutOfRangeException>(() => CollatzMath.FloorLog2Ratio(-1, 1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => CollatzMath.FloorLog2Ratio(1, -1));
+    }
+
+    // Deliberately unlike the implementation: no bit lengths and no division. It doubles the
+    // numerator until the ratio reaches one, then doubles the denominator until it drops below
+    // two, so the exponent it counts is floor(log2(a / b)) by construction.
+    private static int ReferenceFloorLog2Ratio(BigInteger a, BigInteger b)
+    {
+        int exponent = 0;
+        BigInteger numerator = a, denominator = b;
+        while (numerator < denominator) { numerator *= 2; exponent--; }
+        while (numerator >= denominator * 2) { denominator *= 2; exponent++; }
+        return exponent;
     }
     [Fact]
     public void TestDecayInOneViaBinaryBigendianText()

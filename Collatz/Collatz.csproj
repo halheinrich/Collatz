@@ -17,4 +17,8 @@
     <ProjectReference Include="..\..\BigRationalLibrary\BigRationalLibrary\BigRationalLibrary.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="Collatz.Tests" />
+  </ItemGroup>
+
 </Project>
