@@ -85,6 +85,47 @@ public static class CollatzMath
         return result;
     }
     /// <summary>
+    /// Returns the zero-based position of <paramref name="odd"/> in the sequence of odd
+    /// integers 3, 5, 7, 9, &#8230;
+    /// </summary>
+    /// <param name="odd">An odd value of three or more.</param>
+    /// <returns>(<paramref name="odd"/> &#8722; 3) / 2.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// <paramref name="odd"/> is even, or is less than three.
+    /// </exception>
+    /// <remarks>
+    /// The inverse of <see cref="OddOfIndex"/> over that domain. The domain is checked rather
+    /// than assumed, because the arithmetic alone fails quietly outside it: measured on SDK
+    /// 10.0.400, the unguarded expression maps an even argument to the index of the odd value
+    /// below it - 4 to 0 and 6 to 1, with no error - and an argument below three to a negative
+    /// quotient whose conversion throws <see cref="OverflowException"/>, which tells a caller
+    /// nothing about what it did wrong.
+    /// </remarks>
+    public static BigInteger IndexOfOdd(BigInteger odd)
+    {
+        if (odd.IsEven || odd < 3)
+            throw new ArgumentOutOfRangeException(nameof(odd), odd, "Must be an odd value of three or more.");
+        return (odd - 3) / 2;
+    }
+    /// <summary>
+    /// Returns the odd integer at zero-based position <paramref name="index"/> in the sequence
+    /// 3, 5, 7, 9, &#8230;
+    /// </summary>
+    /// <param name="index">A position of zero or more.</param>
+    /// <returns>2 &#215; <paramref name="index"/> + 3.</returns>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is negative.</exception>
+    /// <remarks>
+    /// The inverse of <see cref="IndexOfOdd"/>. The parameter is a <see cref="BigInteger"/>
+    /// deliberately: the test-local version this replaces took an <see cref="int"/> and
+    /// evaluated the arithmetic in <see cref="int"/> before widening, so index 1073741823
+    /// returned -2147483647 instead of 2147483649, silently.
+    /// </remarks>
+    public static BigInteger OddOfIndex(BigInteger index)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(index);
+        return 2 * index + 3;
+    }
+    /// <summary>
     /// Returns (4^<paramref name="n"/> &#8722; 1) / 3 &#8212; the sequence 1, 5, 21, 85, 341, &#8230; for n = 1, 2, 3, &#8230;
     /// </summary>
     public static BigInteger CollapseInOne(Int32 n)

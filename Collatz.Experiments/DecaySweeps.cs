@@ -198,7 +198,7 @@ internal static class DecaySweeps
         while (true)
         {
             thisOddList.Clear();
-            BigInteger nxtOdd = OddOfIndex(loopIdx);
+            BigInteger nxtOdd = CollatzMath.OddOfIndex(loopIdx);
             thisOddList.Add(nxtOdd);
             while (true)
             {
@@ -206,11 +206,11 @@ internal static class DecaySweeps
                 if (nxtOdd == 1)
                 {
                     for (int i = 0; i < thisOddList.Count; i++)
-                        seedList[(int)IndexofOdd(thisOddList[i])] = (ulong)(thisOddList.Count - i);
+                        seedList[(int)CollatzMath.IndexOfOdd(thisOddList[i])] = (ulong)(thisOddList.Count - i);
                     break;
                 }
                 thisOddList.Add(nxtOdd);
-                BigInteger nxtIdx = IndexofOdd(nxtOdd);
+                BigInteger nxtIdx = CollatzMath.IndexOfOdd(nxtOdd);
                 while (nxtIdx >= seedList.Count)
                     seedList.Add(0);
             }
@@ -236,7 +236,7 @@ internal static class DecaySweeps
             if (seedList[i] == 0)
                 continue;
             filled++;
-            BigInteger odd = OddOfIndex(i);
+            BigInteger odd = CollatzMath.OddOfIndex(i);
             ulong bruteForce = CollatzMath.OddStepCountToOne(odd);
             if (seedList[i] != bruteForce)
             {
@@ -275,8 +275,4 @@ internal static class DecaySweeps
         Console.Error.WriteLine($"--- {label} ({csv.Length:N0} chars) ---");
         Console.Out.Write(csv);
     }
-
-    private static ulong IndexofOdd(BigInteger odd) => (ulong)((odd - 3) / 2);
-
-    private static BigInteger OddOfIndex(int index) => index * 2 + 3;
 }

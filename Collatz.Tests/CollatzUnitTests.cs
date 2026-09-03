@@ -651,6 +651,43 @@ public class CollatzUnitTests
     }
 
     [Fact]
+    public void TestOddIndexBijection_RoundTrips()
+    {
+        // CollatzMath.OddOfIndex / IndexOfOdd index the odd integers 3, 5, 7, ... from zero.
+        for (int index = 0; index < 1000; index++)
+        {
+            BigInteger odd = CollatzMath.OddOfIndex(index);
+            Assert.Equal((BigInteger)(2 * index + 3), odd);
+            Assert.Equal((BigInteger)index, CollatzMath.IndexOfOdd(odd));
+        }
+
+        // Past the int boundary where the test-local version this replaces used to wrap:
+        // it evaluated index * 2 + 3 in int, so 1073741823 came back as -2147483647.
+        Assert.Equal(BigInteger.Parse("2147483649", CultureInfo.InvariantCulture),
+            CollatzMath.OddOfIndex(1_073_741_823));
+
+        BigInteger farOut = (BigInteger.One << 200) + 7;
+        Assert.Equal(farOut, CollatzMath.IndexOfOdd(CollatzMath.OddOfIndex(farOut)));
+    }
+
+    [Fact]
+    public void TestOddIndexBijection_RejectsValuesOutsideItsDomain()
+    {
+        // An even argument used to return the index of the odd value below it, silently:
+        // 4 gave 0, the index of 3, and 6 gave 1.
+        Assert.Throws<ArgumentOutOfRangeException>(() => CollatzMath.IndexOfOdd(4));
+        Assert.Throws<ArgumentOutOfRangeException>(() => CollatzMath.IndexOfOdd(6));
+
+        // Below three the quotient went negative and the conversion threw OverflowException,
+        // which said nothing about the argument. It is now the argument's own exception.
+        Assert.Throws<ArgumentOutOfRangeException>(() => CollatzMath.IndexOfOdd(1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => CollatzMath.IndexOfOdd(0));
+        Assert.Throws<ArgumentOutOfRangeException>(() => CollatzMath.IndexOfOdd(-3));
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => CollatzMath.OddOfIndex(-1));
+    }
+
+    [Fact]
     public void TestFloorLog2Ratio_RejectsNonPositiveArguments()
     {
         Assert.Throws<ArgumentOutOfRangeException>(() => CollatzMath.FloorLog2Ratio(0, 1));
@@ -846,7 +883,7 @@ public class CollatzUnitTests
         {
             thisOddList.Clear();
 
-            nxtOdd = OddOfIndex(loopIdx);
+            nxtOdd = CollatzMath.OddOfIndex(loopIdx);
             thisOddList.Add(nxtOdd);
             currIdx = loopIdx;
             while (true)
@@ -856,17 +893,17 @@ public class CollatzUnitTests
                 {
                     for (int i = 0; i < thisOddList.Count; i++)
                     {
-                        seedList[(int)IndexofOdd(thisOddList[i])] = (ulong)(thisOddList.Count - i);
+                        seedList[(int)CollatzMath.IndexOfOdd(thisOddList[i])] = (ulong)(thisOddList.Count - i);
                     }
                     break;
                 }
                 thisOddList.Add(nxtOdd);
-                nxtIdx = IndexofOdd(nxtOdd);
+                nxtIdx = CollatzMath.IndexOfOdd(nxtOdd);
                 while (nxtIdx >= seedList.Count)
                 {
                     seedList.Add(0);
                 }
-                currIdx = IndexofOdd(nxtOdd);
+                currIdx = CollatzMath.IndexOfOdd(nxtOdd);
             }
             if (loopIdx > maxLoopIdx)
             {
@@ -887,7 +924,7 @@ public class CollatzUnitTests
         {
             if (seedList[i] != 0)
             {
-                BigInteger bi = OddOfIndex(i);
+                BigInteger bi = CollatzMath.OddOfIndex(i);
                 Assert.True(seedList[i] == CollatzMath.OddStepCountToOne(bi));
             }
         }
@@ -895,14 +932,6 @@ public class CollatzUnitTests
         // Collatz.Experiments' SeedIndexSweep, which runs the full index range.
     }
     // Remove optional leading "10" blocks and optional trailing "000111" block.
-    private static ulong IndexofOdd(BigInteger _Odd)
-    {
-        return (ulong)((_Odd - 3) / 2);
-    }
-    private static BigInteger OddOfIndex(int _Index)
-    {
-        return _Index * 2 + 3; ;
-    }
 
     //[Fact]
     //public void TestDecayInTwoViaBinaryBigendianText()
