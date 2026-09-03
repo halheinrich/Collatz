@@ -35,6 +35,19 @@ public class CollatzUnitTests
     private static readonly int[] Exp_2_2_1 = [2, 2, 1];
     private static readonly int[] Exp_2_2_2 = [2, 2, 2];
 
+    // Gating bound. These scans used to run to 10,000,000, 100,000,000 or int.MaxValue, which
+    // put the suite past an hour and so stopped it gating anything. What each test claims is
+    // unchanged; only the range it is checked over is. Measured coverage below this limit:
+    // 9 values decaying to one in a single odd step, 22 in two, 48 in three, and 8,338
+    // reducible by the 4n+1 map - enough of each that the property is exercised rather than
+    // merely named. The unbounded sweep each of these came from lives in Collatz.Experiments,
+    // where it may take an hour; run it there when the range itself is the point.
+    private const int GatedOddScanLimit = 100_000;
+
+    // Idea2026 walks odd *indices* rather than odd values, so it carries its own bound.
+    // Its full run is Collatz.Experiments' SeedIndexSweep.
+    private const int GatedSeedIndexLimit = 10_000;
+
     // Straddles long.MaxValue and mixes symmetric with asymmetric bit patterns, so a
     // most-significant-first result cannot be mistaken for a least-significant-first one.
     private static readonly BigInteger[] BinaryRoundTripValues =
@@ -821,7 +834,7 @@ public class CollatzUnitTests
     [Fact]
     public void Idea2026()
     {
-        const int maxLoopIdx = 75000;
+        const int maxLoopIdx = GatedSeedIndexLimit;
         BigInteger nxtOdd, nxtIdx, currIdx;
         int loopIdx = 0;
         List<ulong> seedList =
@@ -878,23 +891,8 @@ public class CollatzUnitTests
                 Assert.True(seedList[i] == CollatzMath.OddStepCountToOne(bi));
             }
         }
-        StringBuilder sb = new();
-        string result = string.Empty;
-        for (int i = 0; i < seedList.Count; i++)
-        {
-            ulong targetDecay = 1;
-            if (true && seedList[i] == targetDecay)
-            {
-                List<BigInteger> decayInN_List = [];
-                decayInN_List.Add(OddOfIndex(i));
-                for (ulong j = 1; j < targetDecay; j++)
-                    decayInN_List.Add(CollatzMath.NextOdd(decayInN_List[decayInN_List.Count - 1]));
-                for (int j = 0; j < decayInN_List.Count; j++)
-                    sb.Append(decayInN_List[j].ToString(CultureInfo.InvariantCulture) + ',');
-                sb.AppendLine();
-            }
-        }
-        result = sb.ToString();
+        // The table this method used to build here and drop is now
+        // Collatz.Experiments' SeedIndexSweep, which runs the full index range.
     }
     // Remove optional leading "10" blocks and optional trailing "000111" block.
     private static ulong IndexofOdd(BigInteger _Odd)
@@ -1466,24 +1464,36 @@ public class CollatzUnitTests
         HashSet<BigInteger> ToOneInOneSet = new HashSet<BigInteger>();
         HashSet<BigInteger> ToOneInTwoSet = new HashSet<BigInteger>();
         ToOneInOneSet.Add(fnDecayToOneInOne(0));
-        for (int n = 1; n < 1000; n++)
+        // The closed-form sets only have to cover the range this test scans. Building a fixed
+        // 1000 terms of each cost 3.8 of this test's 4 seconds, nearly all of it on values
+        // orders of magnitude above GatedOddScanLimit - and each generator verifies its own
+        // closed form with a full Collatz descent, so a term thousands of bits wide is not
+        // cheap. All three generators are strictly increasing, so stopping one term past the
+        // limit covers everything the scan can reach.
+        for (int n = 1; ; n++)
         {
-            ToOneInOneSet.Add(fnDecayToOneInOne(n));
-            ToOneInTwoSet.Add(fnDecayToOneInTwo_Mod2(n));
-            ToOneInTwoSet.Add(fnDecayToOneInTwo_Mod1(n));
+            BigInteger inOne = fnDecayToOneInOne(n);
+            BigInteger inTwoMod2 = fnDecayToOneInTwo_Mod2(n);
+            BigInteger inTwoMod1 = fnDecayToOneInTwo_Mod1(n);
+            ToOneInOneSet.Add(inOne);
+            ToOneInTwoSet.Add(inTwoMod2);
+            ToOneInTwoSet.Add(inTwoMod1);
+            if (inOne > GatedOddScanLimit && inTwoMod2 > GatedOddScanLimit && inTwoMod1 > GatedOddScanLimit)
+                break;
         }
         ulong oddDecaySteps = 0;
-        ulong trials = 10000000;
-        bool isContains;
+        ulong trials = GatedOddScanLimit;
         for (ulong odd = 1; odd < trials; odd += 2)
         {
             oddDecaySteps = CollatzMath.OddStepCountToOne(odd);
             switch (oddDecaySteps)
             {
                 case 1:
-                    isContains = ToOneInOneSet.Contains(odd);
-                    if (!isContains)
-                        isContains = false;
+                    // This branch used to assign the membership result and throw it away, so
+                    // the decay-in-one half of this test verified nothing at all -
+                    // halheinrich/Math#4's family, inside a test that does assert elsewhere.
+                    Assert.True(ToOneInOneSet.Contains(odd),
+                        $"{odd} decays to one in a single odd step but is not in the closed-form decay-in-one set");
                     break;
                 case 2:
                     ulong decaysTo = odd;
@@ -1512,7 +1522,7 @@ public class CollatzUnitTests
         collatzFormulaList.Add(collatzDecayFormulaRecursive);
         collatzFormulaList.Add(collatzDecayFormula);
         collatzFormulaList.Add(collatzDecayFormulaBitManipulation);
-        int trials = 10000000;
+        int trials = GatedOddScanLimit;
         ulong oddDecaySteps = 0;
         // Test decay in 1
         for (int odd = 1; odd < trials; odd++)
@@ -1562,8 +1572,7 @@ public class CollatzUnitTests
         //collatzFormulaList.Add(collatzDecayFormulaRecursive);
         //collatzFormulaList.Add(collatzDecayFormula);
         //collatzFormulaList.Add(collatzDecayFormulaBitManipulation);
-        int trials = 10000000;
-        //trials = 1000;
+        int trials = GatedOddScanLimit;
         ulong oddDecaySteps = 0;
         int isMemberCt;
         // Test decay in 2
@@ -1655,8 +1664,7 @@ public class CollatzUnitTests
     public void TestDecayViaFunctionIn3()
     {
         CollatzDecayFormulaBitManipulation collatzDecayFormulaBitManipulationIn3 = new(3);
-        int trials = int.MaxValue;
-        //trials = 1000;
+        int trials = GatedOddScanLimit;
         ulong oddDecaySteps = 0;
         bool isMember;
         for (int odd = 1; odd < trials; odd += 2)
@@ -1671,7 +1679,7 @@ public class CollatzUnitTests
     [Fact]
     public void Test4nPlus1()
     {
-        int trials = 10000000;
+        int trials = GatedOddScanLimit;
         ulong oddDecaySteps = 0, fourNplusOneSteps = 0;
         for (int odd = 1; odd < trials; odd += 2)
         {
@@ -1765,87 +1773,38 @@ public class CollatzUnitTests
         Assert.True(true);
     }
     [Fact]
-    public void ExploreDecayInTwo()
+    public void TestDecayInTwoSuccessorDecaysInOne()
     {
-        int trials = int.MaxValue; // 2,147,483,647 
-        trials = 100000000; //
-        BigInteger decayIn1;
-        HashSet<BigInteger> DecayIn2HashSet = new HashSet<BigInteger>();
-        HashSet<BigInteger> DecayIn1HashSet = new HashSet<BigInteger>();
-        HashSet<(BigInteger DecayIn2, BigInteger DecayIn1)> DecayIn21HashSet = new();
-        for (int i = 1; i < trials; i++)
+        // Was ExploreDecayInTwo, which asserted this over 100,000,000 values and then built
+        // three CSVs it discarded. The claim is the assertion; the tables were the experiment.
+        // Bounded gate here; DecayInTwoSweep in Collatz.Experiments runs the full range and
+        // emits the tables.
+        for (int i = 1; i < GatedOddScanLimit; i++)
         {
             if (CollatzMath.OddStepCountToOne(i) != 2)
                 continue;
             if ((i & 1) == 0) // even
                 continue;
-            int decayIn2candidate = i;
-            DecayIn2HashSet.Add(i);
-            decayIn1 = CollatzMath.NextOdd(i);
+            BigInteger decayIn1 = CollatzMath.NextOdd(i);
             Assert.True(CollatzMath.OddStepCountToOne(decayIn1) == 1);
-            DecayIn1HashSet.Add(decayIn1);
-            DecayIn21HashSet.Add((i, decayIn1));
         }
-        StringBuilder sb2 = new();
-        foreach (BigInteger c2 in DecayIn2HashSet)
-            sb2.AppendLine(c2.ToString(CultureInfo.InvariantCulture));
-        string s2 = sb2.ToString();
-        StringBuilder sb1 = new();
-        foreach (BigInteger c1 in DecayIn1HashSet)
-            sb1.AppendLine(c1.ToString(CultureInfo.InvariantCulture));
-        string s1 = sb1.ToString();
-        StringBuilder sb21 = new();
-        foreach ((BigInteger DecayIn2, BigInteger DecayIn1) c21 in DecayIn21HashSet)
-            sb21.AppendLine(c21.DecayIn2.ToString(CultureInfo.InvariantCulture) + ',' + c21.DecayIn1.ToString(CultureInfo.InvariantCulture)
-                + ',' + CollatzMath.toBinaryBigEndianString(c21.DecayIn2));
-        string s21 = sb21.ToString();
-        Assert.True(true);
     }
     [Fact]
-    public void ExploreDecayInThree()
+    public void TestDecayInThreeSuccessorsDecayInTwoThenOne()
     {
-        int trials = int.MaxValue; // 2,147,483,647 
-        trials = 100000000; //
-        BigInteger decayIn1, decayIn2;
-        HashSet<BigInteger> DecayIn3HashSet = new HashSet<BigInteger>();
-        HashSet<BigInteger> DecayIn2HashSet = new HashSet<BigInteger>();
-        HashSet<BigInteger> DecayIn1HashSet = new HashSet<BigInteger>();
-        HashSet<(BigInteger DecayIn3, BigInteger DecayIn2, BigInteger DecayIn1)> DecayIn321HashSet = new();
-        for (int i = 1; i < trials; i++)
+        // Was ExploreDecayInThree; see the note on the decay-in-two case above. The full
+        // sweep and its tables are DecayInThreeSweep in Collatz.Experiments.
+        for (int i = 1; i < GatedOddScanLimit; i++)
         {
             if (CollatzMath.OddStepCountToOne(i) != 3)
                 continue;
             if ((i & 1) == 0) // even
                 continue;
-            int decayIn3candidate = i;
-            DecayIn3HashSet.Add(decayIn3candidate);
-            decayIn2 = CollatzMath.NextOdd(decayIn3candidate);
+            BigInteger decayIn2 = CollatzMath.NextOdd(i);
             Assert.True(CollatzMath.OddStepCountToOne(decayIn2) == 2);
-            DecayIn2HashSet.Add(decayIn2);
-            decayIn1 = CollatzMath.NextOdd(decayIn2);
+            BigInteger decayIn1 = CollatzMath.NextOdd(decayIn2);
             Assert.True(CollatzMath.OddStepCountToOne(decayIn1) == 1);
-            DecayIn1HashSet.Add(decayIn1);
-            DecayIn321HashSet.Add((decayIn3candidate, decayIn2, decayIn1));
         }
-        StringBuilder sb3 = new();
-        foreach (BigInteger c3 in DecayIn3HashSet)
-            sb3.AppendLine(c3.ToString(CultureInfo.InvariantCulture));
-        string s3 = sb3.ToString();
-        StringBuilder sb2 = new();
-        foreach (BigInteger c2 in DecayIn2HashSet)
-            sb2.AppendLine(c2.ToString(CultureInfo.InvariantCulture));
-        string s2 = sb2.ToString();
-        StringBuilder sb1 = new();
-        foreach (BigInteger c1 in DecayIn1HashSet)
-            sb1.AppendLine(c1.ToString(CultureInfo.InvariantCulture));
-        string s1 = sb1.ToString();
-        StringBuilder sb321 = new();
-        foreach ((BigInteger DecayIn3, BigInteger DecayIn2, BigInteger DecayIn1) c321 in DecayIn321HashSet)
-            sb321.AppendLine(c321.DecayIn3.ToString(CultureInfo.InvariantCulture) + ',' + c321.DecayIn2.ToString(CultureInfo.InvariantCulture) + ',' + c321.DecayIn1.ToString(CultureInfo.InvariantCulture)
-                + ',' + CollatzMath.toBinaryBigEndianString(c321.DecayIn3)
-                + ',' + CollatzMath.toBinaryBigEndianString(c321.DecayIn2));
-        string s321 = sb321.ToString();
-        Assert.True(true);
     }
     [Fact]
     public void ExploreSpecificDecay()

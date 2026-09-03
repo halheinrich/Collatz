@@ -23,6 +23,14 @@ internal static class Program
         ("PowerOfTwoPlusConstantConst",     DecayExperiments.PowerOfTwoPlusConstantConst),
         ("PowerOfTwoPlusConstantSurvivors", DecayExperiments.PowerOfTwoPlusConstantSurvivors),
         ("DeriveDecayInNFormula",           DecayExperiments.DeriveDecayInNFormula),
+        ("DecayInTwoSweep",                 DecaySweeps.DecayInTwoSweep),
+        ("DecayInThreeSweep",               DecaySweeps.DecayInThreeSweep),
+        ("DecayViaFunctionIn1Sweep",        DecaySweeps.DecayViaFunctionIn1Sweep),
+        ("DecayViaFunctionIn2Sweep",        DecaySweeps.DecayViaFunctionIn2Sweep),
+        ("DecayViaFunctionIn3Sweep",        DecaySweeps.DecayViaFunctionIn3Sweep),
+        ("FourNPlusOneSweep",               DecaySweeps.FourNPlusOneSweep),
+        ("DecayAsExpectedSweep",            DecaySweeps.DecayAsExpectedSweep),
+        ("SeedIndexSweep",                  DecaySweeps.SeedIndexSweep),
     ];
 
     private static int Main(string[] args)
