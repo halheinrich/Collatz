@@ -237,14 +237,15 @@ public static class CollatzMath
     public static BigInteger CollapseInTwoModOne(int n1, int n2);   // n1 >= 1, n2 >= 1
     public static BigInteger CollapseInTwoModTwo(int n1, int n2);   // n1 >= 1, n2 >= 1
 
-    // base-2 string conversions - READ THE REMARKS, NOT THE NAMES; see § Pitfalls
-    public static string toBinaryBigEndianString(BigInteger bigInt);
-    public static string toBinaryBigEndianStringGtInt64(BigInteger bigInt);
-    public static string toBinaryLittleEndianString(BigInteger bigInt);
-    public static string toBinaryLittleEndianStringGtInt64(BigInteger bigInt);
-    public static BigInteger toBigIntegerFromBinaryBigEndianString(string s);
-    public static BigInteger toBigIntegerFromBinaryLittleEndianString(string s);
+    // base-2 string conversions; each writer pairs with the reader of its own order
+    public static string ToBinaryLittleEndianString(BigInteger bigInt);          // lsb first
+    public static string ToBinaryLittleEndianStringGtInt64(BigInteger bigInt);   // lsb first
+    public static string ToBinaryBigEndianString(BigInteger bigInt);             // msb first
+    public static string ToBinaryBigEndianStringGtInt64(BigInteger bigInt);      // msb first
+    public static BigInteger ToBigIntegerFromBinaryLittleEndianString(string s); // reads lsb first
+    public static BigInteger ToBigIntegerFromBinaryBigEndianString(string s);    // reads msb first
 
+    // yields lsb-first digits, so this name is still inverted - see § Pitfalls
     public static IEnumerable<string> GetBinaryBigEndianDecaysInOne();  // endless
 
     public static UInt64 OddStepCountToOne(BigInteger n);      // n > 0
@@ -332,12 +333,15 @@ for `StepsToOne` other than one.
   the bit-pattern implementation covers all 90. That gap is halheinrich/Math#2,
   and the test asserts the model the gap contradicts. Weakening the assertion to
   make the suite green destroys the finding. Fix the model, or leave it red.
-- **The endian names in the binary-string family are inverted, all six
-  together** (halheinrich/Math#25). A method named `BigEndian` produces or reads
-  least-significant-first, and one named `LittleEndian` does the opposite of
-  that. The XML remarks on each say what it actually does and are the authority;
-  the names are not. Renaming them is a six-method change with call sites in all
-  three projects, which is why it is an issue rather than a drive-by.
+- **`GetBinaryBigEndianDecaysInOne` is the last inverted endian name.** It
+  yields least-significant-first digits, which is what
+  `ToBigIntegerFromBinaryLittleEndianString` reads. halheinrich/Math#25 flipped
+  the six conversion methods and stopped there, because renaming this one is a
+  seventh public change and a separate decision; its remark says so at the point
+  of use. Local and private names elsewhere — `BigEndAnchor`, `seedBinaryBE`,
+  `Strip_10_000111_BigEnd`, `binaryBE`, `TestDecayInOneViaBinaryBigendianText`
+  and its DecayInThree sibling — carry the same inverted label and were left with
+  it.
 - **Two of three `NthMember` implementations are broken**
   (halheinrich/Math#24). `CollatzDecayFormula.NthMember` returns zero for every
   `n`. `CollatzDecayFormulaBitManipulation.NthMember` drops the leading `1` of
@@ -373,7 +377,7 @@ for `StepsToOne` other than one.
 ## Subproject-internal next steps
 
 The open backlog for this member lives in the umbrella tracker rather than
-repeated here: halheinrich/Math#2, #24, #25 and #28 are all
+repeated here: halheinrich/Math#2, #24 and #28 are all
 subproject-internal, and § Pitfalls above says what each one costs a reader
 today.
 

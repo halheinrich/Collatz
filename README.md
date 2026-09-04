@@ -106,8 +106,8 @@ dotnet build
 dotnet test
 ```
 
-37 tests, one of them the deliberate failure described above. The suite builds
-and runs identically in Debug and Release.
+One test fails deliberately, for the reason described above; everything else is
+green. The suite builds and runs identically in Debug and Release.
 
 ## Licence
 

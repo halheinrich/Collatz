@@ -328,15 +328,17 @@ public static class CollatzMath
     /// Returns the base-2 digits of <paramref name="bigInt"/>, least-significant digit first.
     /// </summary>
     /// <remarks>
-    /// Despite the name, the digit order produced is least-significant-first. Values above
-    /// <see cref="long.MaxValue"/> are delegated to <see cref="toBinaryBigEndianStringGtInt64"/>;
-    /// below that the conversion runs through <see cref="long"/>, so a negative value yields a
-    /// 64-digit two's-complement form rather than a sign-magnitude one.
+    /// Values above <see cref="long.MaxValue"/> are delegated to
+    /// <see cref="ToBinaryLittleEndianStringGtInt64"/>; below that the conversion runs through
+    /// <see cref="long"/>, so a negative value yields a 64-digit two's-complement form rather
+    /// than a sign-magnitude one. This method was called <c>toBinaryBigEndianString</c> until
+    /// halheinrich/Math#25, and produced least-significant-first digits under that name too -
+    /// only the name changed.
     /// </remarks>
-    public static string toBinaryBigEndianString(BigInteger bigInt)
+    public static string ToBinaryLittleEndianString(BigInteger bigInt)
     {
         if (bigInt > long.MaxValue)
-            return toBinaryBigEndianStringGtInt64(bigInt);
+            return ToBinaryLittleEndianStringGtInt64(bigInt);
         string binaryString = Convert.ToString((long)bigInt, 2);
         char[] binaryCharArray = binaryString.ToCharArray();
         Array.Reverse(binaryCharArray);
@@ -347,13 +349,13 @@ public static class CollatzMath
     /// <c>"0"</c> when <paramref name="bigInt"/> is zero.
     /// </summary>
     /// <remarks>
-    /// The name is wrong twice over and is left alone for now: the digit order produced is
-    /// most-significant-first, and the loop below handles any non-negative
-    /// <see cref="BigInteger"/> rather than only values above <see cref="long.MaxValue"/>.
-    /// That second point is why halheinrich/Math#1's guard could be deleted outright rather
-    /// than repaired - there was nothing for it to delegate to.
+    /// The endianness half of this name was wrong until halheinrich/Math#25 and is right now.
+    /// The <c>GtInt64</c> half is still misleading and was left alone: the loop below handles any
+    /// non-negative <see cref="BigInteger"/> rather than only values above
+    /// <see cref="long.MaxValue"/>, which is why halheinrich/Math#1's guard could be deleted
+    /// outright rather than repaired - there was nothing for it to delegate to.
     /// </remarks>
-    public static string toBinaryLittleEndianStringGtInt64(BigInteger bigInt)
+    public static string ToBinaryBigEndianStringGtInt64(BigInteger bigInt)
     {
         // Special case for zero
         if (bigInt == 0) return "0";
@@ -374,7 +376,7 @@ public static class CollatzMath
     /// Returns the base-2 digits of <paramref name="bigInt"/>, least-significant digit first, or
     /// <c>"0"</c> when <paramref name="bigInt"/> is zero.
     /// </summary>
-    public static string toBinaryBigEndianStringGtInt64(BigInteger bigInt)
+    public static string ToBinaryLittleEndianStringGtInt64(BigInteger bigInt)
     {
         if (bigInt == 0) return "0";
 
@@ -392,8 +394,14 @@ public static class CollatzMath
     /// Returns the base-2 digits of <paramref name="bigInt"/>, most-significant digit first, with
     /// leading zeros trimmed.
     /// </summary>
-    /// <remarks>Despite the name, the digit order produced is most-significant-first.</remarks>
-    public static string toBinaryLittleEndianString(BigInteger bigInt)
+    /// <remarks>
+    /// Trimming rather than special-casing makes zero the one argument on which this method and
+    /// <see cref="ToBinaryBigEndianStringGtInt64"/> disagree: <see cref="BigInteger.ToByteArray()"/>
+    /// gives a single zero byte, so the trim leaves the empty string where the loop-based sibling
+    /// returns <c>"0"</c>. Both still round-trip, because
+    /// <see cref="ToBigIntegerFromBinaryBigEndianString"/> reads an empty string as zero.
+    /// </remarks>
+    public static string ToBinaryBigEndianString(BigInteger bigInt)
     {
         byte[] bytes = bigInt.ToByteArray();
         Array.Reverse(bytes);
@@ -401,28 +409,28 @@ public static class CollatzMath
         return retval;
     }
     /// <summary>
-    /// Reads <paramref name="littleEndianBinaryText"/> left to right, treating the first character as
+    /// Reads <paramref name="bigEndianBinaryText"/> left to right, treating the first character as
     /// the most significant base-2 digit.
     /// </summary>
     /// <remarks>Any character other than <c>1</c> contributes a zero digit.</remarks>
-    public static BigInteger toBigIntegerFromBinaryLittleEndianString(string littleEndianBinaryText)
+    public static BigInteger ToBigIntegerFromBinaryBigEndianString(string bigEndianBinaryText)
     {
         BigInteger retval = 0;
-        foreach (char c in littleEndianBinaryText)
+        foreach (char c in bigEndianBinaryText)
             retval = (retval << 1) | (c == '1' ? 1 : 0);
         return retval;
     }
     /// <summary>
-    /// Reads <paramref name="bigEndianBinaryText"/> right to left, treating the last character as the
+    /// Reads <paramref name="littleEndianBinaryText"/> right to left, treating the last character as the
     /// most significant base-2 digit.
     /// </summary>
     /// <remarks>Any character other than <c>1</c> contributes a zero digit.</remarks>
-    public static BigInteger toBigIntegerFromBinaryBigEndianString(string bigEndianBinaryText)
+    public static BigInteger ToBigIntegerFromBinaryLittleEndianString(string littleEndianBinaryText)
     {
         BigInteger retval = 0;
-        for (int i = bigEndianBinaryText.Length - 1; i >= 0; i--)
+        for (int i = littleEndianBinaryText.Length - 1; i >= 0; i--)
         {
-            retval = (retval << 1) | (bigEndianBinaryText[i] == '1' ? 1 : 0);
+            retval = (retval << 1) | (littleEndianBinaryText[i] == '1' ? 1 : 0);
         }
         return retval;
     }
@@ -430,7 +438,13 @@ public static class CollatzMath
     /// Yields the unbounded sequence <c>1</c>, <c>101</c>, <c>10101</c>, &#8230; &#8212; each element the
     /// previous one with <c>01</c> appended.
     /// </summary>
-    /// <remarks>The sequence never ends; callers must bound their own enumeration.</remarks>
+    /// <remarks>
+    /// The sequence never ends; callers must bound their own enumeration. The digits are
+    /// least-significant-first, so <c>BigEndian</c> in this name is inverted in exactly the way
+    /// halheinrich/Math#25 corrected across the six conversion methods - the elements it yields
+    /// are read by <see cref="ToBigIntegerFromBinaryLittleEndianString"/>. Renaming it is a
+    /// seventh public change and was left for a separate decision.
+    /// </remarks>
     public static IEnumerable<string> GetBinaryBigEndianDecaysInOne()
     {
         StringBuilder sb = new StringBuilder("1");
@@ -957,7 +971,7 @@ public class CollatzDecayFormulaBitManipulation : ICollatzDecayFormula
             if (candidate.IsEven)
                 candidate = (candidate << 2) + 1;
         }
-        string bitString = CollatzMath.toBinaryBigEndianString(candidate);
+        string bitString = CollatzMath.ToBinaryLittleEndianString(candidate);
         switch (StepsToOne)
         {
             case 1:
@@ -1045,7 +1059,7 @@ public class CollatzDecayFormulaBitManipulation : ICollatzDecayFormula
             default:
                 throw new NotImplementedException();
         }
-        retval = CollatzMath.toBigIntegerFromBinaryBigEndianString(sb.ToString());
+        retval = CollatzMath.ToBigIntegerFromBinaryLittleEndianString(sb.ToString());
         return retval;
     }
     private static bool IsPatternMatch(string binaryBE, int minBits, string prefix, string repeat, string suffix)

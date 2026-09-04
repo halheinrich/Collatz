@@ -130,11 +130,11 @@ internal static class DecayExperiments
         int multStepCt;
         while (sb.Length < 128)
         {
-            c = CollatzMath.toBigIntegerFromBinaryBigEndianString(sb.ToString());
+            c = CollatzMath.ToBigIntegerFromBinaryLittleEndianString(sb.ToString());
             multStepCt = 0;
             while (true)
             {
-                csvSb.AppendLine(c.ToString(CultureInfo.InvariantCulture) + ',' + CollatzMath.toBinaryBigEndianString(c));
+                csvSb.AppendLine(c.ToString(CultureInfo.InvariantCulture) + ',' + CollatzMath.ToBinaryLittleEndianString(c));
                 c = CollatzMath.NextOdd(c);
                 ++multStepCt;
                 if (c == 1)
@@ -219,7 +219,7 @@ internal static class DecayExperiments
         for (int n = 0; n < LessThanSeedList.Count; n++)
         {
             int bitLength = GetBitLength(LessThanSeedList[n].PowerOfTwo);
-            string binaryString = CollatzMath.toBinaryBigEndianString(LessThanSeedList[n].Constant);
+            string binaryString = CollatzMath.ToBinaryLittleEndianString(LessThanSeedList[n].Constant);
             string bitPrefix;
             if (bitLength > binaryString.Length)
                 binaryString = binaryString.PadRight(bitLength, '0');
@@ -258,7 +258,7 @@ internal static class DecayExperiments
         for (int n = 0; n < SurvivorList.Count; n++)
         {
             int bitLength = GetBitLength(SurvivorList[n].PowerOfTwo);
-            string binaryString = CollatzMath.toBinaryBigEndianString(SurvivorList[n].Constant);
+            string binaryString = CollatzMath.ToBinaryLittleEndianString(SurvivorList[n].Constant);
             string bitPrefix;
             if (bitLength > binaryString.Length)
                 binaryString = binaryString.PadRight(bitLength, '0');
@@ -277,7 +277,7 @@ internal static class DecayExperiments
         foreach ((BigInteger DecayInTarget, BigInteger FirstDecay, uint _PowTwo) tuple in decayInN_FirstDecayPairList)
         {
             bigEndSb.Clear();
-            bigEndSb.Append(CollatzMath.toBinaryBigEndianString(tuple.DecayInTarget));
+            bigEndSb.Append(CollatzMath.ToBinaryLittleEndianString(tuple.DecayInTarget));
             string bigEndTxt = bigEndSb.ToString();
             string bigEndCore = Strip_10_000111_BigEnd(bigEndSb.ToString());
             sb.AppendLine(tuple.DecayInTarget.ToString(CultureInfo.InvariantCulture) + ',' + (tuple.DecayInTarget % 3).ToString(CultureInfo.InvariantCulture) + ',' +
