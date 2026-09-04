@@ -344,10 +344,21 @@ public static class CollatzMath
     /// Strips factors of two from <paramref name="n"/>, then counts applications of
     /// <see cref="NextOdd"/> until the value is less than <paramref name="n"/> itself.
     /// </summary>
-    /// <remarks>Does not return for a value whose orbit never drops below <paramref name="n"/>.</remarks>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="n"/> is zero or negative.</exception>
+    /// <remarks>
+    /// Positivity used to be a <see cref="Debug.Assert(bool, string)"/>, so Release had no check.
+    /// What that hid is not what it hid in <see cref="OddStepCountToOne"/>, measured on SDK
+    /// 10.0.400: zero hangs the same way, in the strip loop, but a negative argument usually
+    /// hangs in the step loop instead, its orbit settling into a negative cycle that never drops
+    /// below the argument - and sometimes it does not hang at all. -17 returned 1, because -25
+    /// genuinely is less than -17. A plausible number for a nonsensical argument is worse than a
+    /// hang, which is why the guard is on the argument rather than on the loop.
+    /// Does not return for a positive value whose orbit never drops below <paramref name="n"/>;
+    /// that one is the conjecture, not a missing guard.
+    /// </remarks>
     public static UInt64 OddStepCountToSmaller(BigInteger n)
     {
-        Debug.Assert(n > 0, "CollatzMath.OddStepCountToSmaller");
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(n);
         BigInteger odd = n;
         while (odd.IsEven)
             odd >>= 1;
@@ -730,8 +741,6 @@ public class CollatzDecayFormula : ICollatzDecayFormula
         // f(n) = [2^(6n+4) - 7] / 3^2
         if (c < 1)
             return false;
-        if (c == 113 && SubtractiveConstant == 7)
-            Debug.Assert(true);
         BigInteger candidate = c;
         while (candidate.IsEven)
             candidate >>= 1;

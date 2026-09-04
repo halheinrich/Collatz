@@ -665,6 +665,26 @@ public class CollatzUnitTests
     }
 
     [Fact]
+    public void TestOddStepCountToSmaller_RejectsNonPositiveArgumentsAndCountsSteps()
+    {
+        // The sibling guard halheinrich/Math#6's list did not name. Same Debug.Assert, but not
+        // the same failure behind it, measured on SDK 10.0.400 with the guard removed: 0 hung in
+        // the strip loop as OddStepCountToOne does, most negatives hung in the step loop with the
+        // orbit settling into a negative cycle - and -17 returned 1, because -25 really is less
+        // than -17. A plausible answer to a nonsensical argument, which is worse than a hang.
+        Assert.Throws<ArgumentOutOfRangeException>(() => CollatzMath.OddStepCountToSmaller(0));
+        Assert.Throws<ArgumentOutOfRangeException>(() => CollatzMath.OddStepCountToSmaller(-1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => CollatzMath.OddStepCountToSmaller(-17));
+
+        // This method had no test of any kind before now; its only live callers are experiments.
+        // Both expectations are hand-derived rather than read off the implementation:
+        //   3 -> 10 -> 5, and 5 is not below 3; 5 -> 16 -> 8 -> 4 -> 2 -> 1, and 1 is. Two steps.
+        Assert.Equal(2ul, CollatzMath.OddStepCountToSmaller(3));
+        //   7 -> 11 -> 17 -> 13 -> 5, none below 7 until 5. Four steps.
+        Assert.Equal(4ul, CollatzMath.OddStepCountToSmaller(7));
+    }
+
+    [Fact]
     public void TestOddIndexBijection_RoundTrips()
     {
         // CollatzMath.OddOfIndex / IndexOfOdd index the odd integers 3, 5, 7, ... from zero.
