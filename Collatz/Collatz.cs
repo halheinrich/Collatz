@@ -692,6 +692,27 @@ public class CollatzDecayFormulaRecursive : IIndexedCollatzDecayFormula
     public Int64 AdditiveConstant { get; }
     private readonly List<BigInteger> DecayAnchorList;
     private readonly HashSet<BigInteger> DecayAnchorHashSet;
+    /// <summary>
+    /// Every recurrence this class can seed, with the anchor that seeds it.
+    /// </summary>
+    /// <remarks>
+    /// The table is data rather than a switch so that the constructor's guard, its exception message
+    /// and this documentation cannot drift apart: adding a row is the only edit a new seeded family
+    /// needs. It is not an enumeration of the families that exist at these depths - see
+    /// halheinrich/Math#2 - only of the ones this constructor holds an anchor for.
+    /// </remarks>
+    private static readonly (UInt32 StepsToOne, Int32 TwosExponent, Int64 AdditiveConstant, BigInteger SeedAnchor)[] SeededRecurrences =
+    [
+        (1, 2, 1, 1),
+        (2, 6, 35, 3),
+        (2, 6, 49, 113),
+    ];
+    /// <summary>Renders <see cref="SeededRecurrences"/> for an exception message.</summary>
+    private static string DescribeSeededRecurrences()
+    {
+        return string.Join("; ", SeededRecurrences.Select(recurrence => string.Create(CultureInfo.InvariantCulture,
+            $"depth {recurrence.StepsToOne} f(n) = 2^{recurrence.TwosExponent} * f(n-1) + {recurrence.AdditiveConstant} anchored at {recurrence.SeedAnchor}")));
+    }
     #endregion Properties
     #region Constructors
     private CollatzDecayFormulaRecursive()
@@ -700,46 +721,52 @@ public class CollatzDecayFormulaRecursive : IIndexedCollatzDecayFormula
         DecayAnchorHashSet = new HashSet<BigInteger>();
     }
     /// <summary>
-    /// Creates a formula from an explicit recurrence, seeding the anchor list with the known first
-    /// member: 1 for <paramref name="stepsToOne"/> 1, and 3 or 113 for <paramref name="stepsToOne"/> 2
-    /// with <paramref name="additiveConstant"/> 35 or 49 respectively.
+    /// Creates a formula from an explicit recurrence, seeding the anchor list with that recurrence's
+    /// known first member.
     /// </summary>
+    /// <param name="stepsToOne">The number of odd steps this family's members take to reach one.</param>
+    /// <param name="twosExponent">The base-two logarithm of the recurrence's multiplier.</param>
+    /// <param name="additiveConstant">The recurrence's additive term.</param>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// No recurrence in <see cref="SeededRecurrences"/> has that <paramref name="stepsToOne"/>, so no
+    /// seed anchor is known at that depth and there is nothing to build the object from.
+    /// </exception>
+    /// <exception cref="ArgumentException">
+    /// The depth is seeded but <paramref name="twosExponent"/> and <paramref name="additiveConstant"/>
+    /// name no recurrence seeded at it.
+    /// </exception>
     /// <remarks>
-    /// Any other combination leaves the anchor list empty and trips a
-    /// <see cref="Debug.Assert(bool, string)"/>, which is absent from Release builds &#8212;
-    /// see halheinrich/Math#6.
+    /// The constructor accepts exactly the triples in <see cref="SeededRecurrences"/>. That set is
+    /// what this constructor can seed and not a claim about how many families exist &#8212; what the
+    /// depth-<i>d</i> family count is, and whether this recursion reaches all of it, is open in
+    /// halheinrich/Math#2. Rejecting what cannot be seeded is not asserting the enumeration is closed.
+    /// <para>
+    /// Validation used to be one <see cref="Debug.Assert(bool, string)"/> covering one case of one
+    /// depth, so Release accepted every bad triple silently and Debug killed the process on the
+    /// single case it caught. Two whole regions went unchecked: depth 1 ignored both recurrence
+    /// parameters, and depth 3 upward fell through to an object with an empty anchor list, which no
+    /// method here can use. See halheinrich/Math#28.
+    /// </para>
     /// </remarks>
     public CollatzDecayFormulaRecursive(UInt32 stepsToOne, Int32 twosExponent, Int64 additiveConstant) : this()
     {
-        // f(n) = 2^2 * f(n-1) + 1
-        // f(n) = 2^6 * f(n-1) + 35
-        // f(n) = 2^6 * f(n-1) + 49
+        if (!SeededRecurrences.Any(recurrence => recurrence.StepsToOne == stepsToOne))
+            throw new ArgumentOutOfRangeException(nameof(stepsToOne), stepsToOne, string.Create(CultureInfo.InvariantCulture,
+                $"No seed anchor is known at depth {stepsToOne}. Seeded here: {DescribeSeededRecurrences()}. Depths beyond those are open - see halheinrich/Math#2 - so no anchor can be supplied for them."));
+        int index = Array.FindIndex(SeededRecurrences, recurrence =>
+            recurrence.StepsToOne == stepsToOne
+            && recurrence.TwosExponent == twosExponent
+            && recurrence.AdditiveConstant == additiveConstant);
+        if (index < 0)
+            throw new ArgumentException(string.Create(CultureInfo.InvariantCulture,
+                $"f(n) = 2^{twosExponent} * f(n-1) + {additiveConstant} has no seed anchor at depth {stepsToOne}. Seeded here: {DescribeSeededRecurrences()}. That set is what this constructor can seed, not a claim that no other family exists at these depths - see halheinrich/Math#2."),
+                nameof(additiveConstant));
         StepsToOne = stepsToOne;
         TwosExponent = twosExponent;
         PowerOfTwo = BigInteger.Pow(2, TwosExponent);
         AdditiveConstant = additiveConstant;
-        if (StepsToOne == 1)
-        {
-            DecayAnchorList.Add(1);
-            DecayAnchorHashSet.Add(1);
-        }
-        if (StepsToOne == 2)
-        {
-            switch (AdditiveConstant)
-            {
-                case 35:
-                    DecayAnchorList.Add(3);
-                    DecayAnchorHashSet.Add(3);
-                    break;
-                case 49:
-                    DecayAnchorList.Add(113);
-                    DecayAnchorHashSet.Add(113);
-                    break;
-                default:
-                    Debug.Assert(false, "CollatzDecayFormula.new bad parameters");
-                    break;
-            }
-        }
+        DecayAnchorList.Add(SeededRecurrences[index].SeedAnchor);
+        DecayAnchorHashSet.Add(SeededRecurrences[index].SeedAnchor);
     }
     /// <summary>
     /// Derives a formula from <paramref name="predecessorFormula"/>: it walks that formula's members,
@@ -755,18 +782,32 @@ public class CollatzDecayFormulaRecursive : IIndexedCollatzDecayFormula
     /// cannot seed it.
     /// </param>
     /// <param name="modThree">Selects the residue class to keep; must be 1 or 2.</param>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="modThree"/> is neither 1 nor 2.</exception>
+    /// <exception cref="InvalidOperationException">
+    /// The derivation did not produce a family: the anchors it collected do not satisfy a single
+    /// recurrence, or one of them does not reach one in <see cref="StepsToOne"/> odd steps.
+    /// </exception>
     /// <remarks>
     /// The walk is unbounded: a predecessor that never yields enough qualifying members does not
-    /// return. Every check here is a <see cref="Debug.Assert(bool, string)"/> and so is absent from
-    /// Release builds &#8212; see halheinrich/Math#6.
+    /// return.
+    /// <para>
+    /// Both derivation failures used to be a <see cref="Debug.Assert(bool, string)"/>, which is absent
+    /// from Release builds, so a Release build returned the object built from the failed derivation
+    /// and a Debug build killed the process instead of failing a test. They are the caller's
+    /// <paramref name="predecessorFormula"/> reaching a place this recursion cannot follow, not the
+    /// caller mis-spelling a parameter, so they throw <see cref="InvalidOperationException"/> rather
+    /// than an argument exception. See halheinrich/Math#28.
+    /// </para>
     /// </remarks>
     public CollatzDecayFormulaRecursive(IIndexedCollatzDecayFormula predecessorFormula, int modThree) : this()
     {
         // f(n) = 2^2 * f(n-1) + 1
         // f(n) = 2^6 * f(n-1) + 35
         // f(n) = 2^6 * f(n-1) + 49
+        if (modThree is not (1 or 2))
+            throw new ArgumentOutOfRangeException(nameof(modThree), modThree,
+                "Must be 1 or 2: the derivation keeps one of the two residue classes modulo three that can yield an anchor.");
         const int successThreshold = 7;
-        Debug.Assert(modThree == 1 || modThree == 2, "CollatzDecayFormulaRecursive.new()");
         BigInteger prevAnchor, anchor, pow2 = -1;
         Int64 addConst = -1;
         bool isOk = false;
@@ -779,7 +820,12 @@ public class CollatzDecayFormulaRecursive : IIndexedCollatzDecayFormula
             if (prevAnchor % 3 == modThree)
             {
                 anchor = (modThree == 1) ? 4 * prevAnchor - 1 : 2 * prevAnchor - 1;
-                Debug.Assert(anchor % 3 == 0, "CollatzDecayFormulaRecursive.new()");
+                // The division below is exact, so nothing checks it. Working modulo three: the
+                // guard above leaves modThree at 1 or 2, and this branch is reached only when
+                // prevAnchor % 3 == modThree - which under C#'s truncated remainder also rules out a
+                // negative prevAnchor, whose remainder can only be 0, -1 or -2. So 4 * prevAnchor is
+                // 4 * 1 = 1 when modThree is 1, and 2 * prevAnchor is 2 * 2 = 4 = 1 when it is 2:
+                // either product is 1, and one less than it is divisible by three.
                 anchor /= 3;
                 DecayAnchorList.Add(anchor);
                 DecayAnchorHashSet.Add(anchor);
@@ -804,14 +850,17 @@ public class CollatzDecayFormulaRecursive : IIndexedCollatzDecayFormula
             if (DecayAnchorList.Count > successThreshold)
                 break;
         }
-        Debug.Assert(isOk, "CollatzDecayFormulaRecursive.new()");
+        if (!isOk)
+            throw new InvalidOperationException(string.Create(CultureInfo.InvariantCulture,
+                $"The {DecayAnchorList.Count} anchors derived from {predecessorFormula} keeping residue {modThree} do not satisfy one recurrence f(n) = 2^{log2ratio} * f(n-1) + {addConst}, so they are not a family this class can represent."));
         PowerOfTwo = pow2;
         TwosExponent = log2ratio;
         AdditiveConstant = addConst;
         StepsToOne = predecessorFormula.StepsToOne + 1;
         foreach (BigInteger c in DecayAnchorList)
             if (CollatzMath.OddStepCountToOne(c) != StepsToOne)
-                Debug.Assert(CollatzMath.OddStepCountToOne(c) == StepsToOne, "CollatzDecayFormulaRecursive.new()");
+                throw new InvalidOperationException(string.Create(CultureInfo.InvariantCulture,
+                    $"Anchor {c} derived from {predecessorFormula} reaches one in {CollatzMath.OddStepCountToOne(c)} odd steps, not the {StepsToOne} this family claims."));
     }
     #endregion Constructors
     #region Public Methods

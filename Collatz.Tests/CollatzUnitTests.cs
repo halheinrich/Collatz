@@ -2223,6 +2223,99 @@ public class CollatzUnitTests
         // Distinct instances print distinctly, so the text identifies which family it came from.
         Assert.NotEqual(new CollatzDecayFormulaBitManipulation(1).ToString(), new CollatzDecayFormulaBitManipulation(3).ToString());
     }
+    [Fact]
+    public void TestSeededRecursiveConstructorRejectsDepthsItHasNoAnchorFor()
+    {
+        // Before halheinrich/Math#28 the only check here was a Debug.Assert reached solely by
+        // StepsToOne == 2 with an unrecognised constant. Depth 3 upward matched neither of the two
+        // if blocks and fell straight out of the constructor, so the object came back with an empty
+        // DecayAnchorList - well-formed and unusable, since IsMember and NthMember both begin at
+        // DecayAnchorList.Last(). Depth 0 fell through the same way.
+        foreach (UInt32 depth in new UInt32[] { 0, 3, 4, 10 })
+        {
+            ArgumentOutOfRangeException thrown = Assert.Throws<ArgumentOutOfRangeException>(
+                () => new CollatzDecayFormulaRecursive(depth, 6, 35));
+            Assert.Equal("stepsToOne", thrown.ParamName);
+        }
+        // The message names what is seeded and says why the set is not known to be everything,
+        // rather than asserting the depth-1 and depth-2 enumeration is complete - halheinrich/Math#2.
+        string message = Assert.Throws<ArgumentOutOfRangeException>(
+            () => new CollatzDecayFormulaRecursive(3, 6, 35)).Message;
+        Assert.Contains("halheinrich/Math#2", message, StringComparison.Ordinal);
+        Assert.Contains("2^6 * f(n-1) + 35", message, StringComparison.Ordinal);
+    }
+    [Fact]
+    public void TestSeededRecursiveConstructorRejectsRecurrencesItHasNoAnchorFor()
+    {
+        // The wider half of the same hole. Depth 1 used to ignore twosExponent and additiveConstant
+        // completely: new(1, 999, 12345) seeded anchor 1 and stored a PowerOfTwo of 2^999, so every
+        // value the recurrence went on to produce was nonsense the object asserted was a family.
+        (UInt32 StepsToOne, Int32 TwosExponent, Int64 AdditiveConstant)[] unseeded =
+        [
+            (1, 999, 12345),    // the depth that ignored both parameters
+            (1, 2, 35),         // right exponent, another depth's constant
+            (1, 6, 1),          // right constant, another depth's exponent
+            (2, 6, 7),          // the one case the old Debug.Assert did reach
+            (2, 2, 35),         // recognised constant, wrong exponent
+        ];
+        foreach ((UInt32 stepsToOne, Int32 twosExponent, Int64 additiveConstant) in unseeded)
+        {
+            ArgumentException thrown = Assert.Throws<ArgumentException>(
+                () => new CollatzDecayFormulaRecursive(stepsToOne, twosExponent, additiveConstant));
+            Assert.Equal("additiveConstant", thrown.ParamName);
+        }
+    }
+    [Fact]
+    public void TestSeededRecursiveConstructorStillSeedsEveryRecurrenceItSupports()
+    {
+        // The control for the two rejection tests above: a guard that rejected everything would pass
+        // both of them. Index zero is the seed anchor for this implementation, so NthMember(0) reads
+        // back exactly what the table seeded.
+        Assert.Equal(1, new CollatzDecayFormulaRecursive(1, 2, 1).NthMember(0));
+        Assert.Equal(3, new CollatzDecayFormulaRecursive(2, 6, 35).NthMember(0));
+        Assert.Equal(113, new CollatzDecayFormulaRecursive(2, 6, 49).NthMember(0));
+    }
+    [Fact]
+    public void TestDerivedRecursiveConstructorRejectsAResidueItCannotKeep()
+    {
+        // modThree selects which of the two maps runs, so a third value silently ran the mod-2 map
+        // over a residue class that map is not for. In Release the Debug.Assert was not there at all.
+        CollatzDecayFormulaRecursive depthOne = new(1, 2, 1);
+        foreach (int modThree in new[] { -1, 0, 3, 4 })
+        {
+            ArgumentOutOfRangeException thrown = Assert.Throws<ArgumentOutOfRangeException>(
+                () => new CollatzDecayFormulaRecursive(depthOne, modThree));
+            Assert.Equal("modThree", thrown.ParamName);
+        }
+    }
+    [Fact]
+    public void TestDerivedRecursiveConstructorRejectsAPredecessorWhoseAnchorsAreNotAFamily()
+    {
+        // The isOk invariant. ScriptedPredecessor yields members congruent to 1 modulo three whose
+        // anchors are 9, 13, 21, 37, 69, 133, 261, 517 - a sequence no f(n) = 2^k * f(n-1) + a fits.
+        // The constructor used to Debug.Assert here, so Release built the object from the failed
+        // derivation and returned it, with PowerOfTwo and AdditiveConstant read off the last two
+        // anchors as though they described all eight.
+        ScriptedPredecessor notAFamily = new(1, 7, 10, 16, 28, 52, 100, 196, 388);
+        InvalidOperationException thrown = Assert.Throws<InvalidOperationException>(
+            () => new CollatzDecayFormulaRecursive(notAFamily, 1));
+        Assert.Contains("do not satisfy one recurrence", thrown.Message, StringComparison.Ordinal);
+    }
+    [Fact]
+    public void TestDerivedRecursiveConstructorRejectsAnchorsThatDecayAtTheWrongDepth()
+    {
+        // The OddStepCountToOne invariant, which is a different failure from the one above: these
+        // anchors are 9, 41, 169, 681, 2729, 10921, 43689, 174761 and they do satisfy one recurrence,
+        // f(n) = 2^2 * f(n-1) + 5, so isOk is true and the derivation looks successful. What they are
+        // not is a depth-two family - 9 reaches one in six odd steps, not two.
+        ScriptedPredecessor wrongDepth = new(1, 7, 31, 127, 511, 2047, 8191, 32767, 131071);
+        InvalidOperationException thrown = Assert.Throws<InvalidOperationException>(
+            () => new CollatzDecayFormulaRecursive(wrongDepth, 1));
+        Assert.Contains("reaches one in 6 odd steps", thrown.Message, StringComparison.Ordinal);
+        // The control: the same walk over a real depth-one family does derive, so the guard is
+        // rejecting the anchors rather than rejecting everything.
+        Assert.Equal(2u, new CollatzDecayFormulaRecursive(new CollatzDecayFormulaRecursive(1, 2, 1), 1).StepsToOne);
+    }
     #endregion Fact Methods
     #region Helper Methods
     private static void AssertDecayIn1(string _AnchorBits)
@@ -2278,6 +2371,24 @@ public class CollatzUnitTests
         Assert.True(CollatzMath.NextOdd(decayInOne) == 1);
         Assert.True(decayInTwo == (BigInteger.Pow(2, 6 * _N + 4) - 7) / 9);
         return decayInTwo;
+    }
+    /// <summary>
+    /// A predecessor that yields exactly the members it is given, so a derivation can be walked onto
+    /// anchors no real family produces. Reading past the script throws, which keeps a changed walk
+    /// visible instead of letting the test pass for a different reason.
+    /// </summary>
+    private sealed class ScriptedPredecessor : IIndexedCollatzDecayFormula
+    {
+        private readonly BigInteger[] Members;
+        public ScriptedPredecessor(UInt32 stepsToOne, params BigInteger[] members)
+        {
+            StepsToOne = stepsToOne;
+            Members = members;
+        }
+        public UInt32 StepsToOne { get; }
+        public BigInteger NthMember(int n) => Members[n];
+        public bool IsMember(BigInteger c) => Array.IndexOf(Members, c) >= 0;
+        public override string ToString() => "a scripted predecessor";
     }
     #endregion Helper Methods
 }
