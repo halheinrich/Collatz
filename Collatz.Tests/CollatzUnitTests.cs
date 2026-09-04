@@ -2224,6 +2224,91 @@ public class CollatzUnitTests
         Assert.NotEqual(new CollatzDecayFormulaBitManipulation(1).ToString(), new CollatzDecayFormulaBitManipulation(3).ToString());
     }
     [Fact]
+    public void TestFormulaTextSignsEachTermAndDropsAZeroOne()
+    {
+        // halheinrich/Math#31. Six occurrences across five sites concatenated a sign character ahead of
+        // a signed value, so each of them printed "+ -5" for a negative constant and "+ 0" for a term
+        // that is not there. Asserting only a positive constant would prove nothing, positive being the
+        // case that already worked, so every rendering is asserted at a negative, a zero and a positive
+        // value. The helper is what the five sites now read, so this is where the rule is pinned.
+        Assert.Equal(" + 5", FormulaText.AddedTerm(5));
+        Assert.Equal(" - 5", FormulaText.AddedTerm(-5));
+        Assert.Equal(string.Empty, FormulaText.AddedTerm(0));
+        // Subtraction flips it: the term a negative subtractive constant contributes is a positive one.
+        Assert.Equal(" - 5", FormulaText.SubtractedTerm(5));
+        Assert.Equal(" + 5", FormulaText.SubtractedTerm(-5));
+        Assert.Equal(string.Empty, FormulaText.SubtractedTerm(0));
+        // The exponent term is unspaced, because 2^(6n + 4) is not how an exponent is written.
+        Assert.Equal("+4", FormulaText.AddedTermCompact(4));
+        Assert.Equal("-1", FormulaText.AddedTermCompact(-1));
+        Assert.Equal(string.Empty, FormulaText.AddedTermCompact(0));
+        // The recurrence shape reads the same rule, so a zero constant leaves the term off entirely
+        // rather than printing an arity the recurrence does not have.
+        Assert.Equal("f(n) = 2^6 * f(n-1) + 35", FormulaText.Recurrence(6, 35));
+        Assert.Equal("f(n) = 2^6 * f(n-1) - 35", FormulaText.Recurrence(6, -35));
+        Assert.Equal("f(n) = 2^6 * f(n-1)", FormulaText.Recurrence(6, 0));
+        // Int64.MinValue is why the terms are taken as BigInteger rather than Int64: SubtractedTerm
+        // negates, and negating that value as an Int64 overflows. Asserting the digits also catches a
+        // magnitude taken by trimming a rendered minus sign rather than by BigInteger.Abs.
+        Assert.Equal(" + 9223372036854775808", FormulaText.SubtractedTerm(Int64.MinValue));
+        Assert.Equal(" - 9223372036854775808", FormulaText.AddedTerm(Int64.MinValue));
+    }
+    [Fact]
+    public void TestClosedFormPrintsBothConstantsSignedRatherThanConcatenated()
+    {
+        // The site halheinrich/Math#31 was filed against, and the second defect beside it: one line
+        // carried two concatenations, and "- {SubtractiveConstant}" printed "- -5" where "+ 5" is what
+        // subtracting a negative means. Nothing validates either constant, so both signs are reachable
+        // through the public constructor.
+        // The real depth-two family that made the filed report: this printed 2^(6n+-1) before the fix.
+        Assert.Equal("f(n) = [2^(6n-1) - 5] / 3^2", new CollatzDecayFormula(2, 6, -1, 5, 2).ToString());
+        // The controls, both already correct, so a fix that broke them would show here.
+        Assert.Equal("f(n) = [2^(6n+4) - 7] / 3^2", new CollatzDecayFormula(2, 6, 4, 7, 2).ToString());
+        Assert.Equal("f(n) = [2^(2n+2) - 1] / 3^1", new CollatzDecayFormula(1, 2, 2, 1, 1).ToString());
+        // A zero exponent constant drops the term: 2^(6n), not 2^(6n+0).
+        Assert.Equal("f(n) = [2^(6n) - 5] / 3^2", new CollatzDecayFormula(2, 6, 0, 5, 2).ToString());
+        // The second concatenation, at both of the signs it never rendered correctly.
+        Assert.Equal("f(n) = [2^(6n+4) + 5] / 3^2", new CollatzDecayFormula(2, 6, 4, -5, 2).ToString());
+        Assert.Equal("f(n) = [2^(6n+4)] / 3^2", new CollatzDecayFormula(2, 6, 4, 0, 2).ToString());
+        // Both zero at once, which is where the printed shape loses the most terms.
+        Assert.Equal("f(n) = [2^(6n)] / 3^2", new CollatzDecayFormula(2, 6, 0, 0, 2).ToString());
+    }
+    [Fact]
+    public void TestRecurrenceTextPrintsItsConstantSignedAtEverySiteThatPrintsOne()
+    {
+        // The four sites that print a recurrence: this type's ToString, the seeded table, and the two
+        // exception messages halheinrich/Math#28 added, which spelled the shape out for themselves
+        // precisely because ToString rendered it wrongly. All four now read one helper.
+        //
+        // ToString itself can only be asserted at positive constants: since halheinrich/Math#28 the
+        // seeded constructor accepts exactly the three triples in SeededRecurrences, whose constants
+        // are 1, 35 and 49, and the derived constructor infers a constant that must then describe a
+        // real depth-(d+1) family. So no negative or zero AdditiveConstant is reachable on an
+        // instance today, and the negative and zero cases are pinned above on the helper and below on
+        // the message, which renders through the same call.
+        Assert.Equal("f(n) = 2^2 * f(n-1) + 1", new CollatzDecayFormulaRecursive(1, 2, 1).ToString());
+        Assert.Equal("f(n) = 2^6 * f(n-1) + 35", new CollatzDecayFormulaRecursive(2, 6, 35).ToString());
+        Assert.Equal("f(n) = 2^6 * f(n-1) + 49", new CollatzDecayFormulaRecursive(2, 6, 49).ToString());
+        // The reachably wrong site: additiveConstant is caller-supplied, so a negative one used to
+        // render "f(n) = 2^6 * f(n-1) + -5" into the message explaining the failure.
+        ArgumentException negative = Assert.Throws<ArgumentException>(
+            () => new CollatzDecayFormulaRecursive(2, 6, -5));
+        Assert.StartsWith("f(n) = 2^6 * f(n-1) - 5 has no seed anchor at depth 2.", negative.Message, StringComparison.Ordinal);
+        ArgumentException zero = Assert.Throws<ArgumentException>(
+            () => new CollatzDecayFormulaRecursive(2, 6, 0));
+        Assert.StartsWith("f(n) = 2^6 * f(n-1) has no seed anchor at depth 2.", zero.Message, StringComparison.Ordinal);
+        // The seeded table renders through the same helper, so its three rows carry the shape too.
+        Assert.Contains("depth 1 f(n) = 2^2 * f(n-1) + 1 anchored at 1", zero.Message, StringComparison.Ordinal);
+        Assert.Contains("depth 2 f(n) = 2^6 * f(n-1) + 35 anchored at 3", zero.Message, StringComparison.Ordinal);
+        Assert.Contains("depth 2 f(n) = 2^6 * f(n-1) + 49 anchored at 113", zero.Message, StringComparison.Ordinal);
+        // And the derived constructor's failure message, the fourth site. These anchors fit no
+        // recurrence, and the pair the derivation last read gives f(n) = 2^0 * f(n-1) + 256.
+        ScriptedPredecessor notAFamily = new(1, 7, 10, 16, 28, 52, 100, 196, 388);
+        InvalidOperationException derived = Assert.Throws<InvalidOperationException>(
+            () => new CollatzDecayFormulaRecursive(notAFamily, 1));
+        Assert.Contains("do not satisfy one recurrence f(n) = 2^0 * f(n-1) + 256,", derived.Message, StringComparison.Ordinal);
+    }
+    [Fact]
     public void TestSeededRecursiveConstructorRejectsDepthsItHasNoAnchorFor()
     {
         // Before halheinrich/Math#28 the only check here was a Debug.Assert reached solely by

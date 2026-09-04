@@ -637,6 +637,71 @@ public static class CollatzMath
     #endregion Internal Methods
 }
 /// <summary>
+/// The text of the formula shapes this library prints, so that each shape and the rule for signing
+/// its terms are stated once rather than at every site that prints one.
+/// </summary>
+/// <remarks>
+/// Six occurrences across five sites used to concatenate a sign character with a signed value, so a
+/// negative constant printed <c>+ -5</c> and a zero constant printed a term that is not there. Four
+/// of those sites also spelled the recurrence shape out for themselves. Both are the one defect: a
+/// rule held in N places is corrected in some of them and survives to diverge in the rest &#8212;
+/// see halheinrich/Math#31.
+/// <para>
+/// Terms are taken as <see cref="BigInteger"/> rather than <see cref="Int64"/> so that
+/// <see cref="Int64.MinValue"/> renders rather than overflowing when <see cref="SubtractedTerm"/>
+/// negates it; the callers' constants are <see cref="Int64"/> and <see cref="Int32"/>, both of
+/// which widen to it implicitly.
+/// </para>
+/// </remarks>
+internal static class FormulaText
+{
+    /// <summary>
+    /// Renders the recurrence <c>f(n) = 2^E * f(n-1) + A</c>, with the additive term carrying the
+    /// operator its own sign calls for and dropped entirely when it is zero.
+    /// </summary>
+    /// <param name="twosExponent">The base-two logarithm of the recurrence's multiplier.</param>
+    /// <param name="additiveConstant">The recurrence's additive term.</param>
+    internal static string Recurrence(Int32 twosExponent, BigInteger additiveConstant)
+    {
+        return string.Create(CultureInfo.InvariantCulture,
+            $"f(n) = 2^{twosExponent} * f(n-1){AddedTerm(additiveConstant)}");
+    }
+    /// <summary>
+    /// Renders <paramref name="value"/> as a term added to the expression it follows, its operator
+    /// spaced: <c> + 5</c>, <c> - 5</c> when it is negative, and nothing at all when it is zero.
+    /// </summary>
+    internal static string AddedTerm(BigInteger value) => SignedTerm(value, " ");
+    /// <summary>
+    /// Renders <paramref name="value"/> as a term subtracted from the expression it follows, its
+    /// operator spaced: <c> - 5</c>, <c> + 5</c> when it is negative, and nothing at all when it is
+    /// zero.
+    /// </summary>
+    internal static string SubtractedTerm(BigInteger value) => SignedTerm(-value, " ");
+    /// <summary>
+    /// Renders <paramref name="value"/> as a term added to the expression it follows, unspaced for
+    /// use inside a compound expression such as an exponent: <c>+5</c>, <c>-5</c> when it is
+    /// negative, and nothing at all when it is zero.
+    /// </summary>
+    internal static string AddedTermCompact(BigInteger value) => SignedTerm(value, "");
+    /// <summary>
+    /// Renders one signed term: the operator its sign calls for, spaced by <paramref name="spacing"/>
+    /// on each side, then its magnitude.
+    /// </summary>
+    /// <remarks>
+    /// A zero term renders as nothing, because a shape printing <c>2^(6n+0)</c> misstates its own
+    /// arity as surely as one printing <c>2^(6n+-1)</c> misstates the sign. The magnitude is taken
+    /// with <see cref="BigInteger.Abs"/> rather than by trimming a rendered minus sign, so that the
+    /// operator and the digits are decided by the same value.
+    /// </remarks>
+    private static string SignedTerm(BigInteger value, string spacing)
+    {
+        if (value.IsZero)
+            return string.Empty;
+        return string.Create(CultureInfo.InvariantCulture,
+            $"{spacing}{(value.Sign < 0 ? '-' : '+')}{spacing}{BigInteger.Abs(value)}");
+    }
+}
+/// <summary>
 /// A family of odd integers that reach one in a fixed number of odd Collatz steps.
 /// </summary>
 /// <remarks>
@@ -711,7 +776,7 @@ public class CollatzDecayFormulaRecursive : IIndexedCollatzDecayFormula
     private static string DescribeSeededRecurrences()
     {
         return string.Join("; ", SeededRecurrences.Select(recurrence => string.Create(CultureInfo.InvariantCulture,
-            $"depth {recurrence.StepsToOne} f(n) = 2^{recurrence.TwosExponent} * f(n-1) + {recurrence.AdditiveConstant} anchored at {recurrence.SeedAnchor}")));
+            $"depth {recurrence.StepsToOne} {FormulaText.Recurrence(recurrence.TwosExponent, recurrence.AdditiveConstant)} anchored at {recurrence.SeedAnchor}")));
     }
     #endregion Properties
     #region Constructors
@@ -759,7 +824,7 @@ public class CollatzDecayFormulaRecursive : IIndexedCollatzDecayFormula
             && recurrence.AdditiveConstant == additiveConstant);
         if (index < 0)
             throw new ArgumentException(string.Create(CultureInfo.InvariantCulture,
-                $"f(n) = 2^{twosExponent} * f(n-1) + {additiveConstant} has no seed anchor at depth {stepsToOne}. Seeded here: {DescribeSeededRecurrences()}. That set is what this constructor can seed, not a claim that no other family exists at these depths - see halheinrich/Math#2."),
+                $"{FormulaText.Recurrence(twosExponent, additiveConstant)} has no seed anchor at depth {stepsToOne}. Seeded here: {DescribeSeededRecurrences()}. That set is what this constructor can seed, not a claim that no other family exists at these depths - see halheinrich/Math#2."),
                 nameof(additiveConstant));
         StepsToOne = stepsToOne;
         TwosExponent = twosExponent;
@@ -852,7 +917,7 @@ public class CollatzDecayFormulaRecursive : IIndexedCollatzDecayFormula
         }
         if (!isOk)
             throw new InvalidOperationException(string.Create(CultureInfo.InvariantCulture,
-                $"The {DecayAnchorList.Count} anchors derived from {predecessorFormula} keeping residue {modThree} do not satisfy one recurrence f(n) = 2^{log2ratio} * f(n-1) + {addConst}, so they are not a family this class can represent."));
+                $"The {DecayAnchorList.Count} anchors derived from {predecessorFormula} keeping residue {modThree} do not satisfy one recurrence {FormulaText.Recurrence(log2ratio, addConst)}, so they are not a family this class can represent."));
         PowerOfTwo = pow2;
         TwosExponent = log2ratio;
         AdditiveConstant = addConst;
@@ -920,10 +985,15 @@ public class CollatzDecayFormulaRecursive : IIndexedCollatzDecayFormula
         }
         return DecayAnchorList[n];
     }
-    /// <summary>Returns the recurrence in the form <c>f(n) = 2^E * f(n-1) + A</c>.</summary>
+    /// <summary>
+    /// Returns the recurrence in the form <c>f(n) = 2^E * f(n-1) + A</c>, where the additive term
+    /// carries the operator its own sign calls for &#8212; <c>+ 35</c>, <c>- 5</c> &#8212; and is
+    /// absent altogether when <see cref="AdditiveConstant"/> is zero, leaving
+    /// <c>f(n) = 2^E * f(n-1)</c>.
+    /// </summary>
     public override string ToString()
     {
-        return $"f(n) = 2^{TwosExponent} * f(n-1) + {AdditiveConstant}";
+        return FormulaText.Recurrence(TwosExponent, AdditiveConstant);
     }
     #endregion Public Methods
 }
@@ -1010,11 +1080,21 @@ public class CollatzDecayFormula : IIndexedCollatzDecayFormula
             return StepsToOne == 1;
         return log2 % NFactor == 0;
     }
-    /// <summary>Returns the closed form as <c>f(n) = [2^(Fn+C) - S] / 3^E</c>.</summary>
+    /// <summary>
+    /// Returns the closed form as <c>f(n) = [2^(Fn+C) - S] / 3^E</c>, where each of the two
+    /// constants carries the operator its own sign calls for and is absent altogether when it is
+    /// zero.
+    /// </summary>
+    /// <remarks>
+    /// So a negative <see cref="NConstant"/> prints <c>2^(6n-1)</c> and a zero one <c>2^(6n)</c>,
+    /// and a negative <see cref="SubtractiveConstant"/> prints <c>+ 5</c>, because subtracting a
+    /// negative adds it. The bracketed numerator is what remains when both are zero:
+    /// <c>f(n) = [2^(6n)] / 3^2</c>.
+    /// </remarks>
     public override string ToString()
     {
         // f(n) = [2^(6n+4) - 7] / 3^2
-        return $"f(n) = [2^({NFactor}n+{NConstant}) - {SubtractiveConstant}] / 3^{ThreesExponent}";
+        return $"f(n) = [2^({NFactor}n{FormulaText.AddedTermCompact(NConstant)}){FormulaText.SubtractedTerm(SubtractiveConstant)}] / 3^{ThreesExponent}";
     }
     /// <summary>
     /// Returns [2^(<see cref="NFactor"/><paramref name="n"/>&#160;+&#160;<see cref="NConstant"/>) &#8722; <see cref="SubtractiveConstant"/>]&#160;/&#160;<see cref="PowerOfThree"/>,

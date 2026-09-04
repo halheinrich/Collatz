@@ -318,6 +318,17 @@ public class CollatzDecayFormulaBitManipulation : ICollatzDecayFormula
 above the depth they cover: `IsMember` for `StepsToOne` above three, `NthMember`
 for `StepsToOne` other than one.
 
+Both `ToString` overrides take each constant's operator from that constant's own
+sign, and drop a term whose constant is zero. So `A` negative prints
+`f(n) = 2^6 * f(n-1) - 5` and `A` zero prints `f(n) = 2^6 * f(n-1)`; `C`
+negative prints `[2^(6n-1) - 5] / 3^2`, `S` negative prints
+`[2^(6n+4) + 5] / 3^2` because subtracting a negative adds it, and both zero
+print `[2^(6n)] / 3^2`. The shapes commented above are those renderings at
+positive constants. One internal helper carries the rule for all five sites that
+print a formula - the two `ToString`s and the three exception messages - so a
+correction cannot land on some of them and leave the rest to diverge
+(halheinrich/Math#31).
+
 ## Pitfalls
 
 - **This repository does not build standalone.** The `ProjectReference` to
