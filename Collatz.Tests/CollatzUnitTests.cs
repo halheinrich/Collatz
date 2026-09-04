@@ -568,6 +568,91 @@ public class CollatzUnitTests
         Assert.True(CollatzMath.CollapseInTwoModTwo(4, 4) == (BigInteger)59652309);
     }
     [Fact]
+    public void TestCollapseFamily_RejectsArgumentsOutsideItsDomain()
+    {
+        // halheinrich/Math#27. Every rejection below used to reach the caller as an
+        // ArgumentOutOfRangeException whose ParamName was "exponent" - a parameter of
+        // BigInteger.Pow that no caller of these methods passed and none could see - or as no
+        // exception at all. Each assertion here names the parameter the caller did pass, so a
+        // regression to the internal name fails rather than merely reading badly.
+
+        // Below the lower bound, where the exponent was still non-negative and the method
+        // answered. CollapseInOne(0) returned 0, which is outside the sequence its own summary
+        // describes.
+        Assert.Equal("n", Assert.Throws<ArgumentOutOfRangeException>(
+            () => CollatzMath.CollapseInOne(0)).ParamName);
+        Assert.Equal("n", Assert.Throws<ArgumentOutOfRangeException>(
+            () => CollatzMath.CollapseInOne(-1)).ParamName);
+        Assert.Equal("n", Assert.Throws<ArgumentOutOfRangeException>(
+            () => CollatzMath.CollapseInOneModOneOut(-1)).ParamName);
+        Assert.Equal("n", Assert.Throws<ArgumentOutOfRangeException>(
+            () => CollatzMath.CollapseInOneModTwoOut(0)).ParamName);
+
+        // CollapseInTwoModOne accepted both of these and answered, measured on SDK 10.0.400.
+        // n2 = 0 leaves the exponent at zero and returns an even value that is not a two-odd-step
+        // decayer at all - 28 for n1 = 1, which takes five odd steps; 1820 for n1 = 2, twelve;
+        // 116508 for n1 = 3, thirty-four. n1 = 0 selects v = 1, the fixed point, so what came back
+        // were one-step decayers: 1 for n2 = 1 and 5 for n2 = 2.
+        Assert.Equal("n2", Assert.Throws<ArgumentOutOfRangeException>(
+            () => CollatzMath.CollapseInTwoModOne(1, 0)).ParamName);
+        Assert.Equal("n1", Assert.Throws<ArgumentOutOfRangeException>(
+            () => CollatzMath.CollapseInTwoModOne(0, 1)).ParamName);
+        Assert.Equal("n2", Assert.Throws<ArgumentOutOfRangeException>(
+            () => CollatzMath.CollapseInTwoModOne(1, -1)).ParamName);
+
+        // CollapseInTwoModTwo rejected the same two cases already, but only as a side effect of
+        // its exponent 2*n2 - 1 going negative there. That accident is the whole difference
+        // between the two siblings, and it is why only one of them was silently wrong.
+        Assert.Equal("n1", Assert.Throws<ArgumentOutOfRangeException>(
+            () => CollatzMath.CollapseInTwoModTwo(0, 1)).ParamName);
+        Assert.Equal("n2", Assert.Throws<ArgumentOutOfRangeException>(
+            () => CollatzMath.CollapseInTwoModTwo(1, 0)).ParamName);
+
+        // Above the upper bound, which nothing checked at either end of the family. 3n + 1,
+        // 3n - 1 and 2*n2 are unchecked int arithmetic, so a large argument wrapped to a tiny
+        // exponent and a small wrong answer came back. Measured on SDK 10.0.400 before the guard:
+        // CollapseInOneModOneOut(1431655765) returned 0 and (1431655766) returned 21;
+        // CollapseInOneModTwoOut(1431655766) returned 1.
+        const int firstOverflowingIndex = (int.MaxValue - 1) / 3 + 1;
+        Assert.Equal("n", Assert.Throws<ArgumentOutOfRangeException>(
+            () => CollatzMath.CollapseInOneModOneOut(firstOverflowingIndex)).ParamName);
+        Assert.Equal("n", Assert.Throws<ArgumentOutOfRangeException>(
+            () => CollatzMath.CollapseInOneModOneOut(1_431_655_766)).ParamName);
+        Assert.Equal("n", Assert.Throws<ArgumentOutOfRangeException>(
+            () => CollatzMath.CollapseInOneModTwoOut(1_431_655_766)).ParamName);
+        Assert.Equal("n1", Assert.Throws<ArgumentOutOfRangeException>(
+            () => CollatzMath.CollapseInTwoModOne(firstOverflowingIndex, 1)).ParamName);
+        Assert.Equal("n1", Assert.Throws<ArgumentOutOfRangeException>(
+            () => CollatzMath.CollapseInTwoModTwo(firstOverflowingIndex, 1)).ParamName);
+
+        const int firstOverflowingHalfExponent = (int.MaxValue - 1) / 2 + 1;
+        Assert.Equal("n2", Assert.Throws<ArgumentOutOfRangeException>(
+            () => CollatzMath.CollapseInTwoModOne(1, firstOverflowingHalfExponent)).ParamName);
+        Assert.Equal("n2", Assert.Throws<ArgumentOutOfRangeException>(
+            () => CollatzMath.CollapseInTwoModTwo(1, firstOverflowingHalfExponent)).ParamName);
+    }
+    [Fact]
+    public void TestCollapseFamily_AcceptsTheLowestArgumentInEachDomain()
+    {
+        // The control for the rejections above: a guard one too strict fails here rather than
+        // passing quietly. The lower bounds are not the same number across the family, which is
+        // the part halheinrich/Math#27 said no caller could discover.
+        Assert.Equal(BigInteger.One, CollatzMath.CollapseInOne(1));
+        Assert.Equal(BigInteger.One, CollatzMath.CollapseInOneModOneOut(0));
+        Assert.Equal((BigInteger)5, CollatzMath.CollapseInOneModTwoOut(1));
+        Assert.Equal((BigInteger)113, CollatzMath.CollapseInTwoModOne(1, 1));
+        Assert.Equal((BigInteger)3, CollatzMath.CollapseInTwoModTwo(1, 1));
+
+        // And each value is a member of the family its method names, which is what the old lower
+        // bounds failed to guarantee. Hand-derived: 1 -> 4 -> 1; 5 -> 16 -> 1;
+        // 113 -> 340 -> 85 -> 256 -> 1; 3 -> 10 -> 5 -> 16 -> 1.
+        Assert.Equal(1ul, CollatzMath.OddStepCountToOne(CollatzMath.CollapseInOne(1)));
+        Assert.Equal(1ul, CollatzMath.OddStepCountToOne(CollatzMath.CollapseInOneModOneOut(0)));
+        Assert.Equal(1ul, CollatzMath.OddStepCountToOne(CollatzMath.CollapseInOneModTwoOut(1)));
+        Assert.Equal(2ul, CollatzMath.OddStepCountToOne(CollatzMath.CollapseInTwoModOne(1, 1)));
+        Assert.Equal(2ul, CollatzMath.OddStepCountToOne(CollatzMath.CollapseInTwoModTwo(1, 1)));
+    }
+    [Fact]
     public void TestBinaryStringToBigInt()
     {
         BigInteger gtUint64max = BigInteger.Parse("818446744073709551615", CultureInfo.InvariantCulture); // Larger than UInt64.MaxValue

@@ -141,6 +141,39 @@ A helper that is wrong outside its domain and silent about it is worse than one
 that is absent, which is why this pair moved into the product with a domain
 rather than staying a test-local convenience.
 
+### The collapse family's bounds are not uniform, and two were wider than the family
+
+`CollapseInOne`, its two `ModOut` refinements and the two `CollapseInTwo`
+methods each reach `BigInteger.Pow` with an exponent derived from an argument,
+and until halheinrich/Math#27 that call was the only thing checking any of
+them — so a rejection surfaced as an `ArgumentOutOfRangeException` naming
+`exponent`, a parameter of an internal call the caller never passed. Each
+method checks its own arguments now and names them.
+
+The bounds are worth stating because they differ. `CollapseInOne` starts at
+one; `CollapseInOneModOneOut` at zero, because `3n + 1` already selects
+`CollapseInOne(1)` there; `CollapseInOneModTwoOut` and both `CollapseInTwo`
+methods at one. Each has an upper bound too — `(int.MaxValue - 1) / 3` for a
+`CollapseInOne` index, `(int.MaxValue - 1) / 2` for a `CollapseInTwo`
+half-exponent — because the exponent arithmetic is unchecked `int`.
+
+**Two of them were wider than the family they enumerate, and silent about it**,
+which is the odd-index pair's failure again. Measured on SDK 10.0.400:
+
+- `CollapseInOne(0)` returned 0, a value outside the sequence its own summary
+  describes.
+- `CollapseInTwoModOne` accepted `n2 = 0` and returned an even value that
+  decays in neither two odd steps nor any small count — 28 for `n1 = 1`, which
+  takes five; 1820 for 2, twelve; 116508 for 3, thirty-four. It also accepted
+  `n1 = 0`, whose `v` is the fixed point 1, so what came back were one-step
+  decayers rather than two-step ones. **`CollapseInTwoModTwo` rejected both
+  cases already, but only because its exponent `2n2 - 1` goes negative where
+  `2n2` goes to zero.** That accident is the whole difference between the two
+  siblings, and it is why only one of them answered wrongly.
+- At the upper end nothing checked either method:
+  `CollapseInOneModOneOut(1431655766)` wrapped to an exponent of 3 and returned
+  21, and `(1431655765)` wrapped to 0 and returned 0.
+
 ### `FloorLog2Ratio` is exact integer arithmetic, and internal
 
 `FloorLog2Ratio` returns the exact floor of `log2(a / b)` for positive `a` and
@@ -197,11 +230,12 @@ public static class CollatzMath
     public static BigInteger IndexOfOdd(BigInteger odd);    // odd, >= 3
     public static BigInteger OddOfIndex(BigInteger index);  // >= 0
 
-    public static BigInteger CollapseInOne(int n);            // (4^n - 1) / 3
-    public static BigInteger CollapseInOneModOneOut(int n);   // (4^(3n+1) - 1) / 3
-    public static BigInteger CollapseInOneModTwoOut(int n);   // (4^(3n-1) - 1) / 3
-    public static BigInteger CollapseInTwoModOne(int n1, int n2);
-    public static BigInteger CollapseInTwoModTwo(int n1, int n2);
+    // lower bounds differ across the family; upper bounds keep the exponent an int
+    public static BigInteger CollapseInOne(int n);            // (4^n - 1) / 3,      n >= 1
+    public static BigInteger CollapseInOneModOneOut(int n);   // (4^(3n+1) - 1) / 3, n >= 0
+    public static BigInteger CollapseInOneModTwoOut(int n);   // (4^(3n-1) - 1) / 3, n >= 1
+    public static BigInteger CollapseInTwoModOne(int n1, int n2);   // n1 >= 1, n2 >= 1
+    public static BigInteger CollapseInTwoModTwo(int n1, int n2);   // n1 >= 1, n2 >= 1
 
     // base-2 string conversions - READ THE REMARKS, NOT THE NAMES; see § Pitfalls
     public static string toBinaryBigEndianString(BigInteger bigInt);
@@ -223,8 +257,9 @@ public static class CollatzMath
 }
 ```
 
-`GenerateExponentPermutations`, `IndexOfOdd`, `OddOfIndex`, both step counters
-and `FloorLog2Ratio` throw `ArgumentOutOfRangeException` outside their domains.
+`GenerateExponentPermutations`, `IndexOfOdd`, `OddOfIndex`, both step counters,
+all five `Collapse` methods and `FloorLog2Ratio` throw
+`ArgumentOutOfRangeException` outside their domains.
 `CollapseInTwoModOne` and `CollapseInTwoModTwo` throw
 `InvalidOperationException` when the value they are about to divide is not
 congruent to 1 modulo 3. `SolveForLoop` throws nothing: it returns `false` with
@@ -326,12 +361,6 @@ for `StepsToOne` other than one.
   (halheinrich/Math#26), including three whole `[Fact]` bodies. Do not read a
   commented block as a specification of anything, and do not restore one without
   re-deriving what it claimed.
-- **Five public methods have undocumented lower bounds**
-  (halheinrich/Math#27): `CollapseInOne`, `CollapseInOneModOneOut`,
-  `CollapseInOneModTwoOut`, `CollapseInTwoModOne` and `CollapseInTwoModTwo`.
-  Each reaches `BigInteger.Pow` with an exponent derived from its argument, so
-  an argument below the bound throws an `ArgumentOutOfRangeException` naming
-  `exponent` — a parameter the caller never passed and cannot see.
 - **`RestoreLockedMode` is dormant here.** `Directory.Build.props` gates it on
   `ContinuousIntegrationBuild`, and with no workflow in this repository nothing
   sets that, so a `packages.lock.json` out of step with a `.csproj` fails
@@ -348,7 +377,7 @@ for `StepsToOne` other than one.
 ## Subproject-internal next steps
 
 The open backlog for this member lives in the umbrella tracker rather than
-repeated here: halheinrich/Math#2, #24, #25, #26, #27 and #28 are all
+repeated here: halheinrich/Math#2, #24, #25, #26 and #28 are all
 subproject-internal, and § Pitfalls above says what each one costs a reader
 today.
 

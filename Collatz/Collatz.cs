@@ -17,6 +17,24 @@ namespace HalHeinrich.Numerics.Collatz;
 /// </summary>
 public static class CollatzMath
 {
+    #region Private Constants
+    /// <summary>
+    /// The largest argument <see cref="CollapseInOneModOneOut"/> and
+    /// <see cref="CollapseInOneModTwoOut"/> accept, and so the largest first argument the two
+    /// <c>CollapseInTwo</c> methods accept: beyond it the <see cref="CollapseInOne"/> index
+    /// 3n&#160;&#177;&#160;1 those methods form does not fit in an <see cref="int"/>, and the
+    /// unchecked arithmetic wraps to a small exponent instead of failing.
+    /// </summary>
+    private const Int32 MaxCollapseInOneIndex = (Int32.MaxValue - 1) / 3;
+    /// <summary>
+    /// The largest second argument <see cref="CollapseInTwoModOne"/> and
+    /// <see cref="CollapseInTwoModTwo"/> accept: beyond it the exponent 2n2 or
+    /// 2n2&#160;&#8722;&#160;1 those methods form does not fit in an <see cref="int"/>. One bound
+    /// covers both, because the two differ by one and the slack below <see cref="int.MaxValue"/>
+    /// is odd.
+    /// </summary>
+    private const Int32 MaxCollapseInTwoIndex = (Int32.MaxValue - 1) / 2;
+    #endregion Private Constants
     #region Public Methods
     /// <summary>
     /// Returns every <see cref="int"/> array of length <paramref name="length"/> whose entries lie in
@@ -129,34 +147,113 @@ public static class CollatzMath
     /// <summary>
     /// Returns (4^<paramref name="n"/> &#8722; 1) / 3 &#8212; the sequence 1, 5, 21, 85, 341, &#8230; for n = 1, 2, 3, &#8230;
     /// </summary>
+    /// <param name="n">A positive index into that sequence.</param>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="n"/> is zero or negative.</exception>
+    /// <remarks>
+    /// The lower bound is one, not zero, and until halheinrich/Math#27 nothing enforced it or said
+    /// so. <see cref="BigInteger.Pow(BigInteger, int)"/> accepts an exponent of zero, so n = 0
+    /// returned 0 without complaint - a value outside the sequence this summary describes, because
+    /// 3c&#160;+&#160;1 = 4^n with c a positive odd integer forces n &#8805; 1. Below zero the
+    /// exponent went negative and <see cref="BigInteger.Pow(BigInteger, int)"/> threw an
+    /// <see cref="ArgumentOutOfRangeException"/> naming <c>exponent</c> - a parameter of an internal
+    /// call that no caller of this method passed and could not see.
+    /// </remarks>
     public static BigInteger CollapseInOne(Int32 n)
     {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(n);
         BigInteger retval = (BigInteger.Pow(4, n) - 1) / (BigInteger)3;
         return retval;
     }
     /// <summary>
-    /// Returns (4^(3<paramref name="n"/>&#160;+&#160;1) &#8722; 1) / 3.
+    /// Returns (4^(3<paramref name="n"/>&#160;+&#160;1) &#8722; 1) / 3 &#8212; the members of the
+    /// <see cref="CollapseInOne"/> sequence congruent to 1 modulo 3.
     /// </summary>
+    /// <param name="n">
+    /// An index of zero or more - <see cref="CollapseInOne"/> index 3<paramref name="n"/>&#160;+&#160;1 -
+    /// and at most (<see cref="int.MaxValue"/>&#160;&#8722;&#160;1)&#160;/&#160;3, beyond which that
+    /// index does not fit in an <see cref="int"/>.
+    /// </param>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// <paramref name="n"/> is negative, or exceeds (<see cref="int.MaxValue"/>&#160;&#8722;&#160;1)&#160;/&#160;3.
+    /// </exception>
+    /// <remarks>
+    /// Zero is inside the domain, unlike <see cref="CollapseInOne"/>'s and
+    /// <see cref="CollapseInOneModTwoOut"/>'s: it selects <see cref="CollapseInOne"/>(1), which is 1.
+    /// The upper bound guards silent wraparound rather than a limit a caller reaches -
+    /// 3<paramref name="n"/>&#160;+&#160;1 is unchecked <see cref="int"/> arithmetic, so measured on
+    /// SDK 10.0.400 n = 1431655766 wrapped to an exponent of 3 and returned 21 with no error, and
+    /// n = 1431655765 wrapped to an exponent of 0 and returned 0 (halheinrich/Math#27).
+    /// </remarks>
     public static BigInteger CollapseInOneModOneOut(Int32 n)
     {
+        ArgumentOutOfRangeException.ThrowIfNegative(n);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(n, MaxCollapseInOneIndex);
         BigInteger retval = (BigInteger.Pow(4, 3 * n + 1) - 1) / (BigInteger)3;
         return retval;
     }
     /// <summary>
-    /// Returns (4^(3<paramref name="n"/>&#160;&#8722;&#160;1) &#8722; 1) / 3.
+    /// Returns (4^(3<paramref name="n"/>&#160;&#8722;&#160;1) &#8722; 1) / 3 &#8212; the members of the
+    /// <see cref="CollapseInOne"/> sequence congruent to 2 modulo 3.
     /// </summary>
+    /// <param name="n">
+    /// A positive index - <see cref="CollapseInOne"/> index 3<paramref name="n"/>&#160;&#8722;&#160;1 -
+    /// and at most (<see cref="int.MaxValue"/>&#160;&#8722;&#160;1)&#160;/&#160;3, beyond which that
+    /// index does not fit in an <see cref="int"/>.
+    /// </param>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// <paramref name="n"/> is zero or negative, or exceeds (<see cref="int.MaxValue"/>&#160;&#8722;&#160;1)&#160;/&#160;3.
+    /// </exception>
+    /// <remarks>
+    /// The lower bound is one where <see cref="CollapseInOneModOneOut"/>'s is zero, because
+    /// 3<paramref name="n"/>&#160;&#8722;&#160;1 reaches the first usable <see cref="CollapseInOne"/>
+    /// index one argument later than 3<paramref name="n"/>&#160;+&#160;1 does. It was already
+    /// enforced, but by accident: the exponent went negative and
+    /// <see cref="BigInteger.Pow(BigInteger, int)"/> threw naming <c>exponent</c>, a parameter of an
+    /// internal call that no caller of this method passed. The upper bound was not enforced at all -
+    /// measured on SDK 10.0.400, n = 1431655766 wrapped to an exponent of 1 and returned 1
+    /// (halheinrich/Math#27).
+    /// </remarks>
     public static BigInteger CollapseInOneModTwoOut(Int32 n)
     {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(n);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(n, MaxCollapseInOneIndex);
         BigInteger retval = (BigInteger.Pow(4, 3 * n - 1) - 1) / (BigInteger)3;
         return retval;
     }
     /// <summary>
     /// Returns (v &#8722; 1) / 3 where v = <see cref="CollapseInOneModOneOut"/>(<paramref name="n1"/>) &#215; 2^(2&#215;<paramref name="n2"/>).
     /// </summary>
+    /// <param name="n1">
+    /// A positive <see cref="CollapseInOneModOneOut"/> index, at most
+    /// (<see cref="int.MaxValue"/>&#160;&#8722;&#160;1)&#160;/&#160;3.
+    /// </param>
+    /// <param name="n2">
+    /// A positive half-exponent, at most (<see cref="int.MaxValue"/>&#160;&#8722;&#160;1)&#160;/&#160;2,
+    /// beyond which 2&#215;<paramref name="n2"/> does not fit in an <see cref="int"/>.
+    /// </param>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// <paramref name="n1"/> or <paramref name="n2"/> is outside the bounds above.
+    /// </exception>
     /// <exception cref="InvalidOperationException">
     /// v is not congruent to 1 modulo 3, so the quotient does not represent what this method computes.
     /// </exception>
     /// <remarks>
+    /// <para>
+    /// Both lower bounds are one, and this is the member of the family whose accepted domain was
+    /// wider than its correct one in <em>both</em> arguments while saying nothing about either
+    /// (halheinrich/Math#27). Measured on SDK 10.0.400: <paramref name="n2"/> = 0 left the exponent
+    /// at zero, which <see cref="BigInteger.Pow(BigInteger, int)"/> accepts, and returned an even
+    /// value that decays in neither two odd steps nor any small count - 28 for
+    /// <paramref name="n1"/> = 1, which takes five; 1820 for 2, which takes twelve; 116508 for 3,
+    /// which takes thirty-four. An odd c makes 3c&#160;+&#160;1 even, so the power of two an odd step
+    /// strips is at least 2^1 and the even exponent 2&#215;<paramref name="n2"/> is at least 2.
+    /// <paramref name="n1"/> = 0 selects v = 1, the fixed point, so the values returned were one-step
+    /// decayers rather than two-step ones - 1 and 5 for <paramref name="n2"/> = 1 and 2.
+    /// <see cref="CollapseInTwoModTwo"/> rejected both cases already, but only as a side effect of
+    /// its exponent 2&#215;<paramref name="n2"/>&#160;&#8722;&#160;1 going negative; this one's stayed
+    /// non-negative and answered.
+    /// </para>
+    /// <para>
     /// The congruence used to be asserted with <see cref="Debug.Assert(bool, string)"/>, and the
     /// assertion's own argument carried the subtraction - <c>--retval % 3 == 0</c> - so in a
     /// Release build, where a conditional call and its arguments are both removed, the check and
@@ -164,9 +261,14 @@ public static class CollatzMath
     /// for v a multiple of three, because 3k/3 is k while (3k&#8722;1)/3 is k&#8722;1, whereas for
     /// v &#8801; 1 and v &#8801; 2 (mod 3) the integer division absorbs the decrement. The check itself,
     /// though, was absent from every Release build. It throws now, in both.
+    /// </para>
     /// </remarks>
     public static BigInteger CollapseInTwoModOne(Int32 n1, Int32 n2)
     {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(n1);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(n1, MaxCollapseInOneIndex);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(n2);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(n2, MaxCollapseInTwoIndex);
         BigInteger value = CollapseInOneModOneOut(n1) * BigInteger.Pow(2, 2 * n2);
         if ((value - 1) % 3 != 0)
             throw new InvalidOperationException(string.Create(CultureInfo.InvariantCulture,
@@ -176,10 +278,31 @@ public static class CollatzMath
     /// <summary>
     /// Returns (v &#8722; 1) / 3 where v = <see cref="CollapseInOneModTwoOut"/>(<paramref name="n1"/>) &#215; 2^(2&#215;<paramref name="n2"/>&#160;&#8722;&#160;1).
     /// </summary>
+    /// <param name="n1">
+    /// A positive <see cref="CollapseInOneModTwoOut"/> index, at most
+    /// (<see cref="int.MaxValue"/>&#160;&#8722;&#160;1)&#160;/&#160;3.
+    /// </param>
+    /// <param name="n2">
+    /// A positive half-exponent, at most (<see cref="int.MaxValue"/>&#160;&#8722;&#160;1)&#160;/&#160;2,
+    /// beyond which 2&#215;<paramref name="n2"/>&#160;&#8722;&#160;1 does not fit in an <see cref="int"/>.
+    /// </param>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// <paramref name="n1"/> or <paramref name="n2"/> is outside the bounds above.
+    /// </exception>
     /// <exception cref="InvalidOperationException">
     /// v is not congruent to 1 modulo 3, so the quotient does not represent what this method computes.
     /// </exception>
     /// <remarks>
+    /// <para>
+    /// Both lower bounds were enforced before halheinrich/Math#27, but by accident rather than by
+    /// intent: each drives the exponent negative, and <see cref="BigInteger.Pow(BigInteger, int)"/>
+    /// rejects that with an <see cref="ArgumentOutOfRangeException"/> naming <c>exponent</c> - a
+    /// parameter of an internal call that no caller of this method passed and could not see. They
+    /// are checked here now, and the upper bounds, which nothing checked, with them. This is the
+    /// sibling <see cref="CollapseInTwoModOne"/> was measured against: that accidental rejection is
+    /// the only reason the silently wrong answers found there have no counterpart here.
+    /// </para>
+    /// <para>
     /// The congruence used to be asserted with <see cref="Debug.Assert(bool, string)"/>, and the
     /// assertion's own argument carried the subtraction - <c>--retval % 3 == 0</c> - so in a
     /// Release build, where a conditional call and its arguments are both removed, the check and
@@ -187,9 +310,14 @@ public static class CollatzMath
     /// for v a multiple of three, because 3k/3 is k while (3k&#8722;1)/3 is k&#8722;1, whereas for
     /// v &#8801; 1 and v &#8801; 2 (mod 3) the integer division absorbs the decrement. The check itself,
     /// though, was absent from every Release build. It throws now, in both.
+    /// </para>
     /// </remarks>
     public static BigInteger CollapseInTwoModTwo(Int32 n1, Int32 n2)
     {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(n1);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(n1, MaxCollapseInOneIndex);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(n2);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(n2, MaxCollapseInTwoIndex);
         BigInteger value = CollapseInOneModTwoOut(n1) * BigInteger.Pow(2, 2 * n2 - 1);
         if ((value - 1) % 3 != 0)
             throw new InvalidOperationException(string.Create(CultureInfo.InvariantCulture,
