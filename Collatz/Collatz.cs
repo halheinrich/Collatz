@@ -1,5 +1,6 @@
 using HalHeinrich.Numerics;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Numerics;
 using System.Reflection.Metadata;
@@ -150,34 +151,50 @@ public static class CollatzMath
         return retval;
     }
     /// <summary>
-    /// Returns v / 3 where v = <see cref="CollapseInOneModOneOut"/>(<paramref name="n1"/>) &#215; 2^(2&#215;<paramref name="n2"/>).
+    /// Returns (v &#8722; 1) / 3 where v = <see cref="CollapseInOneModOneOut"/>(<paramref name="n1"/>) &#215; 2^(2&#215;<paramref name="n2"/>).
     /// </summary>
+    /// <exception cref="InvalidOperationException">
+    /// v is not congruent to 1 modulo 3, so the quotient does not represent what this method computes.
+    /// </exception>
     /// <remarks>
-    /// The code asserts v &#8801; 1 (mod 3); under that invariant v / 3 equals (v &#8722; 1) / 3, which is the
-    /// form the expression is written in. The assertion is a <see cref="Debug.Assert(bool, string)"/>
-    /// and so is absent from Release builds - see halheinrich/Math#6.
+    /// The congruence used to be asserted with <see cref="Debug.Assert(bool, string)"/>, and the
+    /// assertion's own argument carried the subtraction - <c>--retval % 3 == 0</c> - so in a
+    /// Release build, where a conditional call and its arguments are both removed, the check and
+    /// the decrement vanished together. The returned value differed between configurations only
+    /// for v a multiple of three, because 3k/3 is k while (3k&#8722;1)/3 is k&#8722;1, whereas for
+    /// v &#8801; 1 and v &#8801; 2 (mod 3) the integer division absorbs the decrement. The check itself,
+    /// though, was absent from every Release build. It throws now, in both.
     /// </remarks>
     public static BigInteger CollapseInTwoModOne(Int32 n1, Int32 n2)
     {
-        BigInteger retval = CollapseInOneModOneOut(n1);
-        retval *= BigInteger.Pow(2, 2 * n2);
-        Debug.Assert(--retval % 3 == 0, "CollatzMath.CollapseInTwoModOne");
-        return retval / 3;
+        BigInteger value = CollapseInOneModOneOut(n1) * BigInteger.Pow(2, 2 * n2);
+        if ((value - 1) % 3 != 0)
+            throw new InvalidOperationException(string.Create(CultureInfo.InvariantCulture,
+                $"CollapseInTwoModOne({n1}, {n2}) produced {value}, which is congruent to {value % 3} modulo 3 rather than 1."));
+        return (value - 1) / 3;
     }
     /// <summary>
-    /// Returns v / 3 where v = <see cref="CollapseInOneModTwoOut"/>(<paramref name="n1"/>) &#215; 2^(2&#215;<paramref name="n2"/>&#160;&#8722;&#160;1).
+    /// Returns (v &#8722; 1) / 3 where v = <see cref="CollapseInOneModTwoOut"/>(<paramref name="n1"/>) &#215; 2^(2&#215;<paramref name="n2"/>&#160;&#8722;&#160;1).
     /// </summary>
+    /// <exception cref="InvalidOperationException">
+    /// v is not congruent to 1 modulo 3, so the quotient does not represent what this method computes.
+    /// </exception>
     /// <remarks>
-    /// The code asserts v &#8801; 1 (mod 3); under that invariant v / 3 equals (v &#8722; 1) / 3, which is the
-    /// form the expression is written in. The assertion is a <see cref="Debug.Assert(bool, string)"/>
-    /// and so is absent from Release builds - see halheinrich/Math#6.
+    /// The congruence used to be asserted with <see cref="Debug.Assert(bool, string)"/>, and the
+    /// assertion's own argument carried the subtraction - <c>--retval % 3 == 0</c> - so in a
+    /// Release build, where a conditional call and its arguments are both removed, the check and
+    /// the decrement vanished together. The returned value differed between configurations only
+    /// for v a multiple of three, because 3k/3 is k while (3k&#8722;1)/3 is k&#8722;1, whereas for
+    /// v &#8801; 1 and v &#8801; 2 (mod 3) the integer division absorbs the decrement. The check itself,
+    /// though, was absent from every Release build. It throws now, in both.
     /// </remarks>
     public static BigInteger CollapseInTwoModTwo(Int32 n1, Int32 n2)
     {
-        BigInteger retval = CollapseInOneModTwoOut(n1);
-        retval *= BigInteger.Pow(2, 2 * n2 - 1);
-        Debug.Assert(--retval % 3 == 0, "CollatzMath.CollapseInTwoModTwo");
-        return retval / 3;
+        BigInteger value = CollapseInOneModTwoOut(n1) * BigInteger.Pow(2, 2 * n2 - 1);
+        if ((value - 1) % 3 != 0)
+            throw new InvalidOperationException(string.Create(CultureInfo.InvariantCulture,
+                $"CollapseInTwoModTwo({n1}, {n2}) produced {value}, which is congruent to {value % 3} modulo 3 rather than 1."));
+        return (value - 1) / 3;
     }
     /// <summary>
     /// Returns the base-2 digits of <paramref name="bigInt"/>, least-significant digit first.
@@ -299,10 +316,17 @@ public static class CollatzMath
     /// Strips factors of two from <paramref name="n"/>, then counts applications of
     /// <see cref="NextOdd"/> until the value reaches one.
     /// </summary>
-    /// <remarks>Does not return for a value that never reaches one.</remarks>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="n"/> is zero or negative.</exception>
+    /// <remarks>
+    /// Positivity used to be a <see cref="Debug.Assert(bool, string)"/>, so a Release build had no
+    /// check at all and the method simply did not return: measured on SDK 10.0.400, zero drives
+    /// the strip loop forever because 0 &gt;&gt; 1 is 0 and 0 is even, and a negative value reaches
+    /// -1, which <see cref="NextOdd"/> maps back to -1. Does not return for a positive value that
+    /// never reaches one - that one is the Collatz conjecture, not a missing guard.
+    /// </remarks>
     public static UInt64 OddStepCountToOne(BigInteger n)
     {
-        Debug.Assert(n > 0, "CollatzMath.OddStepCountToOne");
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(n);
         BigInteger odd = n;
         while (odd.IsEven)
             odd >>= 1;

@@ -651,6 +651,20 @@ public class CollatzUnitTests
     }
 
     [Fact]
+    public void TestOddStepCountToOne_RejectsNonPositiveArguments()
+    {
+        // halheinrich/Math#6. These were guarded by Debug.Assert, which meant the guard existed
+        // only in Debug - and there it did not fail the test, it killed the process: a failed
+        // Debug.Assert terminates the host, measured at exit code 35 on SDK 10.0.400. In Release
+        // there was no guard at all and the method did not return, because 0 >> 1 is 0 and 0 is
+        // even, so the strip loop spins forever. Either way this test could not have been
+        // written before the change.
+        Assert.Throws<ArgumentOutOfRangeException>(() => CollatzMath.OddStepCountToOne(0));
+        Assert.Throws<ArgumentOutOfRangeException>(() => CollatzMath.OddStepCountToOne(-1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => CollatzMath.OddStepCountToOne(-6));
+    }
+
+    [Fact]
     public void TestOddIndexBijection_RoundTrips()
     {
         // CollatzMath.OddOfIndex / IndexOfOdd index the odd integers 3, 5, 7, ... from zero.
