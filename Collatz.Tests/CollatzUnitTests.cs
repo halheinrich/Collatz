@@ -2316,6 +2316,29 @@ public class CollatzUnitTests
         // rejecting the anchors rather than rejecting everything.
         Assert.Equal(2u, new CollatzDecayFormulaRecursive(new CollatzDecayFormulaRecursive(1, 2, 1), 1).StepsToOne);
     }
+    [Fact]
+    public void TestBitPatternFamilyRejectsDepthsItHoldsNoPatternsFor()
+    {
+        // halheinrich/Math#36. The constructor accepted any depth while IsMember held patterns for
+        // three, so a depth-4 instance built successfully and was unusable: IsMember threw
+        // NotImplementedException, and after halheinrich/Math#24 gave the type a ToString it also
+        // printed "decay in 4 odd steps, decided by base-2 digit pattern" for a family it could not
+        // decide. Depth 0 was accepted the same way and reached the same default.
+        foreach (UInt32 depth in new UInt32[] { 0, 4, 5, 100 })
+        {
+            ArgumentOutOfRangeException thrown = Assert.Throws<ArgumentOutOfRangeException>(
+                () => new CollatzDecayFormulaBitManipulation(depth));
+            Assert.Equal("stepsToOne", thrown.ParamName);
+        }
+        // The control: every depth the pattern table does cover still constructs and still decides.
+        // A guard that rejected everything would pass the loop above and fail here.
+        Assert.True(new CollatzDecayFormulaBitManipulation(1).IsMember(5));
+        Assert.True(new CollatzDecayFormulaBitManipulation(2).IsMember(3));
+        Assert.True(new CollatzDecayFormulaBitManipulation(3).IsMember(17));
+        // And still says no: 17 reaches one in three odd steps, not one or two.
+        Assert.False(new CollatzDecayFormulaBitManipulation(1).IsMember(17));
+        Assert.False(new CollatzDecayFormulaBitManipulation(2).IsMember(17));
+    }
     #endregion Fact Methods
     #region Helper Methods
     private static void AssertDecayIn1(string _AnchorBits)

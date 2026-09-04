@@ -1067,6 +1067,10 @@ public class CollatzDecayFormula : IIndexedCollatzDecayFormula
 public class CollatzDecayFormulaBitManipulation : ICollatzDecayFormula
 {
     #region Properties
+    /// <summary>The shallowest depth <see cref="IsMember"/> holds a pattern for.</summary>
+    private const UInt32 MinStepsToOne = 1;
+    /// <summary>The deepest depth <see cref="IsMember"/> holds a pattern for.</summary>
+    private const UInt32 MaxStepsToOne = 3;
     /// <inheritdoc/>
     public UInt32 StepsToOne { get; }
     #endregion Properties
@@ -1075,8 +1079,27 @@ public class CollatzDecayFormulaBitManipulation : ICollatzDecayFormula
     {
     }
     /// <summary>Creates a formula for the given number of odd steps to one.</summary>
+    /// <param name="stepsToOne">The depth this family decides; 1, 2 or 3.</param>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// <paramref name="stepsToOne"/> is outside 1 to 3. This type's whole definition is the pattern
+    /// table in <see cref="IsMember"/>, which holds those three depths, so an instance for any other
+    /// depth is one that cannot answer the only question it exists to answer.
+    /// </exception>
+    /// <remarks>
+    /// <see cref="StepsToOne"/> is validated here and never changes afterwards, which is what makes
+    /// <see cref="IsMember"/>'s switch total without a default case. Before halheinrich/Math#36 the
+    /// constructor accepted any depth: a depth-4 instance built successfully, threw
+    /// <see cref="NotImplementedException"/> from <see cref="IsMember"/>, and - after
+    /// halheinrich/Math#24 gave the type a <see cref="ToString"/> - printed itself as a family it
+    /// could not decide. Nothing in the repo constructed one, so the object was well-formed and
+    /// wrong rather than actively breaking anything; AGENTS.md &#167;&#160;Writing code asks for that
+    /// shape to be made unrepresentable rather than documented.
+    /// </remarks>
     public CollatzDecayFormulaBitManipulation(UInt32 stepsToOne) : this()
     {
+        if (stepsToOne is < MinStepsToOne or > MaxStepsToOne)
+            throw new ArgumentOutOfRangeException(nameof(stepsToOne), stepsToOne, string.Create(CultureInfo.InvariantCulture,
+                $"This family is decided by a base-2 digit pattern, and patterns are held for depths {MinStepsToOne} to {MaxStepsToOne} only."));
         StepsToOne = stepsToOne;
     }
     #endregion Constructors
@@ -1085,7 +1108,12 @@ public class CollatzDecayFormulaBitManipulation : ICollatzDecayFormula
     /// Reports whether <paramref name="c"/> belongs to this family by pattern-matching its base-2
     /// digits.
     /// </summary>
-    /// <exception cref="NotImplementedException"><see cref="StepsToOne"/> is greater than three.</exception>
+    /// <remarks>
+    /// The switch below has no default case because the constructor rejects every depth this table
+    /// does not cover, so <see cref="StepsToOne"/> is 1, 2 or 3 for the life of the object. Until
+    /// halheinrich/Math#36 the default threw <see cref="NotImplementedException"/>, which was the
+    /// only thing standing between a depth-4 instance and a wrong answer.
+    /// </remarks>
     public bool IsMember(BigInteger c)
     {
         if (c < 1)
@@ -1160,9 +1188,6 @@ public class CollatzDecayFormulaBitManipulation : ICollatzDecayFormula
                 if (!retval)
                     retval = IsPatternMatch(bitString, 2, "11", "000111", "101001000010110111101001");
                 break;
-
-            default:
-                throw new NotImplementedException();
         }
         return retval;
     }
