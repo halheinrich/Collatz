@@ -2185,6 +2185,44 @@ public class CollatzUnitTests
         Assert.True(typeof(ICollatzDecayFormula).IsAssignableFrom(typeof(CollatzDecayFormulaBitManipulation)));
         Assert.True(typeof(ICollatzDecayFormula).IsAssignableFrom(typeof(IIndexedCollatzDecayFormula)));
     }
+    [Fact]
+    public void TestEveryFamilyPrintsItselfRatherThanItsTypeName()
+    {
+        // ICollatzDecayFormula's remark records the trap this closes: object.ToString already satisfies
+        // any interface, so nothing enforces the expectation that an implementation print what it is,
+        // and the compiler cannot see a missing override that is not missing. CollatzDecayFormulaBit-
+        // Manipulation printed its full type name until halheinrich/Math#24. Asserting over all three
+        // rather than the one that was broken is what makes this catch the next omission too.
+        ICollatzDecayFormula[] families =
+        [
+            new CollatzDecayFormulaRecursive(1, 2, 1),
+            new CollatzDecayFormula(1, 2, 2, 1, 1),
+            new CollatzDecayFormulaBitManipulation(1),
+        ];
+        foreach (ICollatzDecayFormula family in families)
+        {
+            string text = family.ToString()!;
+            Assert.NotEqual(family.GetType().ToString(), text);
+            Assert.DoesNotContain(nameof(HalHeinrich), text, StringComparison.Ordinal);
+        }
+    }
+    [Fact]
+    public void TestBitPatternFamilyPrintsTheDepthItDecides()
+    {
+        // What it can honestly say in one line, and no more. The depth is the whole of this type's
+        // state, so it is the whole of what the text can carry; the pattern table lives in IsMember and
+        // is deliberately not restated here, because a count stated in a second place goes wrong the
+        // first time a pattern is added to the switch.
+        for (uint depth = 1; depth <= 3; depth++)
+        {
+            string text = new CollatzDecayFormulaBitManipulation(depth).ToString();
+            Assert.Contains(depth.ToString(CultureInfo.InvariantCulture), text, StringComparison.Ordinal);
+            Assert.Contains("odd steps", text, StringComparison.Ordinal);
+        }
+        Assert.Equal("decay in 3 odd steps, decided by base-2 digit pattern", new CollatzDecayFormulaBitManipulation(3).ToString());
+        // Distinct instances print distinctly, so the text identifies which family it came from.
+        Assert.NotEqual(new CollatzDecayFormulaBitManipulation(1).ToString(), new CollatzDecayFormulaBitManipulation(3).ToString());
+    }
     #endregion Fact Methods
     #region Helper Methods
     private static void AssertDecayIn1(string _AnchorBits)

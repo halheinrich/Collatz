@@ -1117,6 +1117,31 @@ public class CollatzDecayFormulaBitManipulation : ICollatzDecayFormula
         }
         return retval;
     }
+    /// <summary>
+    /// Returns the depth this family decides and the means it decides it by, as
+    /// <c>decay in N odd steps, decided by base-2 digit pattern</c>.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The two siblings print a recurrence and a closed form because each holds one. This type holds
+    /// only <see cref="StepsToOne"/>. Its definition is the table of prefix / repeat / suffix triples
+    /// written into <see cref="IsMember"/>, one set per depth, and restating any of it here - the
+    /// patterns themselves, or merely how many there are - would encode the same rule in a second
+    /// place, where a pattern added to the switch would leave this text quietly wrong. So the line
+    /// says the depth and the method and claims nothing about the patterns: AGENTS.md
+    /// &#167;&#160;Testing discipline forbids a name or doc asserting what the output does not hold,
+    /// and a count this type cannot keep in step with is exactly that.
+    /// </para>
+    /// <para>
+    /// Printing the table honestly would mean lifting it out of the switch into data both this method
+    /// and <see cref="IsMember"/> read, which is a change to the one implementation that gets depth
+    /// three right and is not made here.
+    /// </para>
+    /// </remarks>
+    public override string ToString()
+    {
+        return $"decay in {StepsToOne} odd steps, decided by base-2 digit pattern";
+    }
     private static bool IsPatternMatch(string littleEndianBinaryText, int minBits, string prefix, string repeat, string suffix)
     {
         if (littleEndianBinaryText.Length < minBits || littleEndianBinaryText.Length < prefix.Length + suffix.Length)
