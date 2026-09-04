@@ -22,3 +22,7 @@ TestResults/
 # OS files
 Thumbs.db
 .DS_Store
+
+# Local agent-harness settings. Per-machine and per-operator, not this repo's
+# to carry.
+.claude/
