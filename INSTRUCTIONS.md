@@ -65,8 +65,10 @@ a bit pattern is evidence about the families; agreement between two variants of
 one derivation is evidence about the derivation. A fourth description is
 welcome; a refactor that makes two of these share a derivation is not.
 
-They do not cover the same ground, and the suite reports the gap rather than
-hiding it — see `TestFunctionConstruction` in § Pitfalls.
+They do not cover the same ground, and the gap is measured rather than hidden —
+`RecursiveConstructionDepthThreeCoverage` in `Collatz.Experiments` reports it as
+data, because what the right answer would be is halheinrich/Math#2's open model
+question. § Pitfalls says why that is an experiment and not a test.
 
 ### Two projects, split on whether the answer is known in advance
 
@@ -326,13 +328,20 @@ for `StepsToOne` other than one.
   survived the migration into the umbrella unedited only because
   `Projects\X\Proj` and `Math\X\Proj` are equal depth — a coincidence of layout,
   not a property to rely on.
-- **`TestFunctionConstruction` is red on purpose, and it is reporting a
-  finding.** The recursive derivation is *sound* — it never claims a
-  non-member — but at depth three it is *incomplete*: four derived families
-  cover 20 of the 90 values below 2,000,000 that decay in three odd steps, where
-  the bit-pattern implementation covers all 90. That gap is halheinrich/Math#2,
-  and the test asserts the model the gap contradicts. Weakening the assertion to
-  make the suite green destroys the finding. Fix the model, or leave it red.
+- **The recursive derivation is sound but incomplete at depth three, and that
+  is measured, not asserted.** It never claims a non-member; it misses. Four
+  derived families cover 20 of the 90 values below 2,000,000 that decay in three
+  odd steps, where the bit-pattern implementation covers all 90.
+  halheinrich/Math#2 split the test that used to assert otherwise: its depth-one
+  and depth-two blocks were controls and stayed as
+  `TestRecursiveFormulaConstruction_DepthOnePartitionsBelowScanLimit` and its
+  depth-two sibling, and its depth-three block became
+  `RecursiveConstructionDepthThreeCoverage` in `Collatz.Experiments`, which
+  emits coverage per bound and has no pass or fail. **Do not turn it back into
+  an assertion that passes.** An assertion that no longer claims a partition
+  would report coverage the recursion does not have, which is worse than the
+  red it replaced. The suite therefore has no deliberate failure; #2 stays open
+  on the model question, which no test result settles.
 - **Two of three `NthMember` implementations are broken**
   (halheinrich/Math#24). `CollatzDecayFormula.NthMember` returns zero for every
   `n`. `CollatzDecayFormulaBitManipulation.NthMember` drops the leading `1` of

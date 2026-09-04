@@ -150,6 +150,96 @@ internal static class DecaySweeps
         });
     }
 
+    /// <summary>
+    /// How much of depth three the recursive construction covers, reported per bound.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// This is the third block of what was Collatz.Tests' TestFunctionConstruction, moved here by
+    /// halheinrich/Math#2. That method had never passed at any commit at which this project
+    /// built: its first two blocks are controls with known answers and stayed behind as tests,
+    /// and this one is unfinished exploration, so it reports and does not assert. Making it green
+    /// would mean weakening it into something that no longer claims a partition, which would
+    /// silence the finding rather than settle it.
+    /// </para>
+    /// <para>
+    /// It is <b>not</b> a duplicate of <see cref="DecayViaFunctionIn3Sweep"/>. That one measures
+    /// CollatzDecayFormulaBitManipulation(3), which covers depth three with nine hand-listed
+    /// pattern families; this one measures the recursive construction at the same depth, which
+    /// does not cover it. Same depth, the other implementation - and the disagreement between
+    /// them is the evidence against the implicit 2^(d-1) model that halheinrich/Math#2 holds.
+    /// </para>
+    /// <para>
+    /// The scan counts up in ones, so it visits evens; OddStepCountToOne strips factors of two,
+    /// so each even aliases its odd core. That is the basis halheinrich/Math#2's table uses, and
+    /// it is preserved so the two can be read against each other line for line.
+    /// </para>
+    /// </remarks>
+    internal static void RecursiveConstructionDepthThreeCoverage()
+    {
+        CollatzDecayFormulaRecursive depthOne = new(1, 2, 1);
+        List<ICollatzDecayFormula> depthTwo =
+        [
+            new CollatzDecayFormulaRecursive(depthOne, 2),
+            new CollatzDecayFormulaRecursive(depthOne, 1),
+        ];
+        List<ICollatzDecayFormula> depthThree =
+        [
+            new CollatzDecayFormulaRecursive(depthTwo[0], 2),
+            new CollatzDecayFormulaRecursive(depthTwo[0], 1),
+            new CollatzDecayFormulaRecursive(depthTwo[1], 2),
+            new CollatzDecayFormulaRecursive(depthTwo[1], 1),
+        ];
+
+        int[] bounds = [1_000, 10_000, 100_000, 1_000_000];
+        Console.Error.WriteLine(string.Create(CultureInfo.InvariantCulture,
+            $"--- depth-3 recursive construction: {depthThree.Count} formulas, scanning to {bounds[^1]:N0} ---"));
+
+        StringBuilder csv = new();
+        csv.AppendLine("Bound,DepthThreeValues,Covered,Missed,DoubleClaimed,FalsePositives,FirstMissed");
+
+        int depthThreeValues = 0, covered = 0, missed = 0, doubleClaimed = 0, falsePositives = 0, firstMissed = 0;
+
+        void Row(int bound) => csv.AppendLine(string.Create(CultureInfo.InvariantCulture,
+            $"{bound},{depthThreeValues},{covered},{missed},{doubleClaimed},{falsePositives},{firstMissed}"));
+
+        int nextBound = 0;
+        for (int odd = 1; odd < bounds[^1]; odd++)
+        {
+            if (nextBound < bounds.Length && odd == bounds[nextBound])
+            {
+                Row(bounds[nextBound]);
+                nextBound++;
+            }
+
+            ulong steps = CollatzMath.OddStepCountToOne(odd);
+            int claims = depthThree.Count(f => f.IsMember(odd));
+            if (steps == 3)
+            {
+                depthThreeValues++;
+                if (claims == 1)
+                {
+                    covered++;
+                }
+                else
+                {
+                    missed++;
+                    if (claims > 1)
+                        doubleClaimed++;
+                    if (firstMissed == 0)
+                        firstMissed = odd;
+                }
+            }
+            else if (claims != 0)
+            {
+                falsePositives++;
+            }
+        }
+        Row(bounds[^1]);
+
+        Emit("depth-3 recursive-construction coverage", csv.ToString());
+    }
+
     /// <summary>Odd-step count is invariant under reversing the 4n+1 map.</summary>
     internal static void FourNPlusOneSweep()
     {

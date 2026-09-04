@@ -28,6 +28,8 @@ internal static class Program
         ("DecayViaFunctionIn1Sweep",        DecaySweeps.DecayViaFunctionIn1Sweep),
         ("DecayViaFunctionIn2Sweep",        DecaySweeps.DecayViaFunctionIn2Sweep),
         ("DecayViaFunctionIn3Sweep",        DecaySweeps.DecayViaFunctionIn3Sweep),
+        ("RecursiveConstructionDepthThreeCoverage",
+                                           DecaySweeps.RecursiveConstructionDepthThreeCoverage),
         ("FourNPlusOneSweep",               DecaySweeps.FourNPlusOneSweep),
         ("DecayAsExpectedSweep",            DecaySweeps.DecayAsExpectedSweep),
         ("SeedIndexSweep",                  DecaySweeps.SeedIndexSweep),

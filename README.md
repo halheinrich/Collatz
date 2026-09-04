@@ -45,11 +45,13 @@ what makes them worth cross-checking:
 They do not all cover the same ground. The recursive derivation is *sound* —
 it never claims a non-member — but at depth three it is *incomplete*: four
 derived families cover 20 of the 90 values below 2,000,000 that decay in three
-odd steps, while the bit-pattern implementation covers all 90. `dotnet test`
-therefore ends with **one deliberate failure**, `TestFunctionConstruction`,
-which is reporting that gap rather than suffering from a bug. It is tracked as
-[halheinrich/Math#2](https://github.com/halheinrich/Math/issues/2) and is left
-red on purpose: a red test telling the truth beats a green one that does not.
+odd steps, while the bit-pattern implementation covers all 90. What the right
+family count would be is an open model question,
+[halheinrich/Math#2](https://github.com/halheinrich/Math/issues/2), so the gap
+is **reported rather than asserted**: run
+`RecursiveConstructionDepthThreeCoverage` in `Collatz.Experiments` and it emits
+covered, missed and false positives per bound. Depth one and depth two do have
+known answers and stay in `Collatz.Tests` as controls.
 
 ## Projects
 
@@ -106,8 +108,7 @@ dotnet build
 dotnet test
 ```
 
-One test fails deliberately, for the reason described above; everything else is
-green. The suite builds and runs identically in Debug and Release.
+The suite is green. It builds and runs identically in Debug and Release.
 
 ## Licence
 

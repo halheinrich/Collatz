@@ -48,6 +48,15 @@ public class CollatzUnitTests
     // Its full run is Collatz.Experiments' SeedIndexSweep.
     private const int GatedSeedIndexLimit = 10_000;
 
+    // Bound for the two recursive-construction controls. Their predecessor ran at this limit as
+    // a bare local, and the limit is part of what they claim, so it is named here. Measured
+    // umbrella-side on 2026-09-04 and recorded on halheinrich/Math#2 - not re-derived here:
+    // depth one and depth two each hold 0 missed and 0 false positives to 1,000,000, three
+    // orders of magnitude past this bound, so the gate costs milliseconds without narrowing
+    // what is known. Depth three holds at no bound, which is why it is not a control and lives
+    // in Collatz.Experiments instead.
+    private const int RecursiveConstructionScanLimit = 1_000;
+
     // Straddles long.MaxValue and mixes symmetric with asymmetric bit patterns, so a
     // most-significant-first result cannot be mistaken for a least-significant-first one.
     // Values whose base-2 digits read differently in the two directions, so a test over them
@@ -1799,68 +1808,56 @@ public class CollatzUnitTests
         }
     }
     [Fact]
-    public void TestFunctionConstruction()
+    public void TestRecursiveFormulaConstruction_DepthOnePartitionsBelowScanLimit()
     {
-        int trials = 1000;
-        CollatzDecayFormulaRecursive collatzDecayFormulaRecursive = new(1, 2, 1);
-        List<ICollatzDecayFormula> collatzFormulaInOneStepList = new();
-        collatzFormulaInOneStepList.Add(collatzDecayFormulaRecursive);
-        int isMemberCt = 0;
-        ulong oddDecaySteps = 0;
-        // Test decay in 1 step
-        for (int odd = 1; odd < trials; odd++)
+        // halheinrich/Math#2 split TestFunctionConstruction, which had never passed at any
+        // commit at which this project built. Its first two blocks were controls with known
+        // answers and are these two tests; its third was unfinished exploration and is now
+        // RecursiveConstructionDepthThreeCoverage in Collatz.Experiments, where it reports
+        // instead of asserting.
+        //
+        // The claim is a partition, not merely soundness: the single explicitly seeded formula
+        // claims every value reaching one in one odd step, and claims nothing else.
+        //
+        // The loop counts up in ones rather than twos, so it visits evens despite the variable's
+        // name. That is preserved exactly from the method this came out of, and it is not a wrong
+        // result: OddStepCountToOne strips factors of two at Collatz.cs:479, so each even aliases
+        // its odd core and is classified with it. halheinrich/Math#2's measurements are on this
+        // basis, so changing it here would make them incomparable. Renaming the variable or
+        // moving to odds only is its own commit with its own measurement.
+        List<ICollatzDecayFormula> depthOne = [new CollatzDecayFormulaRecursive(1, 2, 1)];
+
+        for (int odd = 1; odd < RecursiveConstructionScanLimit; odd++)
         {
-            oddDecaySteps = CollatzMath.OddStepCountToOne(odd);
-            isMemberCt = 0;
-            foreach (ICollatzDecayFormula collatzFormula in collatzFormulaInOneStepList)
-            {
-                if (collatzFormula.IsMember(odd))
-                    ++isMemberCt;
-            }
-            if (oddDecaySteps == 1)
-                Assert.True(isMemberCt == 1);
-            else
-                Assert.True(isMemberCt == 0);
+            ulong steps = CollatzMath.OddStepCountToOne(odd);
+            Assert.Equal(steps == 1 ? 1 : 0, depthOne.Count(f => f.IsMember(odd)));
         }
-        // Test decay in 2 steps
-        List<ICollatzDecayFormula> collatzFormulaInTwoStepsList = new();
-        collatzFormulaInTwoStepsList.Add(new CollatzDecayFormulaRecursive(collatzFormulaInOneStepList[0], 2));
-        collatzFormulaInTwoStepsList.Add(new CollatzDecayFormulaRecursive(collatzFormulaInOneStepList[0], 1));
-        for (int odd = 1; odd < trials; odd++)
+    }
+    [Fact]
+    public void TestRecursiveFormulaConstruction_DepthTwoPartitionsBelowScanLimit()
+    {
+        // The same claim one level down, over the two formulas the depth-one seed derives - one
+        // per residue class modulo three. Exactly one of the two claims every value reaching one
+        // in two odd steps, and neither claims anything else.
+        //
+        // Two formulas covering a depth with more than two chains is not a coincidence and not a
+        // weaker claim: CollatzDecayFormulaRecursive.IsMember also strips the 4c+1 map off the
+        // candidate, so one formula recognises a whole 4c+1 tree rather than a single chain.
+        // The count of formulas and the count of families are different quantities; only the
+        // first is pinned here, and halheinrich/Math#2 holds the second.
+        //
+        // Same loop basis as the depth-one control above, for the same reason.
+        CollatzDecayFormulaRecursive depthOne = new(1, 2, 1);
+        List<ICollatzDecayFormula> depthTwo =
+        [
+            new CollatzDecayFormulaRecursive(depthOne, 2),
+            new CollatzDecayFormulaRecursive(depthOne, 1),
+        ];
+
+        for (int odd = 1; odd < RecursiveConstructionScanLimit; odd++)
         {
-            oddDecaySteps = CollatzMath.OddStepCountToOne(odd);
-            isMemberCt = 0;
-            foreach (ICollatzDecayFormula collatzFormula in collatzFormulaInTwoStepsList)
-            {
-                if (collatzFormula.IsMember(odd))
-                    ++isMemberCt;
-            }
-            if (oddDecaySteps == 2)
-                Assert.True(isMemberCt == 1);
-            else
-                Assert.True(isMemberCt == 0);
-        }
-        // Test decay in 3 steps
-        List<ICollatzDecayFormula> collatzFormulaInThreeStepsList = new();
-        collatzFormulaInThreeStepsList.Add(new CollatzDecayFormulaRecursive(collatzFormulaInTwoStepsList[0], 2));
-        collatzFormulaInThreeStepsList.Add(new CollatzDecayFormulaRecursive(collatzFormulaInTwoStepsList[0], 1));
-        collatzFormulaInThreeStepsList.Add(new CollatzDecayFormulaRecursive(collatzFormulaInTwoStepsList[1], 2));
-        collatzFormulaInThreeStepsList.Add(new CollatzDecayFormulaRecursive(collatzFormulaInTwoStepsList[1], 1));
-        for (int odd = 1; odd < trials; odd++)
-        {
-            oddDecaySteps = CollatzMath.OddStepCountToOne(odd);
-            isMemberCt = 0;
-            foreach (ICollatzDecayFormula collatzFormula in collatzFormulaInThreeStepsList)
-            {
-                if (collatzFormula.IsMember(odd))
-                    ++isMemberCt;
-            }
-            if (oddDecaySteps == 3)
-            {
-                Assert.True(isMemberCt == 1);
-            }
-            else
-                Assert.True(isMemberCt == 0);
+            ulong steps = CollatzMath.OddStepCountToOne(odd);
+            Assert.Equal(steps == 2 ? 1 : 0, depthTwo.Count(f => f.IsMember(odd)));
         }
     }
     [Fact]
