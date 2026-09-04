@@ -218,8 +218,15 @@ remark recording what its assertion had been hiding, measured on SDK 10.0.400:
   and decrement vanished together, and the returned value differed between
   configurations for `v` a multiple of three.
 
-**The recursive constructors have not had this treatment.** halheinrich/Math#28
-tracks them, and § Pitfalls says what they still do.
+**The recursive constructors have since had the same treatment**
+(halheinrich/Math#28). Their parameter checks are now `ArgumentOutOfRangeException`
+and `ArgumentException`, both derivation failures are `InvalidOperationException`,
+and one invariant was deleted rather than converted, under a proof that it can
+never fire. No `Debug.Assert` **call** remains anywhere in `Collatz/Collatz.cs`:
+the six occurrences of the name still in that file are `<see cref>` references in
+XML docs, each recording what the check it sits on used to be. `Collatz.Experiments`
+still calls `Debug.Assert` in five places, which is not the same defect — it is a
+reporting harness whose output a human reads, not the product.
 
 ## Public API
 
@@ -277,10 +284,16 @@ public interface ICollatzDecayFormula
 {
     UInt32 StepsToOne { get; }
     bool IsMember(BigInteger c);
-    BigInteger NthMember(int n);   // see § Pitfalls - two of three are broken
 }
 
-public class CollatzDecayFormulaRecursive : ICollatzDecayFormula
+// Enumeration is separate because not every family here can do it: membership
+// by digit pattern runs in one direction only. See § Pitfalls.
+public interface IIndexedCollatzDecayFormula : ICollatzDecayFormula
+{
+    BigInteger NthMember(int n);   // index order is the implementation's own
+}
+
+public class CollatzDecayFormulaRecursive : IIndexedCollatzDecayFormula
 {
     public BigInteger PowerOfTwo { get; }      // 2^TwosExponent
     public Int32 TwosExponent { get; }
@@ -291,13 +304,13 @@ public class CollatzDecayFormulaRecursive : ICollatzDecayFormula
                                         Int64 additiveConstant);
 
     // derives from a predecessor by walking ITS NthMember - see § Pitfalls
-    public CollatzDecayFormulaRecursive(ICollatzDecayFormula predecessorFormula,
+    public CollatzDecayFormulaRecursive(IIndexedCollatzDecayFormula predecessorFormula,
                                         int modThree);
 
     public override string ToString();   // "f(n) = 2^E * f(n-1) + A"
 }
 
-public class CollatzDecayFormula : ICollatzDecayFormula
+public class CollatzDecayFormula : IIndexedCollatzDecayFormula
 {
     public int NFactor { get; }
     public int NConstant { get; }
@@ -311,19 +324,29 @@ public class CollatzDecayFormula : ICollatzDecayFormula
     public override string ToString();   // "f(n) = [2^(Fn+C) - S] / 3^E"
 }
 
+// Membership only, deliberately: it matches digit patterns, and nothing in it
+// generates the values those patterns accept.
 public class CollatzDecayFormulaBitManipulation : ICollatzDecayFormula
 {
-    public CollatzDecayFormulaBitManipulation(UInt32 stepsToOne);
+    public CollatzDecayFormulaBitManipulation(UInt32 stepsToOne);   // 1..3 only
+
+    public override string ToString();   // "decay in N odd steps, decided by ..."
 }
 ```
 
-`IsMember` returns `false` for any `c` below one on all three. Both
-`CollatzDecayFormulaBitManipulation` members throw `NotImplementedException`
-above the depth they cover: `IsMember` for `StepsToOne` above three, `NthMember`
-for `StepsToOne` other than one.
+`IsMember` returns `false` for any `c` below one on all three.
+`CollatzDecayFormulaBitManipulation` throws no `NotImplementedException`, and has
+no member that could: halheinrich/Math#24 removed `NthMember` from the type when
+it split the interface, and halheinrich/Math#36 made the constructor reject any
+`StepsToOne` outside 1..3, which left the `IsMember` default arm unreachable and
+it went with them. No `throw` of `NotImplementedException` survives in the
+product — the two occurrences of the name in `Collatz.cs` are `<see cref>` doc
+references recording exactly that history.
 
-Both `ToString` overrides take each constant's operator from that constant's own
-sign, and drop a term whose constant is zero. So `A` negative prints
+The two formula-printing `ToString` overrides — `CollatzDecayFormulaRecursive`'s
+and `CollatzDecayFormula`'s; the third prints a pattern description, not a
+formula — take each constant's operator from that constant's own sign, and drop
+a term whose constant is zero. So `A` negative prints
 `f(n) = 2^6 * f(n-1) - 5` and `A` zero prints `f(n) = 2^6 * f(n-1)`; `C`
 negative prints `[2^(6n-1) - 5] / 3^2`, `S` negative prints
 `[2^(6n+4) + 5] / 3^2` because subtracting a negative adds it, and both zero
@@ -357,25 +380,34 @@ correction cannot land on some of them and leave the rest to diverge
   would report coverage the recursion does not have, which is worse than the
   red it replaced. The suite therefore has no deliberate failure; #2 stays open
   on the model question, which no test result settles.
-- **Two of three `NthMember` implementations are broken**
-  (halheinrich/Math#24). `CollatzDecayFormula.NthMember` returns zero for every
-  `n`. `CollatzDecayFormulaBitManipulation.NthMember` drops the leading `1` of
-  the pattern it builds, because `new('1')` binds to `StringBuilder`'s capacity
-  overload rather than seeding the content. `CollatzDecayFormulaRecursive` has
-  the only working one — **and its own derivation constructor walks the
-  predecessor's `NthMember`**, so that constructor is usable only when seeded
-  with a `CollatzDecayFormulaRecursive`. Seeded with a `CollatzDecayFormula` it
-  never returns, because that `NthMember` returns zero forever and zero never
-  satisfies the residue test that admits an anchor. Seeded with a
-  `CollatzDecayFormulaBitManipulation` it is worse than that: at `StepsToOne` of
-  one it walks values missing their leading digit and derives a recurrence from
-  them, and at any other depth it throws.
-- **That constructor's walk is unbounded in the other direction too.** A
-  predecessor that never yields enough qualifying members does not return, and
-  all five checks inside the two recursive constructors are still `Debug.Assert`
-  (halheinrich/Math#28) — so in Release a derivation that fails its own
-  consistency check proceeds silently. The XML remarks on those constructors
-  still cite halheinrich/Math#6, which has closed; #28 is the live issue.
+- **`NthMember` is not on the shared contract, and index zero is not guaranteed
+  to be a member.** halheinrich/Math#24 moved enumeration to
+  `IIndexedCollatzDecayFormula`, which `CollatzDecayFormulaRecursive` and
+  `CollatzDecayFormula` implement and `CollatzDecayFormulaBitManipulation` does
+  not — it decides membership by matching base-2 digit patterns, and nothing in
+  it generates the values those patterns accept. Both surviving implementations
+  work: `CollatzDecayFormula.NthMember` is the closed form rather than the stub
+  that used to return zero, and it throws `ArgumentOutOfRangeException` on a
+  negative index or exponent and `InvalidOperationException` when its division is
+  not exact, rather than letting `BigInteger` truncate and returning something
+  indistinguishable from a member. What a caller must still do is **filter**. The
+  index order is each implementation's own and index zero can fall outside the
+  family, or outside the integers altogether: `[2^(6n-1) - 5] / 3^2` has its
+  first member at `n` of one, so index zero throws. The derivation constructor
+  filters exactly this way, and because it now takes an
+  `IIndexedCollatzDecayFormula`, seeding it with a bit-pattern formula is a
+  compile error rather than a runtime surprise. halheinrich/Math#35 tracks the
+  indexing contract this leaves unshared.
+- **That constructor's walk is unbounded, and that is the live hazard.** It loops
+  on `while (true)` with no iteration cap, so a predecessor that never yields
+  enough qualifying members does not return. Nothing tracks this; it is the one
+  thing in the derivation a reader still has to know. What is **no longer** true:
+  the checks inside the two recursive constructors were `Debug.Assert` until
+  halheinrich/Math#28 converted them, so a Release build no longer proceeds
+  silently from a failed consistency check — both derivation failures throw
+  `InvalidOperationException` in every configuration. The XML remarks on those
+  constructors cite halheinrich/Math#28 and no longer cite the closed
+  halheinrich/Math#6.
 - **`RestoreLockedMode` is dormant here.** `Directory.Build.props` gates it on
   `ContinuousIntegrationBuild`, and with no workflow in this repository nothing
   sets that, so a `packages.lock.json` out of step with a `.csproj` fails
@@ -391,10 +423,19 @@ correction cannot land on some of them and leave the rest to diverge
 
 ## Subproject-internal next steps
 
-The open backlog for this member lives in the umbrella tracker rather than
-repeated here: halheinrich/Math#2, #24 and #28 are all
-subproject-internal, and § Pitfalls above says what each one costs a reader
-today.
+The open backlog for this member lives in the umbrella tracker, and is
+deliberately not enumerated here. It used to be, and that enumeration was a
+drift *generator* rather than a drifted instance: it named halheinrich/Math#24
+and halheinrich/Math#28 as open, and became false the moment they closed, with
+no mechanism that could have noticed. Correcting the list would only have reset
+the clock on the same failure. This is the defect class halheinrich/Math#41
+names, and the reason `AGENTS.md` § Subproject INSTRUCTIONS.md standard forbids
+drift-prone duplicative content: a member doc restating umbrella state has no
+way to stay true.
+
+Query the tracker for what is open against this member. § Pitfalls above is
+written to be read without it — it states what the code does today, not which
+issues are outstanding.
 
 Cross-cutting items are `../INSTRUCTIONS.md`'s — among them halheinrich/Math#13,
 which asks whether this member is the rational-arithmetic consumer its place in
