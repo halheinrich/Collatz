@@ -2075,6 +2075,116 @@ public class CollatzUnitTests
             is32_17 = !is32_17;
         }
     }
+    [Fact]
+    public void TestClosedFormNthMember_AgreesWithTheRecurrenceIndexForIndex()
+    {
+        // The cross-check AGENTS.md Testing discipline calls the strongest correctness test here: two
+        // independent implementations of the same depth-one family, compared value for value. Before
+        // halheinrich/Math#24 the closed form returned zero at every index, so this fails at index zero
+        // without the change rather than somewhere deep in the sequence.
+        CollatzDecayFormulaRecursive recurrence = new(1, 2, 1);
+        CollatzDecayFormula closedForm = new(1, 2, 2, 1, 1);
+        for (int n = 0; n < 24; n++)
+        {
+            BigInteger member = closedForm.NthMember(n);
+            Assert.Equal(recurrence.NthMember(n), member);
+            Assert.True(closedForm.IsMember(member));
+            Assert.Equal(1UL, CollatzMath.OddStepCountToOne(member));
+        }
+        Assert.Equal(BigInteger.One, closedForm.NthMember(0));
+        Assert.Equal(new BigInteger(1365), closedForm.NthMember(5));
+    }
+    [Fact]
+    public void TestClosedFormNthMember_ProducesGenuineDepthTwoMembers()
+    {
+        // Real values against brute force, not against the formula that produced them. Both depth-two
+        // closed forms are covered because they differ in the sign of NConstant, which is what decides
+        // whether index zero is inside the domain at all.
+        CollatzDecayFormula minusOne = new(2, 6, -1, 5, 2);
+        CollatzDecayFormula plusFour = new(2, 6, 4, 7, 2);
+        for (int n = 1; n < 8; n++)
+        {
+            foreach (CollatzDecayFormula formula in new[] { minusOne, plusFour })
+            {
+                BigInteger member = formula.NthMember(n);
+                Assert.Equal(2UL, CollatzMath.OddStepCountToOne(member));
+                Assert.True(formula.IsMember(member));
+            }
+        }
+        Assert.Equal(new BigInteger(3), minusOne.NthMember(1));
+        Assert.Equal(new BigInteger(113), plusFour.NthMember(1));
+        // The documented caveat, pinned rather than left standing only in prose: the index is the n of
+        // the closed form, so index zero of the second formula is 1 - which reaches one in one odd step
+        // and is therefore no member of this StepsToOne-of-two family. IsMember agrees, and a consumer
+        // walking the indices has to filter rather than trust the position.
+        Assert.Equal(BigInteger.One, plusFour.NthMember(0));
+        Assert.Equal(1UL, CollatzMath.OddStepCountToOne(plusFour.NthMember(0)));
+        Assert.False(plusFour.IsMember(plusFour.NthMember(0)));
+    }
+    [Fact]
+    public void TestClosedFormNthMember_RejectsAnInexactDivision()
+    {
+        // The guard is tested by trying to violate it, per AGENTS.md Testing discipline, not by
+        // observing that it held on a well-formed instance. [2^(2n+2) - 2] / 3 never divides: 4^(n+1) is
+        // congruent to 1 modulo three, so the numerator is congruent to 2 at every index. Truncating
+        // would hand back a plausible-looking integer, which is why this throws instead.
+        CollatzDecayFormula inexact = new(1, 2, 2, 2, 1);
+        for (int n = 0; n < 6; n++)
+        {
+            int index = n;
+            Assert.Throws<InvalidOperationException>(() => inexact.NthMember(index));
+        }
+    }
+    [Fact]
+    public void TestClosedFormNthMember_RejectsAnExponentOutsideItsDomain()
+    {
+        // A negative exponent is reachable from a well-formed instance, not only from a malformed one:
+        // [2^(6n-1) - 5] / 3^2 has its first member at n of one. Index zero asks for 2^-1, which is not
+        // an integer, so it is out of domain rather than a defect - and index one right after it works.
+        CollatzDecayFormula minusOne = new(2, 6, -1, 5, 2);
+        Assert.Throws<ArgumentOutOfRangeException>(() => minusOne.NthMember(0));
+        Assert.Throws<ArgumentOutOfRangeException>(() => minusOne.NthMember(-1));
+        Assert.Equal(new BigInteger(3), minusOne.NthMember(1));
+        CollatzDecayFormula depthOne = new(1, 2, 2, 1, 1);
+        Assert.Throws<ArgumentOutOfRangeException>(() => depthOne.NthMember(-1));
+    }
+    [Fact]
+    public void TestClosedFormSeedsTheDerivationItUsedToHang()
+    {
+        // halheinrich/Math#24 recorded that seeding the derivation with CollatzDecayFormula never
+        // returned, because a stub yielding zero forever never satisfies the residue test the loop waits
+        // on. It returns now, and derives the same recurrence the recursive seed derives - which it must,
+        // since the two enumerate the depth-one family identically.
+        CollatzDecayFormula closedFormSeed = new(1, 2, 2, 1, 1);
+        CollatzDecayFormulaRecursive recurrenceSeed = new(1, 2, 1);
+        CollatzDecayFormulaRecursive fromClosedForm = new(closedFormSeed, 2);
+        CollatzDecayFormulaRecursive fromRecurrence = new(recurrenceSeed, 2);
+        Assert.Equal(fromRecurrence.TwosExponent, fromClosedForm.TwosExponent);
+        Assert.Equal(fromRecurrence.AdditiveConstant, fromClosedForm.AdditiveConstant);
+        Assert.Equal(fromRecurrence.StepsToOne, fromClosedForm.StepsToOne);
+        Assert.Equal(6, fromClosedForm.TwosExponent);
+        Assert.Equal(35L, fromClosedForm.AdditiveConstant);
+        Assert.Equal(2U, fromClosedForm.StepsToOne);
+        for (int n = 0; n < 6; n++)
+        {
+            Assert.Equal(fromRecurrence.NthMember(n), fromClosedForm.NthMember(n));
+            Assert.Equal(2UL, CollatzMath.OddStepCountToOne(fromClosedForm.NthMember(n)));
+        }
+    }
+    [Fact]
+    public void TestOnlyEnumerableFamiliesClaimTheIndexedInterface()
+    {
+        // The point of halheinrich/Math#24 is that the compiler now refuses what it used to accept, and
+        // nothing in the ordinary suite would notice the interface being widened back. This pins the
+        // arrangement: the bit-pattern family decides membership in one direction only and must not
+        // declare an enumeration it cannot perform.
+        Assert.True(typeof(IIndexedCollatzDecayFormula).IsAssignableFrom(typeof(CollatzDecayFormulaRecursive)));
+        Assert.True(typeof(IIndexedCollatzDecayFormula).IsAssignableFrom(typeof(CollatzDecayFormula)));
+        Assert.False(typeof(IIndexedCollatzDecayFormula).IsAssignableFrom(typeof(CollatzDecayFormulaBitManipulation)));
+        // It is still a family, and still testable for membership - only the enumeration is gone.
+        Assert.True(typeof(ICollatzDecayFormula).IsAssignableFrom(typeof(CollatzDecayFormulaBitManipulation)));
+        Assert.True(typeof(ICollatzDecayFormula).IsAssignableFrom(typeof(IIndexedCollatzDecayFormula)));
+    }
     #endregion Fact Methods
     #region Helper Methods
     private static void AssertDecayIn1(string _AnchorBits)

@@ -178,7 +178,9 @@ internal static class DecaySweeps
     internal static void RecursiveConstructionDepthThreeCoverage()
     {
         CollatzDecayFormulaRecursive depthOne = new(1, 2, 1);
-        List<ICollatzDecayFormula> depthTwo =
+        // Declared as the indexed interface rather than ICollatzDecayFormula because these two seed
+        // the depth-three derivations below, which walk NthMember.
+        List<IIndexedCollatzDecayFormula> depthTwo =
         [
             new CollatzDecayFormulaRecursive(depthOne, 2),
             new CollatzDecayFormulaRecursive(depthOne, 1),

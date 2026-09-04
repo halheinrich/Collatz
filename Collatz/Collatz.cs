@@ -651,14 +651,35 @@ public interface ICollatzDecayFormula
     public UInt32 StepsToOne { get; }
     /// <summary>Reports whether <paramref name="c"/> belongs to this family.</summary>
     public bool IsMember(BigInteger c);
-    /// <summary>Returns the member at zero-based index <paramref name="n"/>.</summary>
+}
+/// <summary>
+/// An <see cref="ICollatzDecayFormula"/> that can also produce its members one index at a time.
+/// </summary>
+/// <remarks>
+/// Enumeration is separated from membership because it is not something every family here can do.
+/// <see cref="CollatzDecayFormulaBitManipulation"/> decides membership by matching a candidate's
+/// base-2 digits against fixed patterns, which runs in one direction only: nothing in it generates
+/// the values those patterns accept. While <c>NthMember</c> sat on <see cref="ICollatzDecayFormula"/>
+/// that type declared an operation it could not perform, and the compiler accepted every call to it
+/// &#8212; see halheinrich/Math#24.
+/// </remarks>
+public interface IIndexedCollatzDecayFormula : ICollatzDecayFormula
+{
+    /// <summary>Returns this family's member at zero-based index <paramref name="n"/>.</summary>
+    /// <remarks>
+    /// The order is the implementation's own, and index zero is not guaranteed to be the family's
+    /// least member. <see cref="CollatzDecayFormula"/> indexes by the n of its closed form, which at
+    /// index zero can fall outside the family or outside the integers altogether. A consumer walking
+    /// the indices must therefore filter what it collects rather than trust the position &#8212;
+    /// <see cref="CollatzDecayFormulaRecursive(IIndexedCollatzDecayFormula, int)"/> does exactly that.
+    /// </remarks>
     public BigInteger NthMember(int n);
 }
 /// <summary>
 /// An <see cref="ICollatzDecayFormula"/> whose members satisfy the recurrence
 /// f(i) = <see cref="PowerOfTwo"/> &#215; f(i&#8722;1) + <see cref="AdditiveConstant"/> from a seed anchor.
 /// </summary>
-public class CollatzDecayFormulaRecursive : ICollatzDecayFormula
+public class CollatzDecayFormulaRecursive : IIndexedCollatzDecayFormula
 {
     #region Properties
     /// <inheritdoc/>
@@ -726,14 +747,20 @@ public class CollatzDecayFormulaRecursive : ICollatzDecayFormula
     /// (4p&#160;&#8722;&#160;1)/3 when <paramref name="modThree"/> is 1 or (2p&#160;&#8722;&#160;1)/3 when it is 2, and infers
     /// <see cref="PowerOfTwo"/> and <see cref="AdditiveConstant"/> once more than seven anchors agree.
     /// </summary>
-    /// <param name="predecessorFormula">The formula whose members seed the derivation.</param>
+    /// <param name="predecessorFormula">
+    /// The formula whose members seed the derivation. It is an
+    /// <see cref="IIndexedCollatzDecayFormula"/> rather than an <see cref="ICollatzDecayFormula"/>
+    /// because this constructor walks <see cref="IIndexedCollatzDecayFormula.NthMember"/> and never
+    /// calls <see cref="ICollatzDecayFormula.IsMember"/>; a family that can only test membership
+    /// cannot seed it.
+    /// </param>
     /// <param name="modThree">Selects the residue class to keep; must be 1 or 2.</param>
     /// <remarks>
     /// The walk is unbounded: a predecessor that never yields enough qualifying members does not
     /// return. Every check here is a <see cref="Debug.Assert(bool, string)"/> and so is absent from
     /// Release builds &#8212; see halheinrich/Math#6.
     /// </remarks>
-    public CollatzDecayFormulaRecursive(ICollatzDecayFormula predecessorFormula, int modThree) : this()
+    public CollatzDecayFormulaRecursive(IIndexedCollatzDecayFormula predecessorFormula, int modThree) : this()
     {
         // f(n) = 2^2 * f(n-1) + 1
         // f(n) = 2^6 * f(n-1) + 35
@@ -826,7 +853,14 @@ public class CollatzDecayFormulaRecursive : ICollatzDecayFormula
         }
         return DecayAnchorHashSet.Contains(candidate);
     }
-    /// <inheritdoc/>
+    /// <summary>
+    /// Returns the member at zero-based index <paramref name="n"/>, extending the anchor list by the
+    /// recurrence as far as needed.
+    /// </summary>
+    /// <remarks>
+    /// Index zero is the seed anchor, so unlike <see cref="CollatzDecayFormula.NthMember"/> this
+    /// implementation's order does begin at the family's least member.
+    /// </remarks>
     public BigInteger NthMember(int n)
     {
         while (n >= DecayAnchorList.Count)
@@ -848,7 +882,7 @@ public class CollatzDecayFormulaRecursive : ICollatzDecayFormula
 /// An <see cref="ICollatzDecayFormula"/> whose members are given in closed form as
 /// [2^(<see cref="NFactor"/>n&#160;+&#160;<see cref="NConstant"/>) &#8722; <see cref="SubtractiveConstant"/>] / <see cref="PowerOfThree"/>.
 /// </summary>
-public class CollatzDecayFormula : ICollatzDecayFormula
+public class CollatzDecayFormula : IIndexedCollatzDecayFormula
 {
     #region Properties
     /// <inheritdoc/>
@@ -933,10 +967,47 @@ public class CollatzDecayFormula : ICollatzDecayFormula
         // f(n) = [2^(6n+4) - 7] / 3^2
         return $"f(n) = [2^({NFactor}n+{NConstant}) - {SubtractiveConstant}] / 3^{ThreesExponent}";
     }
-    /// <summary>Not implemented; always returns zero.</summary>
+    /// <summary>
+    /// Returns [2^(<see cref="NFactor"/><paramref name="n"/>&#160;+&#160;<see cref="NConstant"/>) &#8722; <see cref="SubtractiveConstant"/>]&#160;/&#160;<see cref="PowerOfThree"/>,
+    /// this family's closed form evaluated at <paramref name="n"/>.
+    /// </summary>
+    /// <remarks>
+    /// The index is the n of the closed form, not a position in the family's ascending order, and the
+    /// two need not agree: [2^(6n&#160;+&#160;4)&#160;&#8722;&#160;7]&#160;/&#160;3^2 is 1 at index zero,
+    /// which reaches one in a single odd step and so belongs to no <see cref="StepsToOne"/>-of-two
+    /// family. <see cref="IsMember"/> rejects it for the same reason, by the log2-of-zero case it
+    /// carries. Compare <see cref="CollatzDecayFormulaRecursive.NthMember"/>, whose index zero is the
+    /// seed anchor.
+    /// </remarks>
+    /// <param name="n">A zero-based index into the closed form.</param>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// <paramref name="n"/> is negative, or the exponent it forms is negative or exceeds
+    /// <see cref="int.MaxValue"/>. A negative exponent is reachable from a well-formed instance rather
+    /// than only from a malformed one: [2^(6n&#160;&#8722;&#160;1)&#160;&#8722;&#160;5]&#160;/&#160;3^2
+    /// has its first member at n of one, so index zero is outside its domain.
+    /// </exception>
+    /// <exception cref="InvalidOperationException">
+    /// The division is not exact, which is a statement about the instance's constants rather than about
+    /// <paramref name="n"/>. Letting <see cref="BigInteger"/> division truncate instead would return a
+    /// value indistinguishable from a member and carry the error onward untracked, which AGENTS.md
+    /// &#167;&#160;Exactness discipline exists to prevent.
+    /// </exception>
     public BigInteger NthMember(int n)
     {
-        return 0;
+        ArgumentOutOfRangeException.ThrowIfNegative(n);
+        Int64 exponent = (Int64)NFactor * n + NConstant;
+        if (exponent < 0)
+            throw new ArgumentOutOfRangeException(nameof(n), n, string.Create(CultureInfo.InvariantCulture,
+                $"CollatzDecayFormula.NthMember({n}) needs exponent {exponent}, and 2 raised to a negative exponent is not an integer."));
+        if (exponent > Int32.MaxValue)
+            throw new ArgumentOutOfRangeException(nameof(n), n, string.Create(CultureInfo.InvariantCulture,
+                $"CollatzDecayFormula.NthMember({n}) needs exponent {exponent}, which exceeds the largest exponent BigInteger.Pow accepts."));
+        BigInteger numerator = BigInteger.Pow(2, (Int32)exponent) - SubtractiveConstant;
+        BigInteger quotient = BigInteger.DivRem(numerator, PowerOfThree, out BigInteger remainder);
+        if (!remainder.IsZero)
+            throw new InvalidOperationException(string.Create(CultureInfo.InvariantCulture,
+                $"CollatzDecayFormula.NthMember({n}) produced numerator {numerator}, which leaves remainder {remainder} on division by 3^{ThreesExponent}."));
+        return quotient;
     }
     #endregion Public Methods
 }
@@ -1044,32 +1115,6 @@ public class CollatzDecayFormulaBitManipulation : ICollatzDecayFormula
             default:
                 throw new NotImplementedException();
         }
-        return retval;
-    }
-    /// <summary>
-    /// Returns the member at zero-based index <paramref name="n"/> for <see cref="StepsToOne"/> equal to
-    /// one, built from <c>01</c> repeated <paramref name="n"/> times.
-    /// </summary>
-    /// <remarks>
-    /// The leading <c>1</c> that the <see cref="StepsToOne"/>-of-one pattern carries is missing: the
-    /// builder is written <c>new(char)</c>, which binds to the <see cref="StringBuilder"/> capacity
-    /// overload rather than seeding the content. Verified by probe on SDK 10.0.400.
-    /// </remarks>
-    /// <exception cref="NotImplementedException"><see cref="StepsToOne"/> is not one.</exception>
-    public BigInteger NthMember(int n)
-    {
-        BigInteger retval = -1;
-        StringBuilder sb = new('1');
-        switch (StepsToOne)
-        {
-            case 1:
-                for (int i = 1; i <= n; i++)
-                    sb.Append("01");
-                break;
-            default:
-                throw new NotImplementedException();
-        }
-        retval = CollatzMath.ToBigIntegerFromBinaryLittleEndianString(sb.ToString());
         return retval;
     }
     private static bool IsPatternMatch(string littleEndianBinaryText, int minBits, string prefix, string repeat, string suffix)
