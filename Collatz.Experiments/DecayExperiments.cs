@@ -271,16 +271,16 @@ internal static class DecayExperiments
     {
         int decayInTarget = 3;
         List<(BigInteger DecayInTarget, BigInteger FirstDecay, uint _PowTwo)> decayInN_FirstDecayPairList = GetDecayInN_FirstDecayPair(decayInTarget, 300, 300000000);
-        StringBuilder sb = new(), bigEndSb = new();
-        sb.AppendLine("N,N % 3,FirstDecay,Power of 2,BigEndian N,BigEndian Core");
+        StringBuilder sb = new(), littleEndSb = new();
+        sb.AppendLine("N,N % 3,FirstDecay,Power of 2,LittleEndian N,LittleEndian Core");
         foreach ((BigInteger DecayInTarget, BigInteger FirstDecay, uint _PowTwo) tuple in decayInN_FirstDecayPairList)
         {
-            bigEndSb.Clear();
-            bigEndSb.Append(CollatzMath.ToBinaryLittleEndianString(tuple.DecayInTarget));
-            string bigEndTxt = bigEndSb.ToString();
-            string bigEndCore = Strip_10_000111_BigEnd(bigEndSb.ToString());
+            littleEndSb.Clear();
+            littleEndSb.Append(CollatzMath.ToBinaryLittleEndianString(tuple.DecayInTarget));
+            string littleEndTxt = littleEndSb.ToString();
+            string littleEndCore = Strip_10_000111_LittleEnd(littleEndSb.ToString());
             sb.AppendLine(tuple.DecayInTarget.ToString(CultureInfo.InvariantCulture) + ',' + (tuple.DecayInTarget % 3).ToString(CultureInfo.InvariantCulture) + ',' +
-                tuple.FirstDecay.ToString(CultureInfo.InvariantCulture) + ',' + tuple._PowTwo.ToString(CultureInfo.InvariantCulture) + ',' + bigEndTxt + ',' + bigEndCore);
+                tuple.FirstDecay.ToString(CultureInfo.InvariantCulture) + ',' + tuple._PowTwo.ToString(CultureInfo.InvariantCulture) + ',' + littleEndTxt + ',' + littleEndCore);
         }
         Emit("decay-in-n-first-decay-pairs", sb.ToString());
         Emit("decay-in-n-formula-check", CheckFormula(decayInN_FirstDecayPairList));
@@ -448,7 +448,7 @@ internal static class DecayExperiments
         return sb.ToString();
     }
 
-    private static string Strip_10_000111_BigEnd(string s)
+    private static string Strip_10_000111_LittleEnd(string s)
     {
         if (string.IsNullOrEmpty(s))
             return s;

@@ -245,8 +245,8 @@ public static class CollatzMath
     public static BigInteger ToBigIntegerFromBinaryLittleEndianString(string s); // reads lsb first
     public static BigInteger ToBigIntegerFromBinaryBigEndianString(string s);    // reads msb first
 
-    // yields lsb-first digits, so this name is still inverted - see § Pitfalls
-    public static IEnumerable<string> GetBinaryBigEndianDecaysInOne();  // endless
+    // 1, 101, 10101, ... - all palindromes, so this one asserts no digit order
+    public static IEnumerable<string> GetDecayInOneBitPatterns();  // endless
 
     public static UInt64 OddStepCountToOne(BigInteger n);      // n > 0
     public static UInt64 OddStepCountToSmaller(BigInteger n);  // n > 0
@@ -333,15 +333,6 @@ for `StepsToOne` other than one.
   the bit-pattern implementation covers all 90. That gap is halheinrich/Math#2,
   and the test asserts the model the gap contradicts. Weakening the assertion to
   make the suite green destroys the finding. Fix the model, or leave it red.
-- **`GetBinaryBigEndianDecaysInOne` is the last inverted endian name.** It
-  yields least-significant-first digits, which is what
-  `ToBigIntegerFromBinaryLittleEndianString` reads. halheinrich/Math#25 flipped
-  the six conversion methods and stopped there, because renaming this one is a
-  seventh public change and a separate decision; its remark says so at the point
-  of use. Local and private names elsewhere — `BigEndAnchor`, `seedBinaryBE`,
-  `Strip_10_000111_BigEnd`, `binaryBE`, `TestDecayInOneViaBinaryBigendianText`
-  and its DecayInThree sibling — carry the same inverted label and were left with
-  it.
 - **Two of three `NthMember` implementations are broken**
   (halheinrich/Math#24). `CollatzDecayFormula.NthMember` returns zero for every
   `n`. `CollatzDecayFormulaBitManipulation.NthMember` drops the leading `1` of

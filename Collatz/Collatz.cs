@@ -439,13 +439,20 @@ public static class CollatzMath
     /// previous one with <c>01</c> appended.
     /// </summary>
     /// <remarks>
-    /// The sequence never ends; callers must bound their own enumeration. The digits are
-    /// least-significant-first, so <c>BigEndian</c> in this name is inverted in exactly the way
-    /// halheinrich/Math#25 corrected across the six conversion methods - the elements it yields
-    /// are read by <see cref="ToBigIntegerFromBinaryLittleEndianString"/>. Renaming it is a
-    /// seventh public change and was left for a separate decision.
+    /// The sequence never ends; callers must bound their own enumeration.
+    /// <para>
+    /// This was called <c>GetBinaryBigEndianDecaysInOne</c>, and the endianness half of that name
+    /// was dropped rather than flipped, because <em>every element it yields is a palindrome</em>.
+    /// The sequence is 1, 101, 10101, 1010101 and on, which is self-reverse by construction, so
+    /// both readers return the same value for every element and nothing this method emits could
+    /// falsify a claim about digit order either way. The name was not inverted; it was
+    /// undetermined, and a name that asserts a convention its outputs cannot exhibit invites a
+    /// caller to infer a guarantee that is not there. What the elements are is not in doubt: the
+    /// nth is <see cref="CollapseInOne"/>(n + 1), the odd integers reaching one in a single odd
+    /// step. That is what the name says now.
+    /// </para>
     /// </remarks>
-    public static IEnumerable<string> GetBinaryBigEndianDecaysInOne()
+    public static IEnumerable<string> GetDecayInOneBitPatterns()
     {
         StringBuilder sb = new StringBuilder("1");
         while (true)
@@ -1065,29 +1072,29 @@ public class CollatzDecayFormulaBitManipulation : ICollatzDecayFormula
         retval = CollatzMath.ToBigIntegerFromBinaryLittleEndianString(sb.ToString());
         return retval;
     }
-    private static bool IsPatternMatch(string binaryBE, int minBits, string prefix, string repeat, string suffix)
+    private static bool IsPatternMatch(string littleEndianBinaryText, int minBits, string prefix, string repeat, string suffix)
     {
-        if (binaryBE.Length < minBits || binaryBE.Length < prefix.Length + suffix.Length)
+        if (littleEndianBinaryText.Length < minBits || littleEndianBinaryText.Length < prefix.Length + suffix.Length)
             return false;
         for (int i = 0; i < prefix.Length; i++)
         {
-            if (prefix[i] != binaryBE[i])
+            if (prefix[i] != littleEndianBinaryText[i])
                 return false;
         }
-        int suffixStartIndex = binaryBE.Length - suffix.Length;
+        int suffixStartIndex = littleEndianBinaryText.Length - suffix.Length;
         for (int i = 0; i < suffix.Length; i++)
         {
-            if (suffix[i] != binaryBE[suffixStartIndex + i])
+            if (suffix[i] != littleEndianBinaryText[suffixStartIndex + i])
                 return false;
         }
-        if ((binaryBE.Length - prefix.Length - suffix.Length) % repeat.Length != 0)
+        if ((littleEndianBinaryText.Length - prefix.Length - suffix.Length) % repeat.Length != 0)
             return false;
-        int baseIndex = binaryBE.Length - suffix.Length - repeat.Length;
+        int baseIndex = littleEndianBinaryText.Length - suffix.Length - repeat.Length;
         while (baseIndex > prefix.Length - 1)
         {
             for (int i = repeat.Length - 1; i >= 0; i--)
             {
-                if (repeat[i] != binaryBE[baseIndex + i])
+                if (repeat[i] != littleEndianBinaryText[baseIndex + i])
                     return false;
             }
             baseIndex -= repeat.Length;

@@ -711,7 +711,7 @@ public class CollatzUnitTests
     public void TestBinaryStringDigitOrder()
     {
         // halheinrich/Math#26 hoisted this out of the commented-out
-        // TestDecayInThreeViaBinaryBigendianText, where the same two lines sat twice, verbatim,
+        // TestDecayInThreeViaBinaryLittleEndianText, where the same two lines sat twice, verbatim,
         // under headings ("85 echo", "5461 echo") that had nothing to do with what they assert.
         // They belong on their own because of what they pin: 191 is 10111111 read
         // most-significant-first, and 11111101 read the other way. Until halheinrich/Math#25 the
@@ -936,7 +936,7 @@ public class CollatzUnitTests
         return exponent;
     }
     [Fact]
-    public void TestDecayInOneViaBinaryBigendianText()
+    public void TestDecayInOneViaBinaryText()
     {
         int trials = 100;
         bool[] isCase = new bool[8];
@@ -944,13 +944,13 @@ public class CollatzUnitTests
             for (int j = 0; j < isCase.Length; j++)
                 isCase[j] = false;
             StringBuilder sb = new StringBuilder("1");
-            string seedBinaryBE;
+            string seedBits;
             BigInteger seed, pow4 = 1, pow4sum = 1;
             int mod3 = 1;
             for (int i = 0; i < trials; i++)
             {
-                seedBinaryBE = sb.ToString();
-                seed = CollatzMath.ToBigIntegerFromBinaryLittleEndianString(seedBinaryBE);
+                seedBits = sb.ToString();
+                seed = CollatzMath.ToBigIntegerFromBinaryLittleEndianString(seedBits);
                 Assert.True(seed == pow4sum);
                 Assert.True(CollatzMath.NextOdd(seed) == 1);
                 Assert.True(seed % 3 == mod3);
@@ -963,49 +963,49 @@ public class CollatzUnitTests
                 {
                     case 0:
                         Assert.True(seed == 1);
-                        Assert.Equal("1", seedBinaryBE);
+                        Assert.Equal("1", seedBits);
                         Assert.False(isCase[i]);
                         isCase[i] = true;
                         break;
                     case 1:
                         Assert.True(seed == 5);
-                        Assert.Equal("101", seedBinaryBE);
+                        Assert.Equal("101", seedBits);
                         Assert.False(isCase[i]);
                         isCase[i] = true;
                         break;
                     case 2:
                         Assert.True(seed == 21);
-                        Assert.Equal("10101", seedBinaryBE);
+                        Assert.Equal("10101", seedBits);
                         Assert.False(isCase[i]);
                         isCase[i] = true;
                         break;
                     case 3:
                         Assert.True(seed == 85);
-                        Assert.Equal("1010101", seedBinaryBE);
+                        Assert.Equal("1010101", seedBits);
                         Assert.False(isCase[i]);
                         isCase[i] = true;
                         break;
                     case 4:
                         Assert.True(seed == 341);
-                        Assert.Equal("101010101", seedBinaryBE);
+                        Assert.Equal("101010101", seedBits);
                         Assert.False(isCase[i]);
                         isCase[i] = true;
                         break;
                     case 5:
                         Assert.True(seed == 1365);
-                        Assert.Equal("10101010101", seedBinaryBE);
+                        Assert.Equal("10101010101", seedBits);
                         Assert.False(isCase[i]);
                         isCase[i] = true;
                         break;
                     case 6:
                         Assert.True(seed == 5461);
-                        Assert.Equal("1010101010101", seedBinaryBE);
+                        Assert.Equal("1010101010101", seedBits);
                         Assert.False(isCase[i]);
                         isCase[i] = true;
                         break;
                     case 7:
                         Assert.True(seed == 21845);
-                        Assert.Equal("101010101010101", seedBinaryBE);
+                        Assert.Equal("101010101010101", seedBits);
                         Assert.False(isCase[i]);
                         isCase[i] = true;
                         break;
@@ -1021,9 +1021,9 @@ public class CollatzUnitTests
                 isCase[j] = false;
             BigInteger seed, pow4 = 1, pow4sum = 1;
             int mod3 = 1, i = 0;
-            foreach (string seedBinaryBE in CollatzMath.GetBinaryBigEndianDecaysInOne().Take(100))
+            foreach (string seedBits in CollatzMath.GetDecayInOneBitPatterns().Take(100))
             {
-                seed = CollatzMath.ToBigIntegerFromBinaryLittleEndianString(seedBinaryBE);
+                seed = CollatzMath.ToBigIntegerFromBinaryLittleEndianString(seedBits);
                 Assert.True(seed == pow4sum);
                 Assert.True(CollatzMath.NextOdd(seed) == 1);
                 Assert.True(seed % 3 == mod3);
@@ -1035,49 +1035,49 @@ public class CollatzUnitTests
                 {
                     case 0:
                         Assert.True(seed == 1);
-                        Assert.Equal("1", seedBinaryBE);
+                        Assert.Equal("1", seedBits);
                         Assert.False(isCase[i]);
                         isCase[i] = true;
                         break;
                     case 1:
                         Assert.True(seed == 5);
-                        Assert.Equal("101", seedBinaryBE);
+                        Assert.Equal("101", seedBits);
                         Assert.False(isCase[i]);
                         isCase[i] = true;
                         break;
                     case 2:
                         Assert.True(seed == 21);
-                        Assert.Equal("10101", seedBinaryBE);
+                        Assert.Equal("10101", seedBits);
                         Assert.False(isCase[i]);
                         isCase[i] = true;
                         break;
                     case 3:
                         Assert.True(seed == 85);
-                        Assert.Equal("1010101", seedBinaryBE);
+                        Assert.Equal("1010101", seedBits);
                         Assert.False(isCase[i]);
                         isCase[i] = true;
                         break;
                     case 4:
                         Assert.True(seed == 341);
-                        Assert.Equal("101010101", seedBinaryBE);
+                        Assert.Equal("101010101", seedBits);
                         Assert.False(isCase[i]);
                         isCase[i] = true;
                         break;
                     case 5:
                         Assert.True(seed == 1365);
-                        Assert.Equal("10101010101", seedBinaryBE);
+                        Assert.Equal("10101010101", seedBits);
                         Assert.False(isCase[i]);
                         isCase[i] = true;
                         break;
                     case 6:
                         Assert.True(seed == 5461);
-                        Assert.Equal("1010101010101", seedBinaryBE);
+                        Assert.Equal("1010101010101", seedBits);
                         Assert.False(isCase[i]);
                         isCase[i] = true;
                         break;
                     case 7:
                         Assert.True(seed == 21845);
-                        Assert.Equal("101010101010101", seedBinaryBE);
+                        Assert.Equal("101010101010101", seedBits);
                         Assert.False(isCase[i]);
                         isCase[i] = true;
                         break;
@@ -1175,7 +1175,7 @@ public class CollatzUnitTests
     // source that really does decay in two steps - CollapseInTwoModOne and CollapseInTwoModTwo
     // are one - and writing that test is a new claim rather than a restored one.
     [Fact]
-    public void TestDecayInThreeViaBinaryBigendianText()
+    public void TestDecayInThreeViaBinaryLittleEndianText()
     {
         // halheinrich/Math#26 restored this too, and for the same reason: every assertion in it
         // has an answer known in advance. Two kinds of claim are made. The literal conversions
@@ -1185,18 +1185,19 @@ public class CollatzUnitTests
         // reaches one in exactly three odd steps through the same decayIn1.
         // What did not come back: an unterminated "#region One by each" - it has no #endregion,
         // so this method could not have compiled in the state it was left in - and a tail that
-        // built a CSV from CollatzMath.GetBinaryBigEndianDecaysInThree(), an enumerator that has
-        // never existed, then dropped it and asserted Assert.True(true).
+        // built a CSV from CollatzMath.GetBinaryBigEndianDecaysInThree() - written under that
+        // name, as the depth-three sibling of what is now GetDecayInOneBitPatterns, and an
+        // enumerator that has never existed - then dropped it and asserted Assert.True(true).
         int trials = 100;
-        string echoPrefix = "10", targetDecayInThreeBigEnd;
-        StringBuilder BigEndAnchor, BigEndEcho = new();
+        string echoPrefix = "10", targetDecayInThreeLittleEnd;
+        StringBuilder LittleEndAnchor, LittleEndEcho = new();
         BigInteger decayIn1, decayIn2, decayIn3, targetDecayIn1;
         int trialParity;
         // 5 anchor
         targetDecayIn1 = 5;
-        targetDecayInThreeBigEnd = "10001";
-        trialParity = targetDecayInThreeBigEnd[1] == '0' ? 0 : 1;
-        Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString(targetDecayInThreeBigEnd) == 17);
+        targetDecayInThreeLittleEnd = "10001";
+        trialParity = targetDecayInThreeLittleEnd[1] == '0' ? 0 : 1;
+        Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString(targetDecayInThreeLittleEnd) == 17);
         Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString("110001") == 35);
         Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString("10001110001") == 1137);
         Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString("110001110001") == 2275);
@@ -1208,26 +1209,26 @@ public class CollatzUnitTests
         Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString("110001110001110001110001110001") == 596523235);
         Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString("10001110001110001110001110001110001") == 19088743537);
         Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString("110001110001110001110001110001110001") == 38177487075);
-        BigEndAnchor = new(targetDecayInThreeBigEnd);
+        LittleEndAnchor = new(targetDecayInThreeLittleEnd);
         for (int i = 0; i < trials; i++)
         {
-            decayIn3 = CollatzMath.ToBigIntegerFromBinaryLittleEndianString(BigEndAnchor.ToString());
+            decayIn3 = CollatzMath.ToBigIntegerFromBinaryLittleEndianString(LittleEndAnchor.ToString());
             decayIn2 = CollatzMath.NextOdd(decayIn3);
             decayIn1 = CollatzMath.NextOdd(decayIn2);
             Assert.True(CollatzMath.NextOdd(decayIn1) == 1);
             Assert.True(decayIn1 == targetDecayIn1);
-            BigEndEcho.Clear().Append(BigEndAnchor);
+            LittleEndEcho.Clear().Append(LittleEndAnchor);
             for (int j = 0; j < trials; j++)
             {
-                BigEndEcho.Insert(0, echoPrefix);
-                decayIn3 = CollatzMath.ToBigIntegerFromBinaryLittleEndianString(BigEndEcho.ToString());
+                LittleEndEcho.Insert(0, echoPrefix);
+                decayIn3 = CollatzMath.ToBigIntegerFromBinaryLittleEndianString(LittleEndEcho.ToString());
                 decayIn2 = CollatzMath.NextOdd(decayIn3);
                 decayIn1 = CollatzMath.NextOdd(decayIn2);
                 Assert.True(CollatzMath.NextOdd(decayIn1) == 1);
                 Assert.True(decayIn1 == targetDecayIn1);
             }
             string insertTxt = (i & 1) == trialParity ? "1" : "00011";
-            BigEndAnchor.Insert(1, insertTxt);
+            LittleEndAnchor.Insert(1, insertTxt);
         }
         // 5 echo
         Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString("1010001") == 69);
@@ -1245,31 +1246,31 @@ public class CollatzUnitTests
 
         // 85 anchor
         targetDecayIn1 = 85;
-        targetDecayInThreeBigEnd = "1101001";
-        trialParity = targetDecayInThreeBigEnd[1] == '0' ? 0 : 1;
-        Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString(targetDecayInThreeBigEnd) == 75);
+        targetDecayInThreeLittleEnd = "1101001";
+        trialParity = targetDecayInThreeLittleEnd[1] == '0' ? 0 : 1;
+        Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString(targetDecayInThreeLittleEnd) == 75);
         Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString("100011101001") == 2417);
         Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString("1100011101001") == 4835);
-        BigEndAnchor = new(targetDecayInThreeBigEnd);
+        LittleEndAnchor = new(targetDecayInThreeLittleEnd);
         for (int i = 0; i < trials; i++)
         {
-            decayIn3 = CollatzMath.ToBigIntegerFromBinaryLittleEndianString(BigEndAnchor.ToString());
+            decayIn3 = CollatzMath.ToBigIntegerFromBinaryLittleEndianString(LittleEndAnchor.ToString());
             decayIn2 = CollatzMath.NextOdd(decayIn3);
             decayIn1 = CollatzMath.NextOdd(decayIn2);
             Assert.True(CollatzMath.NextOdd(decayIn1) == 1);
             Assert.True(decayIn1 == targetDecayIn1);
-            BigEndEcho.Clear().Append(BigEndAnchor);
+            LittleEndEcho.Clear().Append(LittleEndAnchor);
             for (int j = 0; j < trials; j++)
             {
-                BigEndEcho.Insert(0, echoPrefix);
-                decayIn3 = CollatzMath.ToBigIntegerFromBinaryLittleEndianString(BigEndEcho.ToString());
+                LittleEndEcho.Insert(0, echoPrefix);
+                decayIn3 = CollatzMath.ToBigIntegerFromBinaryLittleEndianString(LittleEndEcho.ToString());
                 decayIn2 = CollatzMath.NextOdd(decayIn3);
                 decayIn1 = CollatzMath.NextOdd(decayIn2);
                 Assert.True(CollatzMath.NextOdd(decayIn1) == 1);
                 Assert.True(decayIn1 == targetDecayIn1);
             }
             string insertTxt = (i & 1) == trialParity ? "1" : "00011";
-            BigEndAnchor.Insert(1, insertTxt);
+            LittleEndAnchor.Insert(1, insertTxt);
         }
 
         // 85 echo
@@ -1280,9 +1281,9 @@ public class CollatzUnitTests
 
         // 341 anchor
         targetDecayIn1 = 341;
-        targetDecayInThreeBigEnd = "11101001";
-        trialParity = targetDecayInThreeBigEnd[1] == '0' ? 0 : 1;
-        Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString(targetDecayInThreeBigEnd) == 151);
+        targetDecayInThreeLittleEnd = "11101001";
+        trialParity = targetDecayInThreeLittleEnd[1] == '0' ? 0 : 1;
+        Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString(targetDecayInThreeLittleEnd) == 151);
         Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString("1000111101001") == 4849);
         Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString("11000111101001") == 9699);
         Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString("1000111000111101001") == 310385);
@@ -1291,26 +1292,26 @@ public class CollatzUnitTests
         Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString("11000111000111000111101001") == 39729379);
         Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString("1000111000111000111000111101001") == 1271340145);
         Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString("11000111000111000111000111101001") == 2542680291);
-        BigEndAnchor = new(targetDecayInThreeBigEnd);
+        LittleEndAnchor = new(targetDecayInThreeLittleEnd);
         for (int i = 0; i < trials; i++)
         {
-            decayIn3 = CollatzMath.ToBigIntegerFromBinaryLittleEndianString(BigEndAnchor.ToString());
+            decayIn3 = CollatzMath.ToBigIntegerFromBinaryLittleEndianString(LittleEndAnchor.ToString());
             decayIn2 = CollatzMath.NextOdd(decayIn3);
             decayIn1 = CollatzMath.NextOdd(decayIn2);
             Assert.True(CollatzMath.NextOdd(decayIn1) == 1);
             Assert.True(decayIn1 == targetDecayIn1);
-            BigEndEcho.Clear().Append(BigEndAnchor);
+            LittleEndEcho.Clear().Append(LittleEndAnchor);
             for (int j = 0; j < trials; j++)
             {
-                BigEndEcho.Insert(0, echoPrefix);
-                decayIn3 = CollatzMath.ToBigIntegerFromBinaryLittleEndianString(BigEndEcho.ToString());
+                LittleEndEcho.Insert(0, echoPrefix);
+                decayIn3 = CollatzMath.ToBigIntegerFromBinaryLittleEndianString(LittleEndEcho.ToString());
                 decayIn2 = CollatzMath.NextOdd(decayIn3);
                 decayIn1 = CollatzMath.NextOdd(decayIn2);
                 Assert.True(CollatzMath.NextOdd(decayIn1) == 1);
                 Assert.True(decayIn1 == targetDecayIn1);
             }
             string insertTxt = (i & 1) == trialParity ? "1" : "00011";
-            BigEndAnchor.Insert(1, insertTxt);
+            LittleEndAnchor.Insert(1, insertTxt);
         }
 
         // 341 echo
@@ -1329,9 +1330,9 @@ public class CollatzUnitTests
 
         // 5461 anchor
         targetDecayIn1 = 5461;
-        targetDecayInThreeBigEnd = "1000110111101001";
-        trialParity = targetDecayInThreeBigEnd[1] == '0' ? 0 : 1;
-        Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString(targetDecayInThreeBigEnd) == 38833);
+        targetDecayInThreeLittleEnd = "1000110111101001";
+        trialParity = targetDecayInThreeLittleEnd[1] == '0' ? 0 : 1;
+        Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString(targetDecayInThreeLittleEnd) == 38833);
         Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString("11000110111101001") == 77667);
         Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString("1000111000110111101001") == 2485361);
         Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString("11000111000110111101001") == 4970723);
@@ -1339,26 +1340,26 @@ public class CollatzUnitTests
         Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString("11000111000111000111101001") == 39729379);
         Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString("1000111000111000111000111101001") == 1271340145);
         Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString("11000111000111000111000111101001") == 2542680291);
-        BigEndAnchor = new(targetDecayInThreeBigEnd);
+        LittleEndAnchor = new(targetDecayInThreeLittleEnd);
         for (int i = 0; i < trials; i++)
         {
-            decayIn3 = CollatzMath.ToBigIntegerFromBinaryLittleEndianString(BigEndAnchor.ToString());
+            decayIn3 = CollatzMath.ToBigIntegerFromBinaryLittleEndianString(LittleEndAnchor.ToString());
             decayIn2 = CollatzMath.NextOdd(decayIn3);
             decayIn1 = CollatzMath.NextOdd(decayIn2);
             Assert.True(CollatzMath.NextOdd(decayIn1) == 1);
             Assert.True(decayIn1 == targetDecayIn1);
-            BigEndEcho.Clear().Append(BigEndAnchor);
+            LittleEndEcho.Clear().Append(LittleEndAnchor);
             for (int j = 0; j < trials; j++)
             {
-                BigEndEcho.Insert(0, echoPrefix);
-                decayIn3 = CollatzMath.ToBigIntegerFromBinaryLittleEndianString(BigEndEcho.ToString());
+                LittleEndEcho.Insert(0, echoPrefix);
+                decayIn3 = CollatzMath.ToBigIntegerFromBinaryLittleEndianString(LittleEndEcho.ToString());
                 decayIn2 = CollatzMath.NextOdd(decayIn3);
                 decayIn1 = CollatzMath.NextOdd(decayIn2);
                 Assert.True(CollatzMath.NextOdd(decayIn1) == 1);
                 Assert.True(decayIn1 == targetDecayIn1);
             }
             string insertTxt = (i & 1) == trialParity ? "1" : "00011";
-            BigEndAnchor.Insert(1, insertTxt);
+            LittleEndAnchor.Insert(1, insertTxt);
         }
         // 5461 echo
         Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString("101000110111101001") == 155333);
@@ -1368,32 +1369,32 @@ public class CollatzUnitTests
 
         // 21845 anchor
         targetDecayIn1 = 21845;
-        targetDecayInThreeBigEnd = "100110111101001";
-        trialParity = targetDecayInThreeBigEnd[1] == '0' ? 0 : 1;
-        Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString(targetDecayInThreeBigEnd) == 19417);
+        targetDecayInThreeLittleEnd = "100110111101001";
+        trialParity = targetDecayInThreeLittleEnd[1] == '0' ? 0 : 1;
+        Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString(targetDecayInThreeLittleEnd) == 19417);
         Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString("1100110111101001") == 38835);
         Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString("100011100110111101001") == 1242737);
         Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString("1100011100110111101001") == 2485475);
-        BigEndAnchor = new(targetDecayInThreeBigEnd);
+        LittleEndAnchor = new(targetDecayInThreeLittleEnd);
         for (int i = 0; i < trials; i++)
         {
-            decayIn3 = CollatzMath.ToBigIntegerFromBinaryLittleEndianString(BigEndAnchor.ToString());
+            decayIn3 = CollatzMath.ToBigIntegerFromBinaryLittleEndianString(LittleEndAnchor.ToString());
             decayIn2 = CollatzMath.NextOdd(decayIn3);
             decayIn1 = CollatzMath.NextOdd(decayIn2);
             Assert.True(CollatzMath.NextOdd(decayIn1) == 1);
             Assert.True(decayIn1 == targetDecayIn1);
-            BigEndEcho.Clear().Append(BigEndAnchor);
+            LittleEndEcho.Clear().Append(LittleEndAnchor);
             for (int j = 0; j < trials; j++)
             {
-                BigEndEcho.Insert(0, echoPrefix);
-                decayIn3 = CollatzMath.ToBigIntegerFromBinaryLittleEndianString(BigEndEcho.ToString());
+                LittleEndEcho.Insert(0, echoPrefix);
+                decayIn3 = CollatzMath.ToBigIntegerFromBinaryLittleEndianString(LittleEndEcho.ToString());
                 decayIn2 = CollatzMath.NextOdd(decayIn3);
                 decayIn1 = CollatzMath.NextOdd(decayIn2);
                 Assert.True(CollatzMath.NextOdd(decayIn1) == 1);
                 Assert.True(decayIn1 == targetDecayIn1);
             }
             string insertTxt = (i & 1) == trialParity ? "1" : "00011";
-            BigEndAnchor.Insert(1, insertTxt);
+            LittleEndAnchor.Insert(1, insertTxt);
         }
         // 21845 echo
         Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString("10100110111101001") == 77669);
@@ -1415,9 +1416,9 @@ public class CollatzUnitTests
 
         // 349525 anchor
         targetDecayIn1 = 349525;
-        targetDecayInThreeBigEnd = "10000010110111101001";
-        trialParity = targetDecayInThreeBigEnd[1] == '0' ? 0 : 1;
-        Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString(targetDecayInThreeBigEnd) == 621377);
+        targetDecayInThreeLittleEnd = "10000010110111101001";
+        trialParity = targetDecayInThreeLittleEnd[1] == '0' ? 0 : 1;
+        Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString(targetDecayInThreeLittleEnd) == 621377);
         Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString("110000010110111101001") == 1242755);
         Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString("10001110000010110111101001") == 39768177);
         Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString("110001110000010110111101001") == 79536355);
@@ -1425,26 +1426,26 @@ public class CollatzUnitTests
         Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString("11000111000111000111101001") == 39729379);
         Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString("1000111000111000111000111101001") == 1271340145);
         Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString("11000111000111000111000111101001") == 2542680291);
-        BigEndAnchor = new(targetDecayInThreeBigEnd);
+        LittleEndAnchor = new(targetDecayInThreeLittleEnd);
         for (int i = 0; i < trials; i++)
         {
-            decayIn3 = CollatzMath.ToBigIntegerFromBinaryLittleEndianString(BigEndAnchor.ToString());
+            decayIn3 = CollatzMath.ToBigIntegerFromBinaryLittleEndianString(LittleEndAnchor.ToString());
             decayIn2 = CollatzMath.NextOdd(decayIn3);
             decayIn1 = CollatzMath.NextOdd(decayIn2);
             Assert.True(CollatzMath.NextOdd(decayIn1) == 1);
             Assert.True(decayIn1 == targetDecayIn1);
-            BigEndEcho.Clear().Append(BigEndAnchor);
+            LittleEndEcho.Clear().Append(LittleEndAnchor);
             for (int j = 0; j < trials; j++)
             {
-                BigEndEcho.Insert(0, echoPrefix);
-                decayIn3 = CollatzMath.ToBigIntegerFromBinaryLittleEndianString(BigEndEcho.ToString());
+                LittleEndEcho.Insert(0, echoPrefix);
+                decayIn3 = CollatzMath.ToBigIntegerFromBinaryLittleEndianString(LittleEndEcho.ToString());
                 decayIn2 = CollatzMath.NextOdd(decayIn3);
                 decayIn1 = CollatzMath.NextOdd(decayIn2);
                 Assert.True(CollatzMath.NextOdd(decayIn1) == 1);
                 Assert.True(decayIn1 == targetDecayIn1);
             }
             string insertTxt = (i & 1) == trialParity ? "1" : "00011";
-            BigEndAnchor.Insert(1, insertTxt);
+            LittleEndAnchor.Insert(1, insertTxt);
         }
         // 349525 echo
         Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString("1010000010110111101001") == 2485509);
@@ -1466,121 +1467,121 @@ public class CollatzUnitTests
 
         // 1398101 anchor
         targetDecayIn1 = 1398101;
-        targetDecayInThreeBigEnd = "10001000010110111101001";
-        trialParity = targetDecayInThreeBigEnd[1] == '0' ? 0 : 1;
-        Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString(targetDecayInThreeBigEnd) == 4971025);
-        BigEndAnchor = new(targetDecayInThreeBigEnd);
+        targetDecayInThreeLittleEnd = "10001000010110111101001";
+        trialParity = targetDecayInThreeLittleEnd[1] == '0' ? 0 : 1;
+        Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString(targetDecayInThreeLittleEnd) == 4971025);
+        LittleEndAnchor = new(targetDecayInThreeLittleEnd);
         for (int i = 0; i < trials; i++)
         {
-            decayIn3 = CollatzMath.ToBigIntegerFromBinaryLittleEndianString(BigEndAnchor.ToString());
+            decayIn3 = CollatzMath.ToBigIntegerFromBinaryLittleEndianString(LittleEndAnchor.ToString());
             decayIn2 = CollatzMath.NextOdd(decayIn3);
             decayIn1 = CollatzMath.NextOdd(decayIn2);
             Assert.True(CollatzMath.NextOdd(decayIn1) == 1);
             Assert.True(decayIn1 == targetDecayIn1);
-            BigEndEcho.Clear().Append(BigEndAnchor);
+            LittleEndEcho.Clear().Append(LittleEndAnchor);
             for (int j = 0; j < trials; j++)
             {
-                BigEndEcho.Insert(0, echoPrefix);
-                decayIn3 = CollatzMath.ToBigIntegerFromBinaryLittleEndianString(BigEndEcho.ToString());
+                LittleEndEcho.Insert(0, echoPrefix);
+                decayIn3 = CollatzMath.ToBigIntegerFromBinaryLittleEndianString(LittleEndEcho.ToString());
                 decayIn2 = CollatzMath.NextOdd(decayIn3);
                 decayIn1 = CollatzMath.NextOdd(decayIn2);
                 Assert.True(CollatzMath.NextOdd(decayIn1) == 1);
                 Assert.True(decayIn1 == targetDecayIn1);
             }
             string insertTxt = (i & 1) == trialParity ? "1" : "00011";
-            BigEndAnchor.Insert(1, insertTxt);
+            LittleEndAnchor.Insert(1, insertTxt);
         }
 
         // 22369621 anchor
         targetDecayIn1 = 22369621;
-        targetDecayInThreeBigEnd = "1101001000010110111101001";
-        trialParity = targetDecayInThreeBigEnd[1] == '0' ? 0 : 1;
-        Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString(targetDecayInThreeBigEnd) == 19884107);
-        BigEndAnchor = new(targetDecayInThreeBigEnd);
+        targetDecayInThreeLittleEnd = "1101001000010110111101001";
+        trialParity = targetDecayInThreeLittleEnd[1] == '0' ? 0 : 1;
+        Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString(targetDecayInThreeLittleEnd) == 19884107);
+        LittleEndAnchor = new(targetDecayInThreeLittleEnd);
         for (int i = 0; i < trials; i++)
         {
-            decayIn3 = CollatzMath.ToBigIntegerFromBinaryLittleEndianString(BigEndAnchor.ToString());
+            decayIn3 = CollatzMath.ToBigIntegerFromBinaryLittleEndianString(LittleEndAnchor.ToString());
             decayIn2 = CollatzMath.NextOdd(decayIn3);
             decayIn1 = CollatzMath.NextOdd(decayIn2);
             Assert.True(CollatzMath.NextOdd(decayIn1) == 1);
             Assert.True(decayIn1 == targetDecayIn1);
-            BigEndEcho.Clear().Append(BigEndAnchor);
+            LittleEndEcho.Clear().Append(LittleEndAnchor);
             for (int j = 0; j < trials; j++)
             {
-                BigEndEcho.Insert(0, echoPrefix);
-                decayIn3 = CollatzMath.ToBigIntegerFromBinaryLittleEndianString(BigEndEcho.ToString());
+                LittleEndEcho.Insert(0, echoPrefix);
+                decayIn3 = CollatzMath.ToBigIntegerFromBinaryLittleEndianString(LittleEndEcho.ToString());
                 decayIn2 = CollatzMath.NextOdd(decayIn3);
                 decayIn1 = CollatzMath.NextOdd(decayIn2);
                 Assert.True(CollatzMath.NextOdd(decayIn1) == 1);
                 Assert.True(decayIn1 == targetDecayIn1);
             }
             string insertTxt = (i & 1) == trialParity ? "1" : "00011";
-            BigEndAnchor.Insert(1, insertTxt);
+            LittleEndAnchor.Insert(1, insertTxt);
         }
 
         // 89478485 anchor
         targetDecayIn1 = 89478485;
-        targetDecayInThreeBigEnd = "11101001000010110111101001";
-        trialParity = targetDecayInThreeBigEnd[1] == '0' ? 0 : 1;
-        Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString(targetDecayInThreeBigEnd) == 39768215);
+        targetDecayInThreeLittleEnd = "11101001000010110111101001";
+        trialParity = targetDecayInThreeLittleEnd[1] == '0' ? 0 : 1;
+        Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString(targetDecayInThreeLittleEnd) == 39768215);
         Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString("1000111101001000010110111101001") == 1272582897);
         Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString("11000111101001000010110111101001") == 2545165795);
         Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString("100011000111101001000010110111101001") == 40722652721);
-        BigEndAnchor = new(targetDecayInThreeBigEnd);
+        LittleEndAnchor = new(targetDecayInThreeLittleEnd);
         for (int i = 0; i < trials; i++)
         {
-            string BigEndTxt = BigEndAnchor.ToString();
-            decayIn3 = CollatzMath.ToBigIntegerFromBinaryLittleEndianString(BigEndAnchor.ToString());
-            string LittleEndTxt = CollatzMath.ToBinaryBigEndianString(decayIn3);
-            Assert.True(CollatzMath.ToBigIntegerFromBinaryBigEndianString(LittleEndTxt) == decayIn3);
+            string LittleEndTxt = LittleEndAnchor.ToString();
+            decayIn3 = CollatzMath.ToBigIntegerFromBinaryLittleEndianString(LittleEndAnchor.ToString());
+            string BigEndTxt = CollatzMath.ToBinaryBigEndianString(decayIn3);
+            Assert.True(CollatzMath.ToBigIntegerFromBinaryBigEndianString(BigEndTxt) == decayIn3);
             decayIn2 = CollatzMath.NextOdd(decayIn3);
             decayIn1 = CollatzMath.NextOdd(decayIn2);
             Assert.True(CollatzMath.NextOdd(decayIn1) == 1);
             Assert.True(decayIn1 == targetDecayIn1);
-            BigEndEcho.Clear().Append(BigEndAnchor);
+            LittleEndEcho.Clear().Append(LittleEndAnchor);
             for (int j = 0; j < trials; j++)
             {
-                BigEndEcho.Insert(0, echoPrefix);
-                decayIn3 = CollatzMath.ToBigIntegerFromBinaryLittleEndianString(BigEndEcho.ToString());
+                LittleEndEcho.Insert(0, echoPrefix);
+                decayIn3 = CollatzMath.ToBigIntegerFromBinaryLittleEndianString(LittleEndEcho.ToString());
                 decayIn2 = CollatzMath.NextOdd(decayIn3);
                 decayIn1 = CollatzMath.NextOdd(decayIn2);
                 Assert.True(CollatzMath.NextOdd(decayIn1) == 1);
                 Assert.True(decayIn1 == targetDecayIn1);
             }
             string insertTxt = (i & 1) == trialParity ? "1" : "00011";
-            BigEndAnchor.Insert(1, insertTxt);
+            LittleEndAnchor.Insert(1, insertTxt);
         }
 
         // 1431655765 anchor
         targetDecayIn1 = 1431655765;
-        targetDecayInThreeBigEnd = "1000110111101001000010110111101001";
-        trialParity = targetDecayInThreeBigEnd[1] == '0' ? 0 : 1;
-        Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString(targetDecayInThreeBigEnd) == 10180663217);
+        targetDecayInThreeLittleEnd = "1000110111101001000010110111101001";
+        trialParity = targetDecayInThreeLittleEnd[1] == '0' ? 0 : 1;
+        Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString(targetDecayInThreeLittleEnd) == 10180663217);
         Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString("11000110111101001000010110111101001") == 20361326435);
         Assert.True(CollatzMath.ToBigIntegerFromBinaryLittleEndianString("1000111000110111101001000010110111101001") == 651562445937);
-        BigEndAnchor = new(targetDecayInThreeBigEnd);
+        LittleEndAnchor = new(targetDecayInThreeLittleEnd);
         for (int i = 0; i < trials; i++)
         {
-            string BigEndTxt = BigEndAnchor.ToString();
-            decayIn3 = CollatzMath.ToBigIntegerFromBinaryLittleEndianString(BigEndAnchor.ToString());
-            string LittleEndTxt = CollatzMath.ToBinaryBigEndianString(decayIn3);
-            Assert.True(CollatzMath.ToBigIntegerFromBinaryBigEndianString(LittleEndTxt) == decayIn3);
+            string LittleEndTxt = LittleEndAnchor.ToString();
+            decayIn3 = CollatzMath.ToBigIntegerFromBinaryLittleEndianString(LittleEndAnchor.ToString());
+            string BigEndTxt = CollatzMath.ToBinaryBigEndianString(decayIn3);
+            Assert.True(CollatzMath.ToBigIntegerFromBinaryBigEndianString(BigEndTxt) == decayIn3);
             decayIn2 = CollatzMath.NextOdd(decayIn3);
             decayIn1 = CollatzMath.NextOdd(decayIn2);
             Assert.True(CollatzMath.NextOdd(decayIn1) == 1);
             Assert.True(decayIn1 == targetDecayIn1);
-            BigEndEcho.Clear().Append(BigEndAnchor);
+            LittleEndEcho.Clear().Append(LittleEndAnchor);
             for (int j = 0; j < trials; j++)
             {
-                BigEndEcho.Insert(0, echoPrefix);
-                decayIn3 = CollatzMath.ToBigIntegerFromBinaryLittleEndianString(BigEndEcho.ToString());
+                LittleEndEcho.Insert(0, echoPrefix);
+                decayIn3 = CollatzMath.ToBigIntegerFromBinaryLittleEndianString(LittleEndEcho.ToString());
                 decayIn2 = CollatzMath.NextOdd(decayIn3);
                 decayIn1 = CollatzMath.NextOdd(decayIn2);
                 Assert.True(CollatzMath.NextOdd(decayIn1) == 1);
                 Assert.True(decayIn1 == targetDecayIn1);
             }
             string insertTxt = (i & 1) == trialParity ? "1" : "00011";
-            BigEndAnchor.Insert(1, insertTxt);
+            LittleEndAnchor.Insert(1, insertTxt);
         }
     }
     [Fact]
@@ -2079,9 +2080,9 @@ public class CollatzUnitTests
     }
     #endregion Fact Methods
     #region Helper Methods
-    private static void AssertDecayIn1(string _AnchorBigEnd)
+    private static void AssertDecayIn1(string _AnchorBits)
     {
-        BigInteger currOdd = CollatzMath.ToBigIntegerFromBinaryLittleEndianString(_AnchorBigEnd.ToString());
+        BigInteger currOdd = CollatzMath.ToBigIntegerFromBinaryLittleEndianString(_AnchorBits.ToString());
         Assert.True(CollatzMath.NextOdd(currOdd) == 1);
     }
     private static BigInteger fnDecayToOneInOne(int _N)
