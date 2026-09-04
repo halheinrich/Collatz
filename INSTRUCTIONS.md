@@ -111,13 +111,16 @@ elsewhere.
 The domain helpers, all `static`, all `BigInteger` but for the one `BigRational`
 noted in § Depends on. `NextOdd` is the odd step itself, and
 `OddStepCountToOne` and `OddStepCountToSmaller` count applications of it.
-`GenerateExponentPermutations` enumerates the exponent arrays the formulas are
-indexed by, materialised into a `List<int[]>` with an exactly computed capacity
-hint. `SolveForLoop` solves the rational `N` implied by a hypothetical cycle of
-odd steps and reports whether that `N` is a positive integer; it is the one
-member that reports invalid input through its return value rather than by
-throwing, because a caller sweeping exponent arrays wants a verdict per array
-rather than an exception per malformed one.
+`GenerateExponentTuplesWithMax` enumerates the exponent arrays the formulas are
+indexed by - those of a given length over `[1, maxExponent]` in which
+`maxExponent` actually appears, so tuples with repetition rather than
+permutations, and fewer than all tuples over that range - materialised into a
+`List<int[]>` with an exactly computed capacity hint. `SolveForLoop` solves the
+rational `N` implied by a hypothetical cycle of odd steps and reports whether
+that `N` is a positive integer; it is the one member that reports invalid input
+through its return value rather than by throwing, because a caller sweeping
+exponent arrays wants a verdict per array rather than an exception per malformed
+one.
 
 Neither step counter returns for an argument whose orbit never terminates. That
 is the Collatz conjecture, not a missing guard, and the distinction is worth
@@ -225,7 +228,8 @@ Namespace `HalHeinrich.Numerics.Collatz`.
 ```csharp
 public static class CollatzMath
 {
-    public static IReadOnlyList<int[]> GenerateExponentPermutations(int length, int order);
+    public static IReadOnlyList<int[]> GenerateExponentTuplesWithMax(int length,
+                                                                    int maxExponent);
     public static BigInteger NextOdd(BigInteger collatz);
 
     // inverses over the odd integers 3, 5, 7, ... and their zero-based positions
@@ -260,7 +264,7 @@ public static class CollatzMath
 }
 ```
 
-`GenerateExponentPermutations`, `IndexOfOdd`, `OddOfIndex`, both step counters,
+`GenerateExponentTuplesWithMax`, `IndexOfOdd`, `OddOfIndex`, both step counters,
 all five `Collapse` methods and `FloorLog2Ratio` throw
 `ArgumentOutOfRangeException` outside their domains.
 `CollapseInTwoModOne` and `CollapseInTwoModTwo` throw

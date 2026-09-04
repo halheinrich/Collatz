@@ -151,36 +151,40 @@ public class CollatzUnitTests
             Assert.True(isCollatzLoop && n == 1);
         }
 
-        // Length 2, order 2: expect {1,2},{2,1},{2,2}
-        IReadOnlyList<int[]> permsOrder2Len2List = CollatzMath.GenerateExponentPermutations(2, 2);
-        List<string> permsOrder2Len2 = permsOrder2Len2List
+        // Length 2, max 2: expect {1,2},{2,1},{2,2}. {2,2} repeats an entry, which is why
+        // halheinrich/Math#32 renamed the method off "Permutations" - these assertions always
+        // described tuples, so the rename left every one of them standing.
+        IReadOnlyList<int[]> tuplesMax2Len2List = CollatzMath.GenerateExponentTuplesWithMax(2, 2);
+        List<string> tuplesMax2Len2 = tuplesMax2Len2List
             .Select(a => string.Join(",", a))
             .OrderBy(s => s)
             .ToList();
         List<string> expected2 = new List<string> { "1,2", "2,1", "2,2" };
-        Assert.True(permsOrder2Len2.Count == expected2.Count);
-        foreach (string e in expected2) Assert.Contains(e, permsOrder2Len2);
+        Assert.True(tuplesMax2Len2.Count == expected2.Count);
+        foreach (string e in expected2) Assert.Contains(e, tuplesMax2Len2);
 
-        // Length 2, order 3: expect {1,3},{2,3},{3,1},{3,2},{3,3}
-        IReadOnlyList<int[]> permsOrder3Len2List = CollatzMath.GenerateExponentPermutations(2, 3);
-        List<string> permsOrder3Len2 = permsOrder3Len2List
+        // Length 2, max 3: expect {1,3},{2,3},{3,1},{3,2},{3,3}. The four tuples over [1,3] that
+        // never reach 3 - {1,1},{1,2},{2,1},{2,2} - are absent, which is the constraint the name
+        // now carries.
+        IReadOnlyList<int[]> tuplesMax3Len2List = CollatzMath.GenerateExponentTuplesWithMax(2, 3);
+        List<string> tuplesMax3Len2 = tuplesMax3Len2List
             .Select(a => string.Join(",", a))
             .OrderBy(s => s)
             .ToList();
         List<string> expected3 = new List<string> { "1,3", "2,3", "3,1", "3,2", "3,3" };
-        Assert.True(permsOrder3Len2.Count == expected3.Count);
-        foreach (string e in expected3) Assert.Contains(e, permsOrder3Len2);
+        Assert.True(tuplesMax3Len2.Count == expected3.Count);
+        foreach (string e in expected3) Assert.Contains(e, tuplesMax3Len2);
 
-        // Length 1, order k: only [k]
-        IReadOnlyList<int[]> single = CollatzMath.GenerateExponentPermutations(1, 5);
+        // Length 1, max k: only [k]
+        IReadOnlyList<int[]> single = CollatzMath.GenerateExponentTuplesWithMax(1, 5);
         Assert.Single(single);
         Assert.True(single[0][0] == 5);
 
-        // Sanity: count formula order^len - (order-1)^len
-        int len = 4, ord = 3;
-        IReadOnlyList<int[]> permsOrder3Len4List = CollatzMath.GenerateExponentPermutations(len, ord);
-        int all = permsOrder3Len4List.Count;
-        int expectedCount = (int)(BigInteger.Pow(ord, len) - BigInteger.Pow(ord - 1, len));
+        // Sanity: count formula maxExponent^len - (maxExponent-1)^len
+        int len = 4, max = 3;
+        IReadOnlyList<int[]> tuplesMax3Len4List = CollatzMath.GenerateExponentTuplesWithMax(len, max);
+        int all = tuplesMax3Len4List.Count;
+        int expectedCount = (int)(BigInteger.Pow(max, len) - BigInteger.Pow(max - 1, len));
         Assert.True(all == expectedCount);
 
         // Build one summary string per length (1..5)
@@ -193,15 +197,15 @@ public class CollatzUnitTests
             // derivation halheinrich/Math#5 removed, where a double decided pow2 and thence
             // addConst. § Exactness discipline bans floating point upstream of presentation, not
             // in it.
-            sbLen.AppendLine("Order,Permutation,N,IsLoop,Numerator,Denominator,Double");
-            for (int order = 1; order <= 5; order++)
+            sbLen.AppendLine("MaxExponent,Tuple,N,IsLoop,Numerator,Denominator,Double");
+            for (int maxExponent = 1; maxExponent <= 5; maxExponent++)
             {
-                foreach (int[] perm in CollatzMath.GenerateExponentPermutations(length, order))
+                foreach (int[] tuple in CollatzMath.GenerateExponentTuplesWithMax(length, maxExponent))
                 {
-                    bool isLoop = CollatzMath.SolveForLoop(perm, out n);
-                    sbLen.Append(order)
+                    bool isLoop = CollatzMath.SolveForLoop(tuple, out n);
+                    sbLen.Append(maxExponent)
                          .Append(",[")
-                         .Append(string.Join(' ', perm))
+                         .Append(string.Join(' ', tuple))
                          .Append("],")
                          .Append(n.ToString())
                          .Append(',')

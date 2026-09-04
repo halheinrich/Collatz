@@ -12,7 +12,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 namespace HalHeinrich.Numerics.Collatz;
 
 /// <summary>
-/// Static helpers for the Collatz decay experiments: exponent permutations, odd-step counting,
+/// Static helpers for the Collatz decay experiments: exponent tuples, odd-step counting,
 /// base-2 string conversions, and loop solving over <see cref="BigInteger"/>.
 /// </summary>
 public static class CollatzMath
@@ -38,25 +38,35 @@ public static class CollatzMath
     #region Public Methods
     /// <summary>
     /// Returns every <see cref="int"/> array of length <paramref name="length"/> whose entries lie in
-    /// [1, <paramref name="order"/>] and whose maximum entry is exactly <paramref name="order"/>.
+    /// [1, <paramref name="maxExponent"/>] and whose largest entry is exactly
+    /// <paramref name="maxExponent"/>, so the set returned has
+    /// <paramref name="maxExponent"/>^<paramref name="length"/>&#160;&#8722;&#160;(<paramref name="maxExponent"/>&#160;&#8722;&#160;1)^<paramref name="length"/>
+    /// members.
     /// </summary>
+    /// <remarks>
+    /// These are tuples drawn with repetition, not permutations: at length two over [1,&#160;3] the
+    /// result is {1,3}, {2,3}, {3,1}, {3,2} and {3,3}, and {3,3} repeats an entry no permutation
+    /// can. Nor is it every tuple over that range - {1,1}, {1,2}, {2,1} and {2,2} are absent,
+    /// because <paramref name="maxExponent"/> must actually appear. The old name asserted the
+    /// first of those and a name naming only the range would drop the second; see
+    /// halheinrich/Math#32.
+    /// </remarks>
     /// <param name="length">Array length; must be positive.</param>
-    /// <param name="order">Largest permitted entry, and the value that must appear at least once; must be positive.</param>
-    /// <exception cref="ArgumentOutOfRangeException"><paramref name="length"/> or <paramref name="order"/> is not positive.</exception>
-    public static IReadOnlyList<int[]> GenerateExponentPermutations(int length, int order)
+    /// <param name="maxExponent">Largest permitted entry, and the value that must appear at least once; must be positive.</param>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="length"/> or <paramref name="maxExponent"/> is not positive.</exception>
+    public static IReadOnlyList<int[]> GenerateExponentTuplesWithMax(int length, int maxExponent)
     {
-        // Returns a materialized list of all int[] of given length with values in [1,order]
-        // such that the maximum value present is exactly 'order'.
         // (Previously yielded an IEnumerable<int[]>; List<int[]> still supports LINQ usage.)
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(length);
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(order);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(maxExponent);
 
-        // Capacity hint: count = order^length - (order-1)^length, computed exactly and clamped
-        // to int. This is not a computational path - a capacity hint cannot change what the
-        // method returns - so the Math.Pow this replaces was not an exactness violation the way
-        // the log2ratio derivation in CollatzDecayFormulaRecursive was. It is exact anyway,
-        // because an apparent violation costs a reader's attention every time they meet it.
-        BigInteger count = BigInteger.Pow(order, length) - BigInteger.Pow(order - 1, length);
+        // Capacity hint: count = maxExponent^length - (maxExponent-1)^length, computed exactly
+        // and clamped to int. This is not a computational path - a capacity hint cannot change
+        // what the method returns - so the Math.Pow this replaces was not an exactness violation
+        // the way the log2ratio derivation in CollatzDecayFormulaRecursive was. It is exact
+        // anyway, because an apparent violation costs a reader's attention every time they meet
+        // it.
+        BigInteger count = BigInteger.Pow(maxExponent, length) - BigInteger.Pow(maxExponent - 1, length);
         int capacity = count > int.MaxValue ? int.MaxValue : (int)count;
         List<int[]> result = new List<int[]>(capacity);
 
@@ -71,18 +81,18 @@ public static class CollatzMath
                 return;
             }
 
-            // If max not yet used and this is the last slot, force it to be 'order'
+            // If max not yet used and this is the last slot, force it to be 'maxExponent'
             if (!hasMax && index == length - 1)
             {
-                current[index] = order;
+                current[index] = maxExponent;
                 Recurse(index + 1, true);
                 return;
             }
 
-            for (int v = 1; v <= order; v++)
+            for (int v = 1; v <= maxExponent; v++)
             {
                 current[index] = v;
-                Recurse(index + 1, hasMax || v == order);
+                Recurse(index + 1, hasMax || v == maxExponent);
             }
         }
 
