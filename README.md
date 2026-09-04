@@ -106,7 +106,7 @@ dotnet build
 dotnet test
 ```
 
-33 tests, one of them the deliberate failure described above. The suite builds
+37 tests, one of them the deliberate failure described above. The suite builds
 and runs identically in Debug and Release.
 
 ## Licence

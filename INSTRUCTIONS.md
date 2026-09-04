@@ -357,10 +357,6 @@ for `StepsToOne` other than one.
   (halheinrich/Math#28) — so in Release a derivation that fails its own
   consistency check proceeds silently. The XML remarks on those constructors
   still cite halheinrich/Math#6, which has closed; #28 is the live issue.
-- **Roughly a third of `CollatzUnitTests.cs` is commented-out code**
-  (halheinrich/Math#26), including three whole `[Fact]` bodies. Do not read a
-  commented block as a specification of anything, and do not restore one without
-  re-deriving what it claimed.
 - **`RestoreLockedMode` is dormant here.** `Directory.Build.props` gates it on
   `ContinuousIntegrationBuild`, and with no workflow in this repository nothing
   sets that, so a `packages.lock.json` out of step with a `.csproj` fails
@@ -377,7 +373,7 @@ for `StepsToOne` other than one.
 ## Subproject-internal next steps
 
 The open backlog for this member lives in the umbrella tracker rather than
-repeated here: halheinrich/Math#2, #24, #25, #26 and #28 are all
+repeated here: halheinrich/Math#2, #24, #25 and #28 are all
 subproject-internal, and § Pitfalls above says what each one costs a reader
 today.
 
