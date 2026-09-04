@@ -233,7 +233,6 @@ internal static class DecayExperiments
     {
         const uint seriesLength = 64;
         BigInteger pow2 = 1, pow2Max = 16384;
-        //List<List<(BigInteger Seed, BigInteger M3a1, int Mod2Power)>> SeedList = new();
         List<(BigInteger PowerOfTwo, BigInteger Constant)> LessThanSeedList = new();
         List<(BigInteger PowerOfTwo, BigInteger Constant)> SurvivorList = new();
         while (true)

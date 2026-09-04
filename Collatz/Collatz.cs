@@ -632,6 +632,12 @@ public static class CollatzMath
 /// <summary>
 /// A family of odd integers that reach one in a fixed number of odd Collatz steps.
 /// </summary>
+/// <remarks>
+/// An implementation is expected to override <see cref="object.ToString"/> with the definition
+/// it describes, so that a family prints as the recurrence, closed form or bit pattern it is.
+/// Nothing enforces that: <see cref="object.ToString"/> already satisfies any interface, so an
+/// implementation that omits it prints its type name and still compiles.
+/// </remarks>
 public interface ICollatzDecayFormula
 {
     /// <summary>The number of odd Collatz steps every member of this family takes to reach one.</summary>
@@ -640,7 +646,6 @@ public interface ICollatzDecayFormula
     public bool IsMember(BigInteger c);
     /// <summary>Returns the member at zero-based index <paramref name="n"/>.</summary>
     public BigInteger NthMember(int n);
-    // override string ToString();
 }
 /// <summary>
 /// An <see cref="ICollatzDecayFormula"/> whose members satisfy the recurrence
@@ -788,8 +793,6 @@ public class CollatzDecayFormulaRecursive : ICollatzDecayFormula
         // f(n) = 2^6 * f(n-1) + 49
         if (c < 1)
             return false;
-        //if (c == 113 && AdditiveConstant == 49)
-        //    Debug.Assert(true);
         BigInteger candidate = c;
         while (candidate.IsEven)
             candidate >>= 1;
