@@ -26,9 +26,15 @@ and live in `../VISION.md` and `Directory.Build.props`.
   one method wide**. `BigRational` reaches the public surface at
   `CollatzMath.SolveForLoop`'s `out` parameter and nowhere else, using `Zero`,
   `Create(BigInteger, BigInteger)`, `IsInteger`, and comparison against zero.
-  Arithmetic everywhere else in this repository is `BigInteger`. Whether that
-  makes this member a rational-arithmetic consumer at all is
-  halheinrich/Math#13, open and unruled.
+  Arithmetic everywhere else in this repository is `BigInteger`. That narrowness
+  is the settled shape of this member rather than a gap in it: the umbrella's
+  invariant is exactness with tracked error, and this member satisfies it with a
+  different instrument, because its objects are integers. Rational arithmetic is
+  what that invariant needs for *real constants*; it is not the mission
+  (halheinrich/Math#13). So the edge is expected to stay one method wide, and it
+  is correct rather than decorative — the `n` it solves for genuinely is a
+  rational, and the alternatives are floating point, which is banned, or a
+  hand-rolled fraction type, which would duplicate the substrate.
 
   By `ProjectReference`, per the umbrella's ruling on intra-umbrella edges, at
   `..\..\BigRationalLibrary\BigRationalLibrary\BigRationalLibrary.csproj`. That
@@ -378,8 +384,9 @@ correction cannot land on some of them and leave the rest to diverge
   emits coverage per bound and has no pass or fail. **Do not turn it back into
   an assertion that passes.** An assertion that no longer claims a partition
   would report coverage the recursion does not have, which is worse than the
-  red it replaced. The suite therefore has no deliberate failure; #2 stays open
-  on the model question, which no test result settles.
+  red it replaced. The suite therefore has no deliberate failure;
+  halheinrich/Math#2 stays open on the model question, which no test result
+  settles.
 - **`NthMember` is not on the shared contract, and index zero is not guaranteed
   to be a member.** halheinrich/Math#24 moved enumeration to
   `IIndexedCollatzDecayFormula`, which `CollatzDecayFormulaRecursive` and
