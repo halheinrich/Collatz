@@ -31,6 +31,73 @@
   </PropertyGroup>
 
   <!--
+    Every ProjectReference builds in the configuration its consumer was asked
+    for. halheinrich/Math#47.
+
+    This member is the odd one, and the property changes nothing observable
+    here today. Collatz.sln is the only solution in the umbrella that lists
+    ..\BigRationalLibrary\BigRationalLibrary\BigRationalLibrary.csproj, so the
+    producer has an entry in this member's solution map and the escaping
+    ProjectReference in Collatz.csproj already resolved to Release in a Release
+    build. That is why the defect was found in the other two members and never
+    in this one, and this comment should not be read as claiming it fixed
+    anything.
+
+    It is adopted for two reasons. The baseline is one thing in every member
+    rather than a property three repos carry and one omits. And it is what
+    makes dropping the producer from this member's solution safe: membership is
+    the only thing holding this edge right today, and the Conventions section
+    of the umbrella's VISION.md says a solution's membership must not be
+    load-bearing.
+
+    Where the default is wrong, and the citation. In
+    Microsoft.Common.CurrentVersion.targets on SDK 10.0.400, line 1584 defaults
+    ShouldUnsetParentConfigurationAndPlatform to true whenever
+    BuildingSolutionFile or BuildingInsideVisualStudio is set, and line 1609
+    hands it to the AssignProjectConfiguration task, whose job is then to
+    rewrite SetConfiguration on every reference absent from the solution map,
+    unsetting the parent's configuration so the referenced project falls back
+    to its own default, which is Debug. Line 1584's condition names
+    BuildingInsideVisualStudio as well, so the defect was never confined to
+    `dotnet build <solution>`: in the members that had it, Release builds
+    inside Visual Studio 2026 linked the Debug producer too.
+
+    How to re-establish that this holds, since the failure mode is silent and
+    a Release build that links a Debug producer reports 0 warnings and 0
+    errors. Build the producer in Release, hash the producer's own Release
+    output, hash the copy of it that landed in each of this member's
+    bin/Release outputs, and compare, recomputing both sides in the same run so
+    that neither is a remembered value. tools/check-release-linkage.sh in the
+    umbrella is what does that, and it inspects all three of this member's
+    output copies rather than stopping at the first. No producer hash is quoted
+    here on purpose (halheinrich/Math#49): the SDK embeds the producer's HEAD
+    sha in AssemblyInformationalVersion, so a hash identifies a commit rather
+    than a source state and goes stale at the producer's next commit, not at
+    its next source change.
+
+    Flagged rather than quietly relied on, on three counts. It overrides an
+    MSBuild default instead of working with it. The property is not part of the
+    documented public surface; it lives in the SDK's targets, which is where it
+    was read, so an SDK upgrade may change it with no error and a silently
+    wrong binary as the symptom. And it propagates Platform as well as
+    Configuration, which is harmless only while every member is AnyCPU-only.
+    The default exists so a solution configuration is not forced onto a project
+    that may not define it; every member here defines exactly Debug and Release
+    with no platform variation, so the condition it guards against does not
+    arise. If either premise changes, this is the decision to revisit.
+
+    Preferred over keeping the producer in this member's solution, which also
+    works and uses only supported solution semantics: it is what has been
+    working here. Membership puts a foreign project inside a member's solution,
+    it scales with dependency depth, it has to be re-established every time the
+    graph grows, and when incomplete it fails silently, restoring exactly this
+    defect with exactly this symptom.
+  -->
+  <PropertyGroup>
+    <ShouldUnsetParentConfigurationAndPlatform>false</ShouldUnsetParentConfigurationAndPlatform>
+  </PropertyGroup>
+
+  <!--
     Lock-file based version pinning. The lock file (packages.lock.json)
     captures exactly the resolved package versions and is committed to git,
     so any clone restores the same dependency graph. RestoreLockedMode fails
