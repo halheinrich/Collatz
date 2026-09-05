@@ -33,13 +33,49 @@
   <!--
     Lock-file based version pinning. The lock file (packages.lock.json)
     captures exactly the resolved package versions and is committed to git,
-    so any clone restores the same dependency graph. RestoreLockedMode
-    fails the build if the lock file is out of sync with the csproj — only
-    enabled in CI so local `dotnet add package` keeps working.
+    so any clone restores the same dependency graph. RestoreLockedMode fails
+    the restore if the lock file is out of sync with the csproj.
+
+    Unconditional, deliberately. This was gated on ContinuousIntegrationBuild,
+    under a comment reading "only enabled in CI so local `dotnet add package`
+    keeps working". No ref in this repository's history has ever contained a
+    .github directory or any .yml or .yaml file, so there was no CI for the
+    gate to be enabled in: the sentence named a tradeoff between local
+    convenience and a CI guarantee where only the convenience ever existed.
+    The gate was not dormant pending a workflow, it was never on anywhere,
+    and the comment implied otherwise. Nor does the SDK infer the property
+    from a CI environment: measured on 10.0.400 in two sibling members, it
+    evaluates empty even with CI and GITHUB_ACTIONS set.
+
+    A file whose promise depends on a switch set somewhere else cannot state
+    its own promise. Removing the condition makes the promise this file's
+    own, which is the reason to prefer it over waiting for a workflow.
+
+    What it buys here, stated precisely because it is less than it sounds.
+    The guarantee reaches the package class only: Collatz.Tests' four test
+    packages, coverlet.collector, Microsoft.NET.Test.Sdk, xunit and
+    xunit.runner.visualstudio. It does not reach the BigRational edge, which
+    this member takes by ProjectReference. A version arriving that way is
+    recorded as a constraint in the consuming project's dependencies map and
+    is not validated. Proven rather than inferred: RationalApproximation has
+    locked mode live in CI and ran green with a stale preview1 constraint
+    against a preview2 producer (halheinrich/Math#44). ContinuedFractions is
+    the inverse case; it consumes BigRational as a package, so there the
+    change does protect that edge.
+
+    Accepted cost: a deliberate package change now fails the restore with
+    NU1004 instead of quietly rewriting the lock. Recover with
+    `dotnet restore -p:RestoreForceEvaluate=true`, which is what the CLI's
+    force-evaluate switch sets, and commit the regenerated lock. One command,
+    once per intended change, on an artefact whose whole purpose is that it
+    does not change silently. (The switch is spelled here as a property
+    because an XML comment may not contain a double hyphen.) NuGet writes the
+    regenerated lock with CRLF while .gitattributes pins it to LF, so
+    `git status` then reports a change that `git diff` cannot show.
   -->
   <PropertyGroup>
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
-    <RestoreLockedMode Condition="'$(ContinuousIntegrationBuild)' == 'true'">true</RestoreLockedMode>
+    <RestoreLockedMode>true</RestoreLockedMode>
   </PropertyGroup>
 
 </Project>
