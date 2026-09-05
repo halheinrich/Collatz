@@ -43,21 +43,24 @@
     Every ProjectReference builds in the configuration its consumer was asked
     for. halheinrich/Math#47.
 
-    This member is the odd one, and the property changes nothing observable
-    here today. Collatz.sln is the only solution in the umbrella that lists
+    This member was the odd one, and when this property was adopted it
+    changed nothing observable here. Collatz.sln was then the only solution in
+    the umbrella that listed
     ..\BigRationalLibrary\BigRationalLibrary\BigRationalLibrary.csproj, so the
-    producer has an entry in this member's solution map and the escaping
-    ProjectReference in Collatz.csproj already resolved to Release in a Release
-    build. That is why the defect was found in the other two members and never
-    in this one, and this comment should not be read as claiming it fixed
-    anything.
+    producer had an entry in this member's solution map and the escaping
+    ProjectReference in Collatz/Collatz.csproj already resolved to Release in a
+    Release build. That is why the defect was found in the two members whose
+    solutions list only their own projects and never in this one.
 
-    It is adopted for two reasons. The baseline is one thing in every member
-    rather than a property three repos carry and one omits. And it is what
-    makes dropping the producer from this member's solution safe: membership is
-    the only thing holding this edge right today, and the Conventions section
+    It is load-bearing here now, and that is deliberate. Collatz.slnx lists
+    only this member's own three projects; the producer entry was dropped once
+    this property was in place to replace it, because the Conventions section
     of the umbrella's VISION.md says a solution's membership must not be
-    load-bearing.
+    load-bearing, and after this property a foreign project sitting in the
+    solution buys nothing. Measured rather than reasoned, with the entry
+    already gone: deleting this one line makes all three of this member's
+    bin/Release copies of BigRationalLibrary.dll the Debug build again, and
+    restoring it makes all three the Release build.
 
     Where the default is wrong, and the citation. In
     Microsoft.Common.CurrentVersion.targets on SDK 10.0.400, line 1584 defaults

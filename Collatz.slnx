@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="Collatz.Experiments/Collatz.Experiments.csproj" />
+  <Project Path="Collatz.Tests/Collatz.Tests.csproj" />
+  <Project Path="Collatz/Collatz.csproj" />
+</Solution>

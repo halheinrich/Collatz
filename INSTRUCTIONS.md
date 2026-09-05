@@ -14,7 +14,7 @@ and live in `../VISION.md` and `Directory.Build.props`.
 
 ## Solution
 
-`D:\Users\Hal\Documents\Visual Studio 2026\Projects\Math\Collatz\Collatz.sln`
+`D:\Users\Hal\Documents\Visual Studio 2026\Projects\Math\Collatz\Collatz.slnx`
 
 ## Repo
 
