@@ -1,13 +1,7 @@
-using HalHeinrich.Numerics;
 using System.Diagnostics;
 using System.Globalization;
-using System.Linq;
 using System.Numerics;
-using System.Reflection.Metadata;
-using System.Security.Cryptography;
 using System.Text;
-using System.Xml.Linq;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace HalHeinrich.Numerics.Collatz;
 
