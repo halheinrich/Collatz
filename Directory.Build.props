@@ -21,10 +21,19 @@
   </PropertyGroup>
 
   <!--
-    Generate XML documentation by default. Test projects opt out by
-    setting <GenerateDocumentationFile>false</GenerateDocumentationFile>
-    in their csproj. (We can't gate this on $(IsPackable) here because
-    the SDK locks in its decision before Directory.Build.targets runs.)
+    Generate XML documentation for every project, Collatz.Tests and
+    Collatz.Experiments included. (We can't gate this on $(IsPackable) here
+    because the SDK locks in its decision before Directory.Build.targets runs.)
+
+    Those two used to opt out, and this comment used to say so. Opting out made
+    IDE0005 structurally unable to fire in them, because documentation
+    generation is that rule's documented prerequisite (roslyn#41640), which is
+    the hole halheinrich/Math#43 is about: setting a severity in .editorconfig
+    would have left two of this member's three projects unable to report the
+    rule at all. An unused using rots identically in a test and in a console
+    experiment, so the prerequisite is now met in all three projects rather than
+    the rule scoped away from two of them, and each of the two suppresses CS1591
+    instead.
   -->
   <PropertyGroup>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>

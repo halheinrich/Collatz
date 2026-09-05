@@ -1,15 +1,32 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <!--
-    TargetFramework, LangVersion, Nullable, ImplicitUsings and analyzer settings
-    come from Directory.Build.props. This is a runnable project rather than a
-    library, so it opts out of XML doc generation and packing.
+    TargetFramework, LangVersion, Nullable, ImplicitUsings, analyzer settings
+    and XML doc generation all come from Directory.Build.props. This is a
+    runnable project rather than a library, so it opts out of packing.
   -->
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <RootNamespace>HalHeinrich.Numerics.Collatz.Experiments</RootNamespace>
     <IsPackable>false</IsPackable>
-    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+
+    <!--
+      GenerateDocumentationFile is inherited as true. This project used to set
+      it false, which made IDE0005 structurally unable to fire here, because
+      documentation generation is that rule's documented prerequisite
+      (roslyn#41640) - halheinrich/Math#43. Measured here before the change:
+      with the severity set and the opt-out still in place, this project failed
+      to build with `error EnableGenerateDocumentationFile` naming both.
+
+      This is an Exe rather than a test project, and the reasoning is
+      unchanged by that. An unused using rots identically in a console
+      experiment, so the prerequisite is met rather than the rule scoped away
+      from this project, and the undocumented-member warning the generated file
+      provokes is suppressed instead. Nothing here is public API for anyone to
+      read docs of; CS1591 is the only part of doc generation this project
+      wants no part of.
+    -->
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
